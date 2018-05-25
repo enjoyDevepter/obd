@@ -1,0 +1,46 @@
+# Ignore file
+*.iml
+*.apk
+/assets/config.json
+/assets/test2.html
+
+# Local configuration file (sdk path, etc)
+/local.properties
+/.idea
+
+# Mac system files
+.DS_Store
+
+# Ignore gradle files
+/.gradle
+/build
+
+# generated files
+/bin
+/gen
+
+# Eclipse project
+/.project
+/*.settings
+/*.classpath
+/project.properties
+
+# Ignore app file
+/app/build
+/app/assets/config.json
+/checkout*.bat
+/app/autoBuild
+co_branch.sh
+/debug.bat
+
+# 去除对 build 出错时生成文件的跟踪
+ajcore*.txt
+myself_config.gradle
+apk/
+app/apk/
+
+captures/
+buildSrc/
+*.puml
+
+reports

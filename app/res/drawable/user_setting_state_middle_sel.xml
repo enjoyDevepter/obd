@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <!-- 内容填充色 -->
+    <item>
+        <shape>
+            <solid android:color="@color/user_setting_state_color_sel" />
+        </shape>
+    </item>
+
+</layer-list>

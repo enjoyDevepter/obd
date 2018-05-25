@@ -1,0 +1,63 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion '25.0.0'
+    defaultConfig {
+        applicationId "com.wedrive.welink.adas"
+        minSdkVersion 14
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.5"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("../key/mapbar2009.keystore")
+            storePassword "mapbar2009"
+            keyAlias "mapbar2009.keystore"
+            keyPassword "mapbar2009"
+        }
+    }
+
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    sourceSets { // 从ANT迁移的工程，可以使用 sourceSets 来配置工程结构.
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            res.srcDirs = ['res']
+
+            java.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs'] // 配置此处才会打包jni 的.so 文件
+//            jni.srcDirs=['jni']
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(path: ':core')
+    debugCompile project(path: ':obd_sdk', configuration: 'allDebug')
+//    releaseCompile project(path: ':library', configuration: 'allRelease')
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.google.code.gson:gson:2.8.1'
+}

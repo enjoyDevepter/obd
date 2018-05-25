@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_layout_bg"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_tittle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/padding_100"
+        android:layout_marginLeft="@dimen/setting_item_padding"
+        android:layout_marginRight="@dimen/setting_item_padding"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/about_info_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/about_info_version"
+                android:textColor="@color/color_white"
+                android:textSize="@dimen/textSize30" />
+
+            <ImageView
+                android:id="@+id/about_update_dot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/about_red_dot" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/about_btn_update"
+            android:layout_width="@dimen/size_180"
+            android:layout_height="@dimen/padding_50"
+            android:layout_marginLeft="@dimen/padding_50"
+            android:background="@drawable/round_angle_button"
+            android:text="@string/about_update"
+            android:textColor="@color/black_layout_bg"
+            android:textSize="@dimen/textSize30" />
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/setting_item_padding"
+        android:layout_marginRight="@dimen/setting_item_padding"
+        android:background="@color/back_btn_round_color" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/padding_100"
+        android:layout_marginLeft="@dimen/setting_item_padding"
+        android:layout_marginRight="@dimen/setting_item_padding">
+
+        <LinearLayout
+            android:id="@+id/about_help_item"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/padding_100"
+            android:layout_weight="1.0"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="@string/about_help"
+                android:textColor="@color/color_white"
+                android:textSize="@dimen/textSize30" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/padding_50"
+                android:src="@drawable/about_next_item" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/back_btn_round_color" />
+
+        <LinearLayout
+            android:id="@+id/about_discliamer_item"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/padding_100"
+            android:layout_weight="1.0"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/padding_50"
+                android:layout_weight="1.0"
+                android:text="@string/about_disclaimer"
+                android:textColor="@color/color_white"
+                android:textSize="@dimen/textSize30" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/about_next_item" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/setting_item_padding"
+        android:layout_marginRight="@dimen/setting_item_padding"
+        android:background="@color/back_btn_round_color" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/pading_30"
+        android:layout_weight="1.0"
+        android:gravity="center_horizontal"
+        android:text="@string/about_bottom_info"
+        android:textColor="@color/seekbar_textcolor_gray"
+        android:textSize="@dimen/textSize24" />
+
+
+</LinearLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_tittle"></include>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/black_layout_bg"
+        android:paddingBottom="@dimen/padding_38"
+        android:paddingLeft="@dimen/padding_50"
+        android:paddingRight="@dimen/padding_50"
+        android:paddingTop="@dimen/padding_38"
+        android:scrollbars="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/disclamier_desc"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/textSize26" />
+
+    </ScrollView>
+
+
+    <FrameLayout
+        android:id="@+id/disc_buttom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height"
+        android:layout_gravity="bottom"
+        android:background="@color/tittle_bg"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/disc_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/disclaimer_checkbox_margin_left"
+            android:background="@null"
+            android:button="@null"
+            android:checked="true"
+            android:drawableLeft="@drawable/checkbox_selector"
+            android:drawablePadding="@dimen/padding_20"
+            android:text="@string/disclaimer_no_notify"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/textSize30" />
+
+        <Button
+            android:id="@+id/disc_agree_btn"
+            android:layout_width="@dimen/disclaimer_button_width"
+            android:layout_height="@dimen/disclaimer_button_height"
+            android:layout_gravity="center"
+            android:background="@drawable/round_angle_button"
+            android:text="@string/disc_argee"
+            android:textColor="@color/tittle_bg"
+            android:textSize="@dimen/textSize30" />
+
+    </FrameLayout>
+
+</LinearLayout>

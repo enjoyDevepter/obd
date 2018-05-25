@@ -1,0 +1,19 @@
+package com.mapbar.adas.preferences;
+
+import android.content.Context;
+
+import com.mapbar.adas.GlobalUtil;
+import com.mapbar.adas.preferences.item.BooleanPreferences;
+import com.mapbar.adas.preferences.item.IntPreferences;
+import com.mapbar.adas.preferences.item.StringPreferences;
+
+/**
+ * 全局设置相关参数
+ */
+public class SettingPreferencesConfig {
+    static final SharedPreferencesWrapper SHARED_PREFERENCES_INIT = new SharedPreferencesWrapper(GlobalUtil.getContext(), "adas_setting", Context.MODE_PRIVATE);
+    /**
+     * 免责声明 是否提醒
+     */
+    public static final BooleanPreferences DISCALIMER_VISIBLE = new BooleanPreferences(SHARED_PREFERENCES_INIT, "calibration_dis", false);
+}

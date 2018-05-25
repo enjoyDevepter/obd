@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomRectView">
+        <attr name="image" format="reference"></attr>
+        <attr name="titleMenu" format="string"></attr>
+        <attr name="title_color" format="color"></attr>
+        <attr name="title_size" format="dimension"></attr>
+        <attr name="image_margin" format="dimension"></attr>
+        <attr name="image_height" format="dimension"></attr>
+    </declare-styleable>
+
+    <declare-styleable name="RoundButton">
+        <attr name="src" format="reference"></attr>
+        <attr name="selector_round_color" format="color"></attr>
+    </declare-styleable>
+
+    <declare-styleable name="SettingChoiceItemView">
+        <attr name="title" format="string"></attr>
+        <attr name="titleSize" format="dimension"></attr>
+        <attr name="titleColor" format="reference|color"></attr>
+        <attr name="choiceItems" format="reference"></attr>
+        <attr name="sideItemWidth" format="dimension"></attr>
+        <attr name="middleItemWidth" format="dimension"></attr>
+        <attr name="itemHeight" format="dimension"></attr>
+    </declare-styleable>
+    
+    <declare-styleable name="NumberSeekBar">
+        <attr name="min_point" format="integer"></attr>
+        <attr name="max_point" format="integer"></attr>
+    </declare-styleable>
+</resources>

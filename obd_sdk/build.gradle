@@ -1,0 +1,128 @@
+apply plugin: 'com.android.library'
+
+
+def computeVersionName() {
+    def log = System.getenv("VERSION")
+    if (log == null) {
+        return "1.0"
+    } else {
+        return log.toString()
+    }
+    printf "log " + log
+}
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'mapbar2009.keystore'
+            keyPassword 'mapbar2009'
+            storeFile file('../key/mapbar2009.keystore')
+            storePassword 'mapbar2009'
+        }
+    }
+
+    compileSdkVersion 22
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        minSdkVersion 11
+        targetSdkVersion 22
+        versionCode 1
+        versionName computeVersionName()
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField "boolean", "IS_SHOW_LOG", "true"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            buildConfigField "boolean", "IS_SHOW_LOG", "true"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    sourceSets { // 工程结构配置
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src', 'aidl']
+            aidl.srcDirs = ['aidl']
+            renderscript.srcDirs = ['src']
+
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs'] // 配置此处才会打包jni 的.so 文件
+            resources.srcDirs = ['resources', 'aidl']
+            jni.srcDirs = ['jni']
+        }
+    }
+
+    productFlavors {
+        create('all') {
+
+        }
+    }
+
+    lintOptions {
+        quiet true
+        abortOnError false
+    }
+    publishNonDefault true
+}
+
+configurations {
+    allDebug
+    allRelease
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.jakewharton.timber:timber:4.7.0'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.android.support:support-annotations:22.2.1'
+}
+
+task createJar(type: Jar, dependsOn: ['compileAllReleaseSources']) {
+    archiveName = 'adas_core.jar'
+    manifest {
+        attributes 'Manifest-Version': '1.0'
+        attributes 'Main-Clas': 'com.mapbar.hamster.core'
+    }
+
+    from('build/intermediates/classes/all/release', 'resources')
+    destinationDir = file('libs')
+    exclude('timber/')
+    exclude('com/mapbar/hamster/bean/')
+//    exclude('com/mapbar/hamster/jni/')
+    exclude('com/mapbar/hamster/log/')
+//    exclude('**/IAdas.class')
+    exclude('**/EventType.class')
+    exclude('**/IAdasCallBack.class')
+    exclude('**/BuildConfig.class')
+}
+
+
+task proguardJar(type: proguard.gradle.ProGuardTask, dependsOn: ['createJar']) {
+    configuration 'proguard-rules.pro'
+    injars 'libs/adas_core.jar'
+    outjars 'libs/adas_V1.0.0.jar'
+}
+
+task javaDoc(type: Javadoc) {
+    def docDir = 'build/javadoc'
+    title = 'ADAS_SDK'
+    source = fileTree(dir: 'src', includes: ['com/mapbar/hamster/bean/*.java', 'com/mapbar/hamster/core/*.java'])
+    destinationDir = file(docDir)
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+    failOnError = false
+    // enables links to Java 7 docs
+//    options.links("http://docs.oracle.com/javase/7/docs/api/ ")
+    // enables links to Android docs.
+//    options.linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
+}

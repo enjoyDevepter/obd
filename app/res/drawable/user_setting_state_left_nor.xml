@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 边框颜色 -->
+    <item>
+        <shape>
+            <solid android:color="@color/user_setting_state_color_sel" />
+            <corners
+                android:bottomLeftRadius="40dp"
+                android:bottomRightRadius="0dp"
+                android:topLeftRadius="40dp"
+                android:topRightRadius="0dp" />
+        </shape>
+    </item>
+
+    <!-- 内容填充色 -->
+    <item
+        android:bottom="@dimen/stroke_width"
+        android:left="@dimen/stroke_width"
+        android:top="@dimen/stroke_width">
+        <shape>
+            <solid android:color="@color/user_setting_state_color_nor" />
+
+            <corners
+                android:bottomLeftRadius="40dp"
+                android:bottomRightRadius="0dp"
+                android:topLeftRadius="40dp"
+                android:topRightRadius="0dp" />
+        </shape>
+    </item>
+
+</layer-list>
