@@ -10,7 +10,7 @@ import timber.log.Timber;
 
 public class Log {
 
-    public final static String TAG = "ADAS_SERVICE";
+    public final static String TAG = "OBD_CORE";
 
     static {
         if (BuildConfig.IS_SHOW_LOG) {

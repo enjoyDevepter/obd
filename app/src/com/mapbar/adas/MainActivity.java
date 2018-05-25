@@ -1,6 +1,11 @@
 package com.mapbar.adas;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -8,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.mapbar.hamster.OBDAidlInterface;
+import com.mapbar.hamster.core.OBDService;
 import com.wedrive.welink.adas.R;
 
 public class MainActivity extends FragmentActivity {
@@ -17,6 +24,8 @@ public class MainActivity extends FragmentActivity {
     private ViewGroup rootViewGroup;
 
     private View splashView;
+
+    private OBDAidlInterface obdAidlInterface;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -60,6 +69,23 @@ public class MainActivity extends FragmentActivity {
         splashView.setBackgroundResource(R.drawable.splash);
         rootViewGroup.addView(splashView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        bindService(new Intent(this, OBDService.class), new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                obdAidlInterface = OBDAidlInterface.Stub.asInterface(service);
+                try {
+                    obdAidlInterface.connect();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        }, BIND_AUTO_CREATE);
     }
 
     @Override
