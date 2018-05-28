@@ -8,36 +8,27 @@
     <include layout="@layout/layout_tittle" />
 
     <TextView
+        android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="请确认已完成以下操作:\n 1、已将盒子插入汽车的OBD插口 \n 2、已打开手机蓝牙(或车载导航、后视镜蓝牙)"
+        android:text="保存当前胎压后，当某个轮胎胎压发生变化时， 盒子会发出报警声音。\n\n 建议检查四个轮胎胎压均为正常的情况下 再进行保存操作！"
         android:textColor="#ff3D424C"
         android:textSize="16sp" />
 
 
-    <ImageView
-        android:id="@+id/connect"
-        android:layout_width="170dp"
-        android:layout_height="170dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="68dp"
-        android:background="@drawable/connect_bg"
-        android:scaleType="center"
-        android:src="@drawable/ble" />
-
-
     <TextView
+        android:id="@+id/save"
         android:layout_width="300dp"
         android:layout_height="44dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="106dp"
-        android:background="@drawable/disclaimer_agree_btn_bg"
+        android:layout_marginTop="126dp"
+        android:background="@drawable/disclaimer_disagree_btn_bg"
         android:gravity="center"
-        android:text="重 试"
-        android:textColor="#ffffffff"
-        android:textSize="18sp" />
+        android:text="保存胎压"
+        android:textColor="#ff3D424C"
+        android:textSize="16sp" />
 
 </LinearLayout>

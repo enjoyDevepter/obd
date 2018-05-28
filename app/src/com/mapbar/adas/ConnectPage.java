@@ -1,6 +1,8 @@
 package com.mapbar.adas;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
@@ -14,18 +16,24 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener {
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.connect)
+    private ImageView connect;
 
     @Override
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText("连接盒子");
+        title.setText("方舟卫士");
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        connect.setBackgroundResource(R.drawable.connect_bg);
+        AnimationDrawable animationDrawable = (AnimationDrawable) connect.getBackground();
+        animationDrawable.start();
     }
+
 
     @Override
     public void onStop() {

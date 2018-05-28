@@ -6,7 +6,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,7 +19,7 @@ import com.mapbar.hamster.core.OBDService;
 import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
 
     private static MainActivity INSTANCE = null;
     private final int head = 0x7d;

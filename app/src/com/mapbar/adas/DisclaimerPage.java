@@ -20,8 +20,6 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
     private TextView agreeTV;
     @ViewInject(R.id.disagree)
     private TextView disagreeTV;
-    @ViewInject(R.id.agree_temp)
-    private TextView agreeTempTV;
 
     @Override
     public void onResume() {
@@ -30,7 +28,6 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
         title.setText("免责声明");
         agreeTV.setOnClickListener(this);
         disagreeTV.setOnClickListener(this);
-        agreeTempTV.setOnClickListener(this);
     }
 
     @Override
@@ -52,9 +49,6 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
                 break;
             case R.id.disagree:
                 PageManager.back();
-                break;
-            case R.id.agree_temp:
-                PageManager.go(new MainPage());
                 break;
         }
     }

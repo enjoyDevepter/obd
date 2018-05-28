@@ -1,11 +1,11 @@
 package com.mapbar.adas;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class GlobalUtil {
 
     private static Context context;
 
-    private static Activity mainActivity;
+    private static AppCompatActivity mainActivity;
 
     private static int sUID;
 
@@ -48,11 +48,12 @@ public class GlobalUtil {
     }
 
 
-    public static Activity getMainActivity() {
+    public static AppCompatActivity getMainActivity() {
         return mainActivity;
     }
 
-    public static void setMainActivity(Activity mainActivity) {
+
+    public static void setMainActivity(AppCompatActivity mainActivity) {
         GlobalUtil.mainActivity = mainActivity;
     }
 

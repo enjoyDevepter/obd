@@ -11,7 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:scrollbars="vertical">
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:scrollbars="none">
 
         <TextView
             android:layout_width="match_parent"
@@ -21,25 +23,27 @@
 
     <TextView
         android:id="@+id/agree"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@drawable/disclaimer_item_bg"
+        android:layout_width="300dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="18dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/disclaimer_agree_btn_bg"
         android:gravity="center"
-        android:text="始终接受以上条款(下次不再提醒)" />
+        android:text="始终接受(下次不再提醒)"
+        android:textColor="@android:color/white"
+        android:textSize="17sp" />
 
     <TextView
         android:id="@+id/disagree"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@drawable/disclaimer_item_bg"
+        android:layout_width="300dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="50dp"
+        android:background="@drawable/disclaimer_agree_btn_bg"
         android:gravity="center"
-        android:text="拒绝以上条款" />
+        android:text="拒绝以上条款"
+        android:textColor="#ff686868"
+        android:textSize="17sp" />
 
-    <TextView
-        android:id="@+id/agree_temp"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@drawable/disclaimer_item_bg"
-        android:gravity="center"
-        android:text="本次接受以上条款(每次打开提醒)" />
 </LinearLayout>

@@ -8,8 +8,8 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.obd.R;
 
-@PageSetting(contentViewId = R.layout.phone_layout)
-public class PhonePage extends AppBasePage implements View.OnClickListener {
+@PageSetting(contentViewId = R.layout.auth_layout)
+public class AuthPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
@@ -21,7 +21,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("输入手机号");
+        title.setText("输入授权码");
         next.setOnClickListener(this);
     }
 
@@ -42,7 +42,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                PageManager.go(new AuthPage());
+                PageManager.go(new IdentifyPage());
                 break;
         }
     }
