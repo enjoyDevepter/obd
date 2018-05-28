@@ -3,24 +3,29 @@
     android:id="@+id/tittle_layout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/title_height"
-    android:background="@color/tittle_bg"
+    android:background="@drawable/title_bg"
     android:orientation="horizontal">
 
-    <ImageButton
-        android:id="@+id/title_back"
-        android:layout_width="@dimen/title_back_height"
-        android:layout_height="@dimen/title_back_height"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="@dimen/padding_20"
-        android:background="@drawable/btn_back_circle"
-        android:src="@drawable/back_img" />
+    <LinearLayout
+        android:id="@+id/back"
+        android:layout_width="47dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left|center_vertical"
+        android:background="@android:color/transparent"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="11dp"
+            android:src="@drawable/back" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="@color/color_white"
-        android:textSize="@dimen/textSize36" />
+        android:textColor="@color/title_color"
+        android:textSize="@dimen/title_size" />
 
 </FrameLayout>

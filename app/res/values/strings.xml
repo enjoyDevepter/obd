@@ -1,35 +1,5 @@
 <resources>
-    <string name="app_name">智驾卫士</string>
-    <string name="main_auxiliary_driving">辅助驾驶</string>
-    <string name="main_userinfo">个人中心</string>
-    <string name="disclaimer_tittle">免责声明</string>
-    <string name="disclaimer_no_notify">不再提醒</string>
-    <string name="disc_argee">同意并使用</string>
-    <string name="help">查看帮助</string>
-    <string name="next">下一步</string>
-    <string name="auxiliary_driving_settings">辅助驾驶设置</string>
-    <string name="adas_calibaration">adas校准</string>
-    <string name="app_about">关于我们</string>
-    <string name="setting_car_type">车辆类型</string>
-    <string name="setting_car_ldw">车道预警</string>
-    <string name="setting_sound">声音设置</string>
-    <string name="setting_start_auto">开机启动</string>
-    <string name="setting_sim">室内模拟</string>
-    <string name="setting_warning_switch">预警开关</string>
-    <string name="setting_front_warning_type">前车预警类型</string>
-    <string name="setting_lane_rate_speed">车道偏离触发时速</string>
-    <string name="setting_front_car_start">前车启动设置</string>
-    <string name="setting_car_ldwSensitivity">车道线灵敏度</string>
-    <string name="setting_car_fcwSensitivity">前车碰撞灵敏度</string>
-    <string name="setting_car_fcw">前车碰撞</string>
-    <string name="setting_car_back">溜车提醒开关</string>
-    <string name="setting">设置</string>
-    <string name="setting_land_and_v_style">识别样式</string>
-    <string name="setting_collecter">采集开关</string>
-    <string name="setting_collecter_cpu">CPU采集</string>
-    <string name="setting_rate_speed_text_new">当相对车速60km/h时，前车碰撞预警时间2.0s(相对速度越快，预碰撞提醒时间越长)</string>
-    <string name="setting_rate_speed_text_old">当相对车速60km/h时，前车碰撞预警时间1.5s(相对速度越快，预碰撞提醒时间越长)</string>
-
+    <string name="app_name">方舟卫士</string>
 
     <string name="disclamier_desc">本免责声明适用于北京图为先科技有限公司发布的图吧智驾卫士APP软件（简称“图吧智驾卫士”）。在您阅读本声明后若不同意此声明的任何条款或存在质疑，请立即停止使用该APP.若您已经开始或正在使用图吧智驾卫士，则表示您已阅读并同意本声明的所有条款之约定。\n\n 1、图吧智驾卫士永久免费，无病毒，图为先科技有限公司有权根据技术更新情况自主决定对APP进行更新、升级或者暂停。\n\n 2、本软件适用于车道标记清晰的道路，软件本身不能代替驾驶员任何自主操作，驾驶员在驾驶过程中应保持警觉，根据自己观察进行驾驶。图吧智驾卫士仅可探测完全可见的车辆尾部，对于迎面会车或横行的车辆无识别能力。本软件在探测车辆、行人或车道，针对潜在危险发出警告时不能保证100%准确率，可能会存在误报。此外，道路环境、天气、手机性能及其他情况对本软件的识别和反应能力有较大影响。摄像头损坏、被遮挡和任何导致无法清晰获取图像等情况将导致本软件无法正常使用。
     \n\n 3、图吧智驾卫士用户转载的内容并不代表北京图为先科技有限公司之意见和观点，也不意味着图吧智驾卫士赞同其观点或证实其内容的真实性。
@@ -45,61 +15,4 @@
     \n\n 12、本声明自2017年7月1日起生效。
     </string>
 
-    <string name="about_info_version">当前版本：%1$s</string>
-    <string name="about_update">立即更新</string>
-    <string name="about_help">使用帮助</string>
-    <string name="about_upate_tittle">新版本更新</string>
-    <string name="about_us">关于我们</string>
-    <string name="about_btn_update">升级</string>
-    <string name="about_disclaimer">免责声明</string>
-    <string name="about_updating">升级中</string>
-    <string name="about_cancle">取消</string>
-    <string name="about_bottom_info">北京图为先科技有限公司\t\t版权所有\t|\t\t NaviInfo&amp;Mapbar\t出品\nCopyright©2017\t\tMapbar.All\tRights\tReserved.</string>
-
-    <string name="download_fail">下载失败</string>
-    <string name="net_disconnect">网络不可用</string>
-
-    <string name="settting_test_modle">测试模式</string>
-    <string name="setting_test_front_calibartionn">前车识别帧率</string>
-    <string name="setting_test_front_tracking">前车跟踪帧率</string>
-    <string name="setting_test_lane">车道识别帧率</string>
-    <string name="setting_test_fram_info">帧率信息</string>
-    <string name="calibration_earth_text">对准天地交接线</string>
-    <string name="calibration_road_center_text">对准前车中心位置</string>
-    <string name="btn_complete">确定</string>
-    <string name="btn_cancel">取消</string>
-    <string name="tittle_help">帮助</string>
-    <string name="umeng_appkey">59e711bc677baa6ee70006e6</string>
-    <string name="mapbar_stat_appkey">461d07af27db12ed1201d70167b1e39b</string>
-    <string name="limit_show_inio">低速%1$dkm/h以内不显示前车预警</string>
-
-
-    <!-- adas -->
-    <string name="settings_dvr">DVR</string>
-    <string name="settings_adas">ADAS</string>
-    <!--  -->
-    <string name="calibration">ADAS calibrating...</string>
-    <string name="horizon">Please align horizon</string>
-    <string name="vertical">Please align vertical</string>
-    <string name="adas_adjust">ADAS adjust</string>
-    <string name="navi_report">Navigator report</string>
-    <string name="dvr_report">Dvr report</string>
-    <string name="background_report">Background icon reminder</string>
-    <string name="adas_warn">Warn</string>
-    <string name="low">Low</string>
-    <string name="middle">Middle</string>
-    <string name="high">High</string>
-    <string name="warn_ldw">Lane departure</string>
-    <string name="warn_fcw">Vehicle collision</string>
-    <string name="warn_stopgo">Stop go</string>
-    <string name="warn_ldw_speed">Lane departure warn speed: %d km/h</string>
-    <string name="warn_fcw_speed">Vehicle collision warn speed: %d km/h</string>
-    <string name="instruction_book">Instruction book</string>
-    <!--  -->
-    <string name="please_turn_on_adas">Please turn on ADAS</string>
-    <string name="adjust_ok">Ok</string>
-    <string name="adjust_cancel">Cancel</string>
-    <!--  -->
-    <string name="adas_on">ADAS ON</string>
-    <string name="adas_off">ADAS OFF</string>
 </resources>

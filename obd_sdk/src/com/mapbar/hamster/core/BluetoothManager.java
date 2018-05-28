@@ -78,12 +78,12 @@ class BluetoothManager {
                     Log.d("OBDEvent  " + OBDEvent.scanStatred);
                 } else if (BluetoothDevice.ACTION_FOUND.equals(action)) { //蓝牙扫描时，扫描到任一远程蓝牙设备时，会发送此广播
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    Log.d("OBDEvent  " + OBDEvent.found);
-                    if (device.getName() != null && (device.getName().startsWith("Mapbar") || device.getName().startsWith("mapbar"))) {
-                        mBluetoothAdapter.cancelDiscovery();
-                        setConnectionState(CONNECTION_STATE_WAIT_START);
-                        connectDevice(device.getAddress());
-                    }
+                    Log.d("OBDEvent  " + OBDEvent.found + "  " + device.getAddress() + "  " + device.getName());
+//                    if (device.getName() != null && (device.getAddress().startsWith("5C:96:9D:75:06:0A") || device.getName().startsWith("mapbar"))) {
+                    mBluetoothAdapter.cancelDiscovery();
+                    setConnectionState(CONNECTION_STATE_WAIT_START);
+                    connectDevice(device.getAddress());
+//                    }
                     if (device != null && !mFoundedDeviceMacs.contains(device.getAddress())) {
                         mFoundedDeviceMacs.add(device.getAddress());
                     }
@@ -222,27 +222,31 @@ class BluetoothManager {
      * @param limit
      * @return String
      */
-    public synchronized String sendAndReceiveData(String msg, byte limit) {
+    public synchronized String sendAndReceiveData(byte[] msg, byte limit) {
         String r = null;
-        Log.d("XXXXXXXXX " + msg);
         try {
             if (getConnectionState() == CONNECTION_STATE_CONNECTED) {
                 StringBuilder result = new StringBuilder();
 
-//                mTimeoutThread.startCommand();
+                mTimeoutThread.startCommand();
 
                 byte c = 0;
 
+                String aticmd = null;
+                if (msg != null) {
+                    aticmd = new String(msg);
+                }
                 //清空串口缓冲区数据，仅在android 4.3以后可用
-                if (!TextUtils.isEmpty(msg)) {
+                if (!TextUtils.isEmpty(aticmd))
                     clearBuffer(mInputStream);
-                    mOutputStream.write(msg.getBytes());
+                if (msg != null) {
+                    mOutputStream.write(msg);
                     mOutputStream.flush();
                 }
 
                 if (limit != (byte) 0) {
                     int rd = mInputStream.read();
-                    while (rd < 1 && !msg.contains("ATBOOT")) {
+                    while (rd < 1) {
                         //TODO 当没有数据的时候,执行到读到数据为止
                         rd = mInputStream.read();
                     }
@@ -256,9 +260,8 @@ class BluetoothManager {
                 } else {
                     r = "";
                 }
-                Log.d("XXXXXXXXX result " + r);
 
-//                mTimeoutThread.endCommand();
+                mTimeoutThread.endCommand();
 
                 return r;
             } else {
@@ -270,16 +273,22 @@ class BluetoothManager {
             synchronized (MSYNCSOCKET) {
                 disconnectDevice();
                 mBluetoothDevice = null;
-//                mTimeoutThread.endCommand();
+                mTimeoutThread.endCommand();
             }
         }
 
         if (getConnectionState() != CONNECTION_STATE_DISCONNECTED) {
             setConnectionState(CONNECTION_STATE_DISCONNECTED);
             Log.d("OBDEvent  " + OBDEvent.disconnected);
-            // Otherwise means the connection has been invalid.
         }
         return r;
+    }
+
+    boolean sendData(String msg) {
+        String result = null;
+        byte[] cmd = msg.getBytes();
+        result = sendAndReceiveData(cmd, (byte) 0);
+        return (result != null);
     }
 
     protected int getConnectionState() {

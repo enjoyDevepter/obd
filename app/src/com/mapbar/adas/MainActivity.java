@@ -14,17 +14,18 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.mapbar.hamster.OBDAidlInterface;
+import com.mapbar.hamster.core.Hex;
 import com.mapbar.hamster.core.OBDService;
-import com.wedrive.welink.adas.R;
+import com.mapbar.hamster.log.Log;
+import com.mapbar.obd.R;
 
 public class MainActivity extends FragmentActivity {
 
     private static MainActivity INSTANCE = null;
+    private final int head = 0x7d;
     public boolean first = true;
     private ViewGroup rootViewGroup;
-
     private View splashView;
-
     private OBDAidlInterface obdAidlInterface;
 
     public MainActivity() {
@@ -86,6 +87,33 @@ public class MainActivity extends FragmentActivity {
 
             }
         }, BIND_AUTO_CREATE);
+
+        String sn = "a3116080275741";
+        byte[] bytes = sn.getBytes();
+        for (int i = 0; i < bytes.length; i++) {
+            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
+        }
+        Log.d(Hex.str2HexStr(sn));
+
+        Log.d("======================");
+
+        long time = System.currentTimeMillis();
+
+        Log.d("" + time);
+
+        bytes = Hex.longToByte(time);
+
+        for (int i = 0; i < bytes.length; i++) {
+            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
+        }
+
+        Log.d(String.valueOf(Hex.byteToLong(bytes)));
+
+        Log.d("======================");
+
+        bytes = new byte[]{head};
+
+        Log.d(String.valueOf(bytes[0]));
     }
 
     @Override

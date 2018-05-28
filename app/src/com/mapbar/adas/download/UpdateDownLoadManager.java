@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.mapbar.adas.GlobalUtil;
-import com.wedrive.welink.adas.R;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -20,15 +19,15 @@ import java.text.DecimalFormat;
 public class UpdateDownLoadManager {
 
 
+    private static UpdateDownLoadManager updateDownLoadManager;
     private DownLoadAppTask downLoadAppTask;
     private CheckUpdateTask checkUpdateTask;
     private DecimalFormat df = new java.text.DecimalFormat("#.00");
 
+    ;
+
     private UpdateDownLoadManager() {
     }
-
-    ;
-    private static UpdateDownLoadManager updateDownLoadManager;
 
     public static synchronized UpdateDownLoadManager getInstance() {
 
@@ -44,7 +43,7 @@ public class UpdateDownLoadManager {
     public void checkUpdate(OnCheckUpdateListener onCheckUpdateListener) {
         boolean bl = NetUtils.getInstance().isConnected(GlobalUtil.getContext());
         if (!bl) {
-            Toast.makeText(GlobalUtil.getContext(), GlobalUtil.getResources().getString(R.string.net_disconnect), Toast.LENGTH_SHORT).show();
+            Toast.makeText(GlobalUtil.getContext(), "网络连接断开", Toast.LENGTH_SHORT).show();
             return;
         }
         if (checkUpdateTask == null) {
@@ -93,29 +92,6 @@ public class UpdateDownLoadManager {
         return (info.getVersion_no() > versionCode && versionCode != -1) ? true : false;
     }
 
-    /**
-     * 检测更新的回调
-     */
-    public interface OnCheckUpdateListener {
-        void prepareUpdate(AppInfoBean appInfoBean);
-
-        void onError();
-    }
-
-    /**
-     * 更新回调接口
-     */
-    public interface OnUpateListener {
-        void downProgress(int progress);
-
-        void onError();
-
-        void onSuccess(String apkFileName);
-
-        void onCancled();
-    }
-
-
     public void install() {
         if (UpdateAPPConstants.appInfoBean == null)
             return;
@@ -161,5 +137,27 @@ public class UpdateDownLoadManager {
             return 0;
         }
 
+    }
+
+    /**
+     * 检测更新的回调
+     */
+    public interface OnCheckUpdateListener {
+        void prepareUpdate(AppInfoBean appInfoBean);
+
+        void onError();
+    }
+
+    /**
+     * 更新回调接口
+     */
+    public interface OnUpateListener {
+        void downProgress(int progress);
+
+        void onError();
+
+        void onSuccess(String apkFileName);
+
+        void onCancled();
     }
 }

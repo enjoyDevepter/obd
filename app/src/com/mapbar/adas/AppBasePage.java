@@ -1,7 +1,7 @@
 package com.mapbar.adas;
 
 
-import com.wedrive.welink.adas.R;
+import com.mapbar.obd.R;
 
 public abstract class AppBasePage extends FragmentPage {
 

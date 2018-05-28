@@ -7,19 +7,19 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.obd.R;
 
-@PageSetting(contentViewId = R.layout.main_layout)
-public class MainPage extends AppBasePage {
+@PageSetting(contentViewId = R.layout.connect_layout)
+public class ConnectPage extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.back)
-    private View back;
     @ViewInject(R.id.title_text)
     private TextView title;
+    @ViewInject(R.id.back)
+    private View back;
 
     @Override
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText(R.string.app_name);
+        title.setText("连接盒子");
     }
 
     @Override
@@ -30,5 +30,11 @@ public class MainPage extends AppBasePage {
     @Override
     public void onStop() {
         super.onStop();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+        }
     }
 }
