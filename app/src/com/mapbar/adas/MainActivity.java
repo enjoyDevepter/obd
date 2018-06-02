@@ -1,11 +1,6 @@
 package com.mapbar.adas;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -13,10 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.mapbar.hamster.OBDAidlInterface;
-import com.mapbar.hamster.core.Hex;
-import com.mapbar.hamster.core.OBDService;
-import com.mapbar.hamster.log.Log;
+import com.mapbar.hamster.BlueManager;
 import com.mapbar.obd.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;
-    private OBDAidlInterface obdAidlInterface;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -71,49 +62,33 @@ public class MainActivity extends AppCompatActivity {
         rootViewGroup.addView(splashView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        bindService(new Intent(this, OBDService.class), new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                obdAidlInterface = OBDAidlInterface.Stub.asInterface(service);
-                try {
-                    obdAidlInterface.connect();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        }, BIND_AUTO_CREATE);
-
-        String sn = "a3116080275741";
-        byte[] bytes = sn.getBytes();
-        for (int i = 0; i < bytes.length; i++) {
-            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
-        }
-        Log.d(Hex.str2HexStr(sn));
-
-        Log.d("======================");
-
-        long time = System.currentTimeMillis();
-
-        Log.d("" + time);
-
-        bytes = Hex.longToByte(time);
-
-        for (int i = 0; i < bytes.length; i++) {
-            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
-        }
-
-        Log.d(String.valueOf(Hex.byteToLong(bytes)));
-
-        Log.d("======================");
-
-        bytes = new byte[]{head};
-
-        Log.d(String.valueOf(bytes[0]));
+//        String sn = "a3116080275741";
+//        byte[] bytes = sn.getBytes();
+//        for (int i = 0; i < bytes.length; i++) {
+//            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
+//        }
+//        Log.d(HexUtils.str2HexStr(sn));
+//
+//        Log.d("======================");
+//
+//        long time = System.currentTimeMillis();
+//
+//        Log.d("" + time);
+//
+//        bytes = HexUtils.longToByte(time);
+//
+//        for (int i = 0; i < bytes.length; i++) {
+//            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
+//        }
+//
+//        Log.d(String.valueOf(HexUtils.byteToLong(bytes)));
+//
+//        Log.d("======================");
+//
+//        bytes = new byte[]{head};
+//
+//        Log.d(String.valueOf(bytes[0]));
+        BlueManager.getInstance().init(getApplication());
     }
 
     @Override
@@ -128,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        BlueManager.getInstance().disconnect();
         MainActivity.INSTANCE = null;
     }
 

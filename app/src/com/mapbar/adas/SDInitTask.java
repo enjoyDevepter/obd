@@ -15,7 +15,6 @@ public class SDInitTask extends BaseTask {
             public void run() {
                 MapbarStorageUtil.listenForStorageRefresh();
                 SdcardUtil.initInstance(GlobalUtil.getContext());
-//                MapbarMobStat.prestrain(GlobalUtil.getContext()); // 初始化統計包
             }
         }).start();
         complate();

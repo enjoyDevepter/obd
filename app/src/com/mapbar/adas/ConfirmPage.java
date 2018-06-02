@@ -8,6 +8,8 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.obd.R;
 
 import java.util.Timer;
@@ -61,6 +63,7 @@ public class ConfirmPage extends AppBasePage implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.save:
+                BlueManager.getInstance().write(ProtocolUtils.study());
                 dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                         .setViewListener(new CustomDialog.ViewListener() {
                             @Override

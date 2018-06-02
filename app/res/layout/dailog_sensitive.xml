@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dailog_bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
+        android:text="设置灵敏度"
+        android:textColor="#ff42484B"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ff5F6876" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="22dp"
+        android:text="请根据实际使用情况设置，灵敏度太高可能会引起误报，太低会引起漏报"
+        android:textColor="#ff3D424C"
+        android:textSize="12sp" />
+
+    <com.mapbar.adas.view.SensitiveView
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="15dp" />
+
+    <TextView
+        android:id="@+id/save"
+        android:layout_width="200dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/disclaimer_agree_btn_bg"
+        android:gravity="center"
+        android:text="确定"
+        android:textColor="#FFFFFFFF"
+        android:textSize="18sp" />
+</LinearLayout>

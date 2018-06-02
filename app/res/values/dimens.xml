@@ -5,4 +5,9 @@
 
     <dimen name="dailog_width">292dp</dimen>
     <dimen name="dailog_height">265dp</dimen>
+    <dimen name="sensitive_text_size">16sp</dimen>
+    <dimen name="sensitive_radius">8dp</dimen>
+    <dimen name="sensitive_height">8dp</dimen>
+    <dimen name="sensitive_padding">15dp</dimen>
+    <dimen name="sensitive_divider">20dp</dimen>
 </resources>

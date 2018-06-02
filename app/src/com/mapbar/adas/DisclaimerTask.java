@@ -22,8 +22,8 @@ public class DisclaimerTask extends BaseTask {
         if (!isFistSatrt) {
             PageManager.go(new DisclaimerPage());
         } else {
-            PageManager.go(new PhonePage());
-//            PageManager.go(new MainPage());
+//            PageManager.go(new PhonePage());
+            PageManager.go(new MainPage());
         }
         complate();
     }

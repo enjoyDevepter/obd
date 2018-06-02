@@ -57,7 +57,7 @@
             android:textColor="#ff0053FD"
             android:textSize="16sp" />
 
-        <view
+        <View
             android:layout_width="25dp"
             android:layout_height="24dp"
             android:layout_marginLeft="3dp"
@@ -65,7 +65,7 @@
 
     </LinearLayout>
 
-    <view
+    <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="20dp"
@@ -99,7 +99,7 @@
             android:textColor="#ff0053FD"
             android:textSize="16sp" />
 
-        <view
+        <View
             android:layout_width="25dp"
             android:layout_height="24dp"
             android:layout_marginLeft="3dp"
