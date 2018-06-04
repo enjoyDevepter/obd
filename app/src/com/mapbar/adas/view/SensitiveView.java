@@ -78,6 +78,13 @@ public class SensitiveView extends View {
         paint.setColor(Color.parseColor("#FFDCDCDC"));
         path.moveTo(sensitive_padding + cricle_radius, sensitive_padding + cricle_radius / 2);
         switch (type) {
+            case LOW:
+                paint.setColor(Color.parseColor("#FFA0A0A0"));
+                canvas.drawCircle(sensitive_padding + cricle_radius, sensitive_padding + cricle_radius, cricle_radius, paint);
+                paint.setColor(Color.parseColor("#FFDCDCDC"));
+                canvas.drawCircle(width / 2, sensitive_padding + cricle_radius, cricle_radius, paint);
+                canvas.drawCircle(width - sensitive_padding - cricle_radius, sensitive_padding + cricle_radius, cricle_radius, paint);
+                break;
             case MEDIUM:
                 path.lineTo(width / 2, sensitive_padding + cricle_radius / 2);
                 path.lineTo(width / 2, sensitive_padding + cricle_radius / 2 + cricle_radius);
@@ -112,12 +119,16 @@ public class SensitiveView extends View {
         canvas.drawText("高", width - sensitive_padding - cricle_radius - singleStrWidth / 2, sensitive_padding + 2 * cricle_radius + sensitive_divider + textPaint.getFontMetrics().descent, paint);
     }
 
+    public Type getType() {
+        return this.type;
+    }
+
     public void setType(Type type) {
         this.type = type;
         invalidate();
     }
 
-    enum Type {
+    public enum Type {
         LOW,
         MEDIUM,
         Hight,

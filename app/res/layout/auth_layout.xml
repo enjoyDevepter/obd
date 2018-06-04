@@ -8,15 +8,73 @@
 
     <include layout="@layout/layout_tittle" />
 
-    <EditText
-        android:id="@+id/content"
+    <LinearLayout
         android:layout_width="300dp"
         android:layout_height="44dp"
         android:layout_marginTop="40dp"
-        android:background="@drawable/input_bg"
-        android:hint="请输入授权码"
-        android:paddingLeft="10dp"
-        android:textSize="17sp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/sn_01"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/input_bg"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:textSize="17sp" />
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="1dp"
+            android:background="@android:color/black"
+            android:gravity="center" />
+
+        <EditText
+            android:id="@+id/sn_02"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/input_bg"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:textSize="17sp" />
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="1dp"
+            android:background="@android:color/black"
+            android:gravity="center" />
+
+        <EditText
+            android:id="@+id/sn_03"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/input_bg"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:textSize="17sp" />
+
+        <View
+            android:layout_width="15dp"
+            android:layout_height="1dp"
+            android:background="@android:color/black"
+            android:gravity="center" />
+
+        <EditText
+            android:id="@+id/sn_04"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/input_bg"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:textSize="17sp" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/next"

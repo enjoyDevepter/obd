@@ -30,6 +30,7 @@
 
 
     <TextView
+        android:id="@+id/retry"
         android:layout_width="300dp"
         android:layout_height="44dp"
         android:layout_gravity="center_horizontal"
@@ -38,6 +39,7 @@
         android:gravity="center"
         android:text="重 试"
         android:textColor="#ffffffff"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:visibility="invisible" />
 
 </LinearLayout>

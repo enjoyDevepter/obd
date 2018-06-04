@@ -1,7 +1,7 @@
 package com.mapbar.hamster;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -23,9 +23,11 @@ import android.widget.Toast;
 
 import com.mapbar.hamster.core.BleWriteCallback;
 import com.mapbar.hamster.core.HexUtils;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,21 +44,30 @@ public class BlueManager {
     public static final String KEY_WRITE_BUNDLE_VALUE = "write_value";
     private static final int STOP_SCAN_AND_CONNECT = 0;
     private static final int MSG_SPLIT_WRITE = 1;
+    private static final int MSG_VERIFY = 2;
+    private static final int MSG_AUTH_RESULT = 3;
+    private static final int MSG_VERSION = 4;
+    private static final int MSG_TIRE_PRESSURE_STATUS = 5;
+
+
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
     private static final String READ_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final String WRITE_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+    private static final int CONNECTED = 1;
+    private static final int DISCONNECTED = 0;
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothAdapter mBluetoothAdapter;
-    private Application mContext;
+    private Activity mContext;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
     private HandlerThread mWorkerThread;
     private Handler mHandler;
-
-    private
-    BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
+    private int connectStatus;
+    private boolean isScaning = false;
+    private ArrayList<BleCallBackListener> callBackListeners = new ArrayList<>();
+    private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         /**
          *
          * @param device    扫描到的设备
@@ -73,7 +84,7 @@ public class BlueManager {
             if (name != null && name.startsWith("BT")) {
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
-                msg.obj = device;
+                msg.obj = device.getAddress();
                 mHandler.sendMessage(msg);
             }
         }
@@ -85,6 +96,7 @@ public class BlueManager {
     private Queue<byte[]> mDataQueue;
     private int mTotalNum;
     private BluetoothManager bluetoothManager;
+    private byte[] result;
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -104,10 +116,28 @@ public class BlueManager {
                 && mContext.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
     }
 
+    public void addBleCallBackListener(BleCallBackListener listener) {
+        callBackListeners.add(listener);
+    }
+
+    void notifyBleCallBackListener(int event, Object data) {
+        for (BleCallBackListener callBackListener : callBackListeners) {
+            callBackListener.onEvent(event, data);
+        }
+    }
+
+    public boolean removeCallBackListener(BleCallBackListener listener) {
+        return callBackListeners.remove(listener);
+    }
+
+    public void setBleWriteCallback(BleWriteCallback bleWriteCallback) {
+        this.bleWriteCallback = bleWriteCallback;
+    }
+
     @SuppressLint("ServiceCast")
     @MainThread
-    public void init(Application application) {
-        mContext = application;
+    public void init(Activity activity) {
+        mContext = activity;
         if (isSupportBle()) {
             bluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
         }
@@ -131,12 +161,14 @@ public class BlueManager {
     }
 
     public synchronized void startScan() {
-        if (null == mBluetoothAdapter) {
+        if (null == mBluetoothAdapter || isScaning) {
             return;
         }
         if (!mBluetoothAdapter.isEnabled()) {
             mBluetoothAdapter.enable();
         }
+
+        isScaning = true;
 
         mBluetoothAdapter.startLeScan(leScanCallback);
 
@@ -150,9 +182,11 @@ public class BlueManager {
     }
 
     synchronized void stopScan() {
-        if (null == mBluetoothAdapter) {
+        if (null == mBluetoothAdapter || !isScaning) {
             return;
         }
+        isScaning = false;
+        notifyBleCallBackListener(OBDEvent.BLUE_SCAN_FINISHED, null);
         mBluetoothAdapter.stopLeScan(leScanCallback);
     }
 
@@ -177,12 +211,14 @@ public class BlueManager {
                             break;
                         case BluetoothProfile.STATE_CONNECTED:
                             Log.d("onConnectionStateChange  STATE_CONNECTED");
+                            connectStatus = CONNECTED;
                             mBluetoothGatt.discoverServices();
                             break;
                         case BluetoothProfile.STATE_DISCONNECTING:
                             Log.d("onConnectionStateChange  STATE_DISCONNECTING");
                             break;
                         case BluetoothProfile.STATE_DISCONNECTED:
+                            connectStatus = DISCONNECTED;
                             Log.d("onConnectionStateChange  STATE_DISCONNECTED");
                             disconnect();
                             break;
@@ -197,6 +233,9 @@ public class BlueManager {
                 super.onServicesDiscovered(gatt, status);
                 Log.d("onServicesDiscovered  " + status);
                 if (status == BluetoothGatt.GATT_SUCCESS) {
+
+                    notifyBleCallBackListener(OBDEvent.BLUE_CONNECTED, null);
+
                     //拿到该服务 1,通过UUID拿到指定的服务  2,可以拿到该设备上所有服务的集合
                     List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
 
@@ -246,7 +285,7 @@ public class BlueManager {
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicWrite(gatt, characteristic, status);
                 Log.d("onCharacteristicWrite  " + " status  " + status);
-                Message message = mHandler.obtainMessage();
+                Message message = new Message();
                 message.what = MSG_SPLIT_WRITE;
                 Bundle bundle = new Bundle();
                 bundle.putInt(KEY_WRITE_BUNDLE_STATUS, status);
@@ -282,6 +321,10 @@ public class BlueManager {
         mBluetoothGatt.close();
     }
 
+    public boolean isConnected() {
+        return connectStatus == 1;
+    }
+
     /**
      * 发送数据
      *
@@ -297,6 +340,7 @@ public class BlueManager {
             splitWrite();
         } else {
             split = false;
+            Log.d("write " + Arrays.toString(data));
             writeCharacteristic.setValue(data);
             mBluetoothGatt.writeCharacteristic(writeCharacteristic);
         }
@@ -350,7 +394,8 @@ public class BlueManager {
                     if (Looper.myLooper() != null && Looper.myLooper() == Looper.getMainLooper()) {
                         write();
                     } else {
-                        Message message = mHandler.obtainMessage(MSG_SPLIT_WRITE);
+                        Message message = mHandler.obtainMessage();
+                        message.what = MSG_SPLIT_WRITE;
                         mHandler.sendMessage(message);
                     }
                 }
@@ -369,15 +414,106 @@ public class BlueManager {
      * @param data
      */
     void analyzeProtocol(byte[] data) {
-        int cr = data[1];
-        for (int i = 1; i < data.length - 2; i++) {
-            cr = cr ^ data[i];
-        }
-        if (cr == data[data.length - 2]) {
-            Log.d("===" + HexUtils.formatHexString(Arrays.copyOfRange(data, 4, data.length - 2)));
+
+        if (null != data && data.length > 0) {
+            if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL) { // 消息开头
+                if (data[data.length - 1] == ProtocolUtils.PROTOCOL_HEAD_TAIL) {
+                    // 完整消息
+                    validateAndNotify(data);
+                } else {
+                    // 消息不完整
+                    result = new byte[data.length];
+                    System.arraycopy(data, 0, result, 0, data.length);
+                }
+            } else {
+                if (null != result) {
+                    byte[] temp = new byte[result.length];
+                    System.arraycopy(result, 0, temp, 0, result.length);
+                    result = new byte[temp.length + data.length];
+                    System.arraycopy(temp, 0, result, 0, temp.length);
+                    System.arraycopy(data, 0, result, temp.length, data.length);
+                }
+                if (data[data.length - 1] == ProtocolUtils.PROTOCOL_HEAD_TAIL) {
+                    // 消息结尾
+                    validateAndNotify(result);
+                }
+            }
         }
     }
 
+    private void validateAndNotify(byte[] result) {
+        int cr = result[1];
+        for (int i = 2; i < result.length - 2; i++) {
+            cr = cr ^ result[i];
+        }
+        if (cr != result[result.length - 2]) {
+            result = null;
+        } else {
+            Log.d("content  " + HexUtils.formatHexString(Arrays.copyOfRange(result, 3, result.length - 2)));
+            byte[] content = new byte[result.length - 5];
+            System.arraycopy(result, 3, content, 0, content.length);
+
+
+            if (result[1] == 00) {
+                if (result[2] == 00) { // 通用错误
+
+                } else if (result[2] == 01) { // 获取终端状态
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_VERIFY;
+                    bundle.putInt("status", content[0]);
+                    bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                } else if (result[2] == 02) { // 授权结果
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_AUTH_RESULT;
+                    bundle.putInt("status", content[0]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+
+            } else if (result[1] == 01) {
+                if (result[2] == 01) { // 获取终端版本
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_VERSION;
+                    bundle.putString("sn", HexUtils.formatHexString(Arrays.copyOfRange(content, 0, 19)));
+                    bundle.putString("version", HexUtils.formatHexString(Arrays.copyOfRange(content, 19, 31)));
+                    bundle.putString("car_no", HexUtils.formatHexString(Arrays.copyOfRange(content, 31, 43)));
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            } else if (result[1] == 02) {
+                if (result[2] == 01) { // 学习模式确认
+
+                } else if (result[2] == 02) { // 学习进度确认
+
+                } else if (result[2] == 03) { // 轮胎状态
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_TIRE_PRESSURE_STATUS;
+                    bundle.putInt("status", content[0]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                } else if (result[2] == 04) { // 灵敏度确认
+                }
+
+            } else if (result[1] == 03) {
+                if (result[2] == 01) { // 报警结果确认
+                }
+            } else if (result[1] == 05) {
+                if (result[2] == 01) { // 车型参数更新确认
+                }
+            } else if (result[1] == 06) {
+                if (result[2] == 01) { // 固件升级确认
+                } else if (result[2] == 02) { // 升级包刷写反馈
+
+                }
+            }
+        }
+    }
 
     public static class InstanceHolder {
         private static final BlueManager INSTANCE = new BlueManager();
@@ -391,9 +527,10 @@ public class BlueManager {
 
         @Override
         public void handleMessage(final Message msg) {
+            Bundle bundle = msg.getData();
             switch (msg.what) {
                 case STOP_SCAN_AND_CONNECT:
-                    final BluetoothDevice device = (BluetoothDevice) msg.obj;
+                    final String address = (String) msg.obj;
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -403,12 +540,11 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            connect(device.getAddress());
+                            connect(address);
                         }
                     });
                     break;
                 case MSG_SPLIT_WRITE:
-                    Bundle bundle = msg.getData();
                     final int status = bundle.getInt(KEY_WRITE_BUNDLE_STATUS);
                     final byte[] value = bundle.getByteArray(KEY_WRITE_BUNDLE_VALUE);
                     mMainHandler.post(new Runnable() {
@@ -423,6 +559,29 @@ public class BlueManager {
                             }
                         }
                     });
+                    break;
+                case MSG_VERIFY:
+                    Log.d("   " + Thread.currentThread().getId());
+                    String date = bundle.getString("value");
+                    switch (bundle.getInt("status")) {
+                        case 0: // 首次使用
+                            notifyBleCallBackListener(OBDEvent.OBD_FIRST_USE, date);
+                            break;
+                        case 1: // 设置授权正常
+                            notifyBleCallBackListener(OBDEvent.OBD_NORMAL, date);
+                            break;
+                        case 2: // 设备授权过期
+                            notifyBleCallBackListener(OBDEvent.OBD_EXPIRE, date);
+                            break;
+                    }
+                    break;
+                case MSG_AUTH_RESULT:
+                    break;
+                case MSG_VERSION:
+                    break;
+                case MSG_TIRE_PRESSURE_STATUS:
+                    break;
+
             }
         }
     }

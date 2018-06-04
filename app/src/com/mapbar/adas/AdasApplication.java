@@ -11,6 +11,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 
 public class AdasApplication extends Application {
 
@@ -64,5 +67,11 @@ public class AdasApplication extends Application {
         GlobalUtil.setContext(this);
         GlobalUtil.setHandler(new Handler());
         registerUncaughtException();
+
+        GlobalUtil.setOkHttpClient(new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .build());
     }
 }

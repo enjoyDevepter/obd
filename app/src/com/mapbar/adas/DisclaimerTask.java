@@ -1,6 +1,8 @@
 package com.mapbar.adas;
 
 
+import com.mapbar.hamster.BlueManager;
+
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.DISCALIMER_VISIBLE;
 
 /**
@@ -22,8 +24,11 @@ public class DisclaimerTask extends BaseTask {
         if (!isFistSatrt) {
             PageManager.go(new DisclaimerPage());
         } else {
-//            PageManager.go(new PhonePage());
-            PageManager.go(new MainPage());
+            if (BlueManager.getInstance().isConnected()) {
+                PageManager.go(new MainPage());
+            } else {
+                PageManager.go(new ConnectPage());
+            }
         }
         complate();
     }

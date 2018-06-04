@@ -2,6 +2,7 @@ package com.mapbar.adas;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,8 @@ public abstract class BasePage implements ILifeCycleListener {
     private int flag = 0;
 
     private BasePage prev;
+
+    private Bundle date;
 
 
     public BasePage() {
@@ -213,5 +216,13 @@ public abstract class BasePage implements ILifeCycleListener {
 
     public void setContentViewId(int contentViewId) {
         this.contentViewId = contentViewId;
+    }
+
+    public Bundle getDate() {
+        return date;
+    }
+
+    public void setDate(Bundle date) {
+        this.date = date;
     }
 }

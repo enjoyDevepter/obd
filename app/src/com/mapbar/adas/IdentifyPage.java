@@ -1,8 +1,10 @@
 package com.mapbar.adas;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
@@ -17,22 +19,20 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
     private EditText content;
     @ViewInject(R.id.next)
     private TextView next;
+    @ViewInject(R.id.back)
+    private View back;
+    @ViewInject(R.id.phone)
+    private TextView phone;
 
     @Override
     public void onResume() {
         super.onResume();
         title.setText("输入验证码");
         next.setOnClickListener(this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+        back.setOnClickListener(this);
+        if (getDate() != null) {
+            phone.setText(getDate().getString("phone"));
+        }
     }
 
     @Override
@@ -42,8 +42,24 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-//                PageManager.go(new AuthPage());
+                goAuth();
                 break;
         }
+    }
+
+    private void goAuth() {
+        String identify = content.getText().toString();
+        if (GlobalUtil.isEmpty(identify)) {
+            Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
+            return;
+        }
+        AuthPage authPage = new AuthPage();
+        Bundle bundle = new Bundle();
+        bundle.putString("boxId", getDate().getString("boxId"));
+        bundle.putString("phone", getDate().getString("phone"));
+        bundle.putString("code", identify);
+        authPage.setDate(bundle);
+        PageManager.go(authPage);
+
     }
 }

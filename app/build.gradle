@@ -30,6 +30,7 @@ android {
         debug {
             minifyEnabled false
         }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -58,5 +59,5 @@ dependencies {
     compile project(path: ':obd_sdk')
     compile 'com.android.support:multidex:1.0.1'
     compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'com.google.code.gson:gson:2.8.1'
+    compile 'com.alibaba:fastjson:1.2.47'
 }

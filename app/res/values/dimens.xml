@@ -10,4 +10,5 @@
     <dimen name="sensitive_height">8dp</dimen>
     <dimen name="sensitive_padding">15dp</dimen>
     <dimen name="sensitive_divider">20dp</dimen>
+    <dimen name="letter_size">14sp</dimen>
 </resources>

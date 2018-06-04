@@ -4,7 +4,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 
-import com.google.gson.Gson;
 import com.mapbar.adas.GlobalUtil;
 
 import org.json.JSONArray;
@@ -67,8 +66,9 @@ class CheckUpdateTask extends AsyncTask<String, Integer, AppInfoBean> {
                 }
                 JSONArray jsonArray = jsonObj.getJSONArray("data");
                 JSONObject json = jsonArray.getJSONObject(0);
-                Gson gsonFormat = new Gson();
-                return gsonFormat.fromJson(json.toString(), AppInfoBean.class);
+//                Gson gsonFormat = new Gson();
+                return null;
+//                return gsonFormat.fromJson(json.toString(), AppInfoBean.class);
             } catch (JSONException e) {
                 e.printStackTrace();
                 onCheckUpdateListener.onError();
