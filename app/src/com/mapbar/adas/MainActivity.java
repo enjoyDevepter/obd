@@ -62,42 +62,6 @@ public class MainActivity extends AppCompatActivity {
         rootViewGroup.addView(splashView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-//        byte[] b = new byte[]{00, 01, 02, 03, 04, 05, 06, 07};
-//        byte[] re = null;
-//        re = new byte[b.length];
-//
-////        Arrays.copyOf(re, b.length);
-//
-//        System.arraycopy(b,0,re,0,b.length);
-//
-//        Log.d(Arrays.toString(re));
-
-//        String sn = "a3116080275741";
-//        byte[] bytes = sn.getBytes();
-//        for (int i = 0; i < bytes.length; i++) {
-//            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
-//        }
-//        Log.d(HexUtils.str2HexStr(sn));
-//
-//        Log.d("======================");
-//
-//        long time = System.currentTimeMillis();
-//
-//        Log.d("" + time);
-//
-//        bytes = HexUtils.longToByte(time);
-//
-//        for (int i = 0; i < bytes.length; i++) {
-//            Log.d("bytes[" + i + "] == " + bytes[i] + "   " + Integer.toHexString(bytes[i]));
-//        }
-//
-//        Log.d(String.valueOf(HexUtils.byteToLong(bytes)));
-//
-//        Log.d("======================");
-//
-//        bytes = new byte[]{head};
-//
-//        Log.d(String.valueOf(bytes[0]));
         BlueManager.getInstance().init(this);
     }
 

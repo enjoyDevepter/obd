@@ -6,6 +6,7 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.mapbar.adas.anno.PageSetting;
@@ -25,7 +26,9 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.choice_car_layout)
@@ -46,6 +49,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
     private CarAdapter carAdapter;
     private CarBrandExpandableListAdapter carBrandExpandableListAdapter;
+    private List<CarInfo> carInfos;
 
     @Override
     public void onResume() {
@@ -70,7 +74,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 try {
                     JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        final List<CarInfo> carInfos = (ArrayList<CarInfo>) JSON.parseArray(result.optString("brands"), CarInfo.class);
+                        carInfos = JSON.parseArray(result.optString("brands"), CarInfo.class);
                         Log.d(carInfos.toString());
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
@@ -178,24 +182,191 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.back:
                 PageManager.back();
                 break;
             case R.id.next:
-                PageManager.go(new MainPage());
+                activate();
                 break;
         }
+    }
+
+    private void activate() {
+
+        if (null == carInfos) {
+            return;
+        }
+
+        String carId = "";
+
+        for (CarInfo carInfo : carInfos) {
+            if (carInfo.isChoice()) {
+                for (CarModel carModel : carInfo.getModels()) {
+                    for (CarStyle carStyle : carModel.getStyles()) {
+                        if (carStyle.isChoice()) {
+                            carId = carStyle.getId();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (GlobalUtil.isEmpty(carId)) {
+            Toast.makeText(getContext(), "请选择车型", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("boxId", getDate().get("boxId"));
+            jsonObject.put("phone", getDate().get("phone"));
+            jsonObject.put("code", getDate().get("code"));
+            jsonObject.put("carId", carId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        Request request = new Request.Builder()
+                .addHeader("serialNumber", GlobalUtil.encrypt((String) getDate().get("sn")))
+                .url(URLUtils.ACTIVATE)
+                .post(requestBody).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("activate failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("activate success " + responese);
+                try {
+                    JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        PageManager.go(new MainPage());
+                    }
+                } catch (JSONException e) {
+                    Log.d("activate failure " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void activate_success() {
+        Request request = new Request.Builder()
+                .addHeader("serialNumber", GlobalUtil.encrypt((String) getDate().get("sn")))
+                .url(URLUtils.ACTIVATE_SUCCESS)
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("activate failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("activate success " + responese);
+                try {
+                    JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+
+                    }
+                } catch (JSONException e) {
+                    Log.d("activate failure " + e.getMessage());
+                }
+            }
+        });
+    }
+
+
+    private void getLisense() {
+        Request request = new Request.Builder()
+                .addHeader("serialNumber", GlobalUtil.encrypt((String) getDate().get("sn")))
+                .url(URLUtils.GET_LISENSE)
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("activate failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("activate success " + responese);
+                try {
+                    JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+
+                    }
+                } catch (JSONException e) {
+                    Log.d("activate failure " + e.getMessage());
+                }
+            }
+        });
+    }
+
+
+    private void modifyCar() {
+
+        if (null == carInfos) {
+            return;
+        }
+
+        String carId = "";
+
+        for (CarInfo carInfo : carInfos) {
+            if (carInfo.isChoice()) {
+                for (CarModel carModel : carInfo.getModels()) {
+                    for (CarStyle carStyle : carModel.getStyles()) {
+                        if (carStyle.isChoice()) {
+                            carId = carStyle.getId();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (GlobalUtil.isEmpty(carId)) {
+            Toast.makeText(getContext(), "请选择车型", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("carId", carId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Request request = new Request.Builder()
+                .addHeader("serialNumber", GlobalUtil.encrypt((String) getDate().get("sn")))
+                .url(URLUtils.MODIFY_CAR_BRAND)
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("activate failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("activate success " + responese);
+                try {
+                    JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+
+                    }
+                } catch (JSONException e) {
+                    Log.d("activate failure " + e.getMessage());
+                }
+            }
+        });
     }
 }

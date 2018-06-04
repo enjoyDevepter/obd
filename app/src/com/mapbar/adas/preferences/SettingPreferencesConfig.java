@@ -4,8 +4,7 @@ import android.content.Context;
 
 import com.mapbar.adas.GlobalUtil;
 import com.mapbar.adas.preferences.item.BooleanPreferences;
-import com.mapbar.adas.preferences.item.IntPreferences;
-import com.mapbar.adas.preferences.item.StringPreferences;
+import com.mapbar.adas.preferences.item.LongPreferences;
 
 /**
  * 全局设置相关参数
@@ -16,4 +15,6 @@ public class SettingPreferencesConfig {
      * 免责声明 是否提醒
      */
     public static final BooleanPreferences DISCALIMER_VISIBLE = new BooleanPreferences(SHARED_PREFERENCES_INIT, "calibration_dis", false);
+
+    public static final LongPreferences UPDATE_ID = new LongPreferences(SHARED_PREFERENCES_INIT, "update_id", -1l);
 }
