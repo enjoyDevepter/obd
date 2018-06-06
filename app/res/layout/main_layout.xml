@@ -69,6 +69,7 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/tire_pressure"
         android:layout_width="147dp"
         android:layout_height="130dp"
         android:layout_gravity="center"
@@ -76,13 +77,15 @@
         android:background="@drawable/normal" />
 
     <TextView
+        android:id="@+id/tire_pressure_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
         android:text="胎压发生变化"
         android:textColor="#FFE00000"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:visibility="invisible" />
 
     <LinearLayout
         android:layout_width="match_parent"

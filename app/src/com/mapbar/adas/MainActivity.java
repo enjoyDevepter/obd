@@ -14,7 +14,6 @@ import com.mapbar.obd.R;
 public class MainActivity extends AppCompatActivity {
 
     private static MainActivity INSTANCE = null;
-    private final int head = 0x7d;
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;

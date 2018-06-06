@@ -69,7 +69,7 @@ public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(GlobalUtil.getContext()).inflate(R.layout.model_item, parent, false);
             groupViewHolder = new GroupViewHolder();
-            groupViewHolder.tvTitle = convertView.findViewById(R.id.car_name);
+            groupViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.car_name);
             convertView.setTag(groupViewHolder);
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
@@ -85,7 +85,7 @@ public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(GlobalUtil.getContext()).inflate(R.layout.model_style_item, parent, false);
             childViewHolder = new ChildViewHolder();
-            childViewHolder.tvTitle = convertView.findViewById(R.id.car_name);
+            childViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.car_name);
             convertView.setTag(childViewHolder);
         } else {
             childViewHolder = (ChildViewHolder) convertView.getTag();

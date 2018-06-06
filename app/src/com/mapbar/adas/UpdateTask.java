@@ -80,7 +80,7 @@ public class UpdateTask extends BaseTask {
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
-                .url(URLUtils.APP_UPDATE)
+                .url(URLUtils.APK_UPDATE)
                 .post(requestBody).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

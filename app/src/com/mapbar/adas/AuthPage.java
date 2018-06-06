@@ -25,7 +25,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
     private EditText sn_02;
     @ViewInject(R.id.sn_03)
     private EditText sn_03;
-    @ViewInject(R.id.sn_01)
+    @ViewInject(R.id.sn_04)
     private EditText sn_04;
 
     @Override

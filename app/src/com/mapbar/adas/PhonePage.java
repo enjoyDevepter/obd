@@ -62,7 +62,13 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                getMSN();
+                IdentifyPage page = new IdentifyPage();
+                Bundle bundle = new Bundle();
+                bundle.putString("boxId", getDate().getString("boxId"));
+                bundle.putString("phone", "18600474095");
+                page.setDate(bundle);
+                PageManager.go(page);
+//                getMSN();
                 break;
         }
     }

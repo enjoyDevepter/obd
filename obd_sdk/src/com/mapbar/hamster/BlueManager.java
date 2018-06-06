@@ -46,8 +46,11 @@ public class BlueManager {
     private static final int MSG_SPLIT_WRITE = 1;
     private static final int MSG_VERIFY = 2;
     private static final int MSG_AUTH_RESULT = 3;
-    private static final int MSG_VERSION = 4;
+    private static final int MSG_OBD_VERSION = 4;
     private static final int MSG_TIRE_PRESSURE_STATUS = 5;
+    private static final int MSG_BEGIN_TO_UPDATE = 6;
+    private static final int MSG_UPDATE_FOR_ONE_UNIT = 7;
+    private static final int MSG_PARAMS_UPDATE_SUCESS = 8;
 
 
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
@@ -386,12 +389,18 @@ public class BlueManager {
             return;
         } else {
             byte[] data = mDataQueue.poll();
+            Log.d("data   " + Arrays.toString(data));
             writeCharacteristic.setValue(data);
             mBluetoothGatt.writeCharacteristic(writeCharacteristic);
             bleWriteCallback = new BleWriteCallback() {
                 @Override
                 public void onWriteSuccess(byte[] justWrite) {
                     if (Looper.myLooper() != null && Looper.myLooper() == Looper.getMainLooper()) {
+                        try {
+                            Thread.sleep(5);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         write();
                     } else {
                         Message message = mHandler.obtainMessage();
@@ -478,10 +487,10 @@ public class BlueManager {
                 if (result[2] == 01) { // 获取终端版本
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
-                    message.what = MSG_VERSION;
-                    bundle.putString("sn", HexUtils.formatHexString(Arrays.copyOfRange(content, 0, 19)));
-                    bundle.putString("version", HexUtils.formatHexString(Arrays.copyOfRange(content, 19, 31)));
-                    bundle.putString("car_no", HexUtils.formatHexString(Arrays.copyOfRange(content, 31, 43)));
+                    message.what = MSG_OBD_VERSION;
+                    bundle.putString("sn", new String(Arrays.copyOfRange(content, 0, 19)));
+                    bundle.putString("version", new String(Arrays.copyOfRange(content, 19, 31)));
+                    bundle.putString("car_no", new String(Arrays.copyOfRange(content, 31, 43)));
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
@@ -505,11 +514,26 @@ public class BlueManager {
                 }
             } else if (result[1] == 05) {
                 if (result[2] == 01) { // 车型参数更新确认
+                    Message message = mHandler.obtainMessage();
+                    message.what = MSG_PARAMS_UPDATE_SUCESS;
+                    mHandler.sendMessage(message);
                 }
             } else if (result[1] == 06) {
                 if (result[2] == 01) { // 固件升级确认
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_BEGIN_TO_UPDATE;
+                    bundle.putInt("status", content[0]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 } else if (result[2] == 02) { // 升级包刷写反馈
-
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_UPDATE_FOR_ONE_UNIT;
+                    bundle.putInt("index", content[0]);
+                    bundle.putInt("status", content[1]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 }
             }
         }
@@ -576,10 +600,30 @@ public class BlueManager {
                     }
                     break;
                 case MSG_AUTH_RESULT:
+                    notifyBleCallBackListener(OBDEvent.OBD_AUTH_RESULT, bundle.getInt("status"));
                     break;
-                case MSG_VERSION:
+                case MSG_OBD_VERSION:
+                    OBDVersionInfo version = new OBDVersionInfo();
+                    version.setCar_no(bundle.getString("car_no"));
+                    version.setSn(bundle.getString("sn"));
+                    version.setVersion(bundle.getString("version"));
+                    notifyBleCallBackListener(OBDEvent.OBD_GET_VERSION, version);
                     break;
                 case MSG_TIRE_PRESSURE_STATUS:
+                    notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getInt("status"));
+                    break;
+                case MSG_BEGIN_TO_UPDATE:
+                    notifyBleCallBackListener(OBDEvent.OBD_BEGIN_UPDATE, bundle.getInt("status"));
+                    break;
+                case MSG_UPDATE_FOR_ONE_UNIT:
+                    Update update = new Update();
+                    update.setIndex(bundle.getInt("index"));
+                    update.setStatus(bundle.getInt("status"));
+                    notifyBleCallBackListener(OBDEvent.OBD_UPDATE_FINISH_UNIT, update);
+                    break;
+                case MSG_PARAMS_UPDATE_SUCESS:
+                    // 车型参数更新成功
+                    notifyBleCallBackListener(OBDEvent.OBD_UPDATE_PARAMS_SUCCESS, null);
                     break;
 
             }

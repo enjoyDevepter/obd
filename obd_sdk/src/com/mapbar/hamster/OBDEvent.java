@@ -45,4 +45,31 @@ public class OBDEvent {
      * OBD过期
      */
     public static final int OBD_EXPIRE = 9;
+    /**
+     * 开始升级
+     */
+    public static final int OBD_BEGIN_UPDATE = 10;
+    /**
+     * 完成1k数据传递
+     */
+    public static final int OBD_UPDATE_FINISH_UNIT = 11;
+    /**
+     * OBD盒子版本
+     */
+    public static final int OBD_GET_VERSION = 12;
+
+    /**
+     * OBD 授权结果
+     */
+    public static final int OBD_AUTH_RESULT = 13;
+
+    /**
+     * OBD 参数更新成功
+     */
+    public static final int OBD_UPDATE_PARAMS_SUCCESS = 14;
+
+    /**
+     * 胎压状态更新
+     */
+    public static final int OBD_UPPATE_TIRE_PRESSURE_STATUS = 15;
 }

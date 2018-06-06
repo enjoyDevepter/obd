@@ -52,6 +52,11 @@ public class ProtocolUtils {
         return result;
     }
 
+    /**
+     * 获取OBD盒子版本
+     *
+     * @return
+     */
     public static byte[] getVersion() {
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
@@ -116,6 +121,70 @@ public class ProtocolUtils {
         for (int i = 0; i < date.length; i++) {
             result[3 + i] = date[i];
             cr = cr ^ date[i];
+        }
+        result[result.length - 2] = (byte) cr;
+        result[result.length - 1] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
+    public static byte[] updateInfo(byte[] version, byte[] packageSize) {
+        byte[] result = new byte[version.length + packageSize.length + 5];
+        byte[] temp = new byte[version.length + packageSize.length];
+        System.arraycopy(version, 0, temp, 0, version.length);
+        System.arraycopy(packageSize, 0, temp, version.length, packageSize.length);
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_06;
+        result[2] = 01;
+        int cr = result[1] ^ result[2];
+        for (int i = 0; i < temp.length; i++) {
+            result[3 + i] = temp[i];
+            cr = cr ^ temp[i];
+        }
+        result[result.length - 2] = (byte) cr;
+        result[result.length - 1] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
+    public static byte[] updateForUnit(int index, byte[] date) {
+        byte[] result = new byte[date.length + 6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_06;
+        result[2] = 02;
+        result[3] = (byte) index;
+        int cr = result[1] ^ result[2] ^ result[3];
+        for (int i = 0; i < date.length; i++) {
+            result[4 + i] = date[i];
+            cr = cr ^ date[i];
+        }
+        result[result.length - 2] = (byte) cr;
+        result[result.length - 1] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 参数更新
+     *
+     * @param sn
+     * @param params
+     * @return
+     */
+    public static byte[] updateParams(String sn, String params) {
+        byte[] snBytes = sn.getBytes();
+        byte[] authBytes = params.getBytes();
+        byte[] result = new byte[snBytes.length + authBytes.length + 5];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_05;
+        result[2] = 01;
+        int cr = result[1] ^ result[2];
+        for (int i = 0; i < snBytes.length; i++) {
+            result[3 + i] = snBytes[i];
+            cr = cr ^ snBytes[i];
+        }
+        for (int i = 0; i < authBytes.length; i++) {
+            result[snBytes.length + 3 + i] = authBytes[i];
+            cr = cr ^ authBytes[i];
         }
         result[result.length - 2] = (byte) cr;
         result[result.length - 1] = PROTOCOL_HEAD_TAIL;

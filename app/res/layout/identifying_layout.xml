@@ -36,6 +36,7 @@
         android:background="@drawable/input_bg"
         android:hint="请输入验证码"
         android:paddingLeft="10dp"
+        android:text="123456"
         android:textSize="17sp" />
 
     <TextView

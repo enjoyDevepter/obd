@@ -50,8 +50,8 @@ public class CarAdapter extends BaseAdapter implements SectionIndexer {
         if (convertView == null) {
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.car_item, null);
-            holder.letterTV = convertView.findViewById(R.id.tv_contact_index_letter);
-            holder.nameTV = convertView.findViewById(R.id.car_name);
+            holder.letterTV = (TextView) convertView.findViewById(R.id.tv_contact_index_letter);
+            holder.nameTV = (TextView) convertView.findViewById(R.id.car_name);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
