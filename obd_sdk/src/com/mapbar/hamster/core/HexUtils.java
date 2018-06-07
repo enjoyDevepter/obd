@@ -62,10 +62,11 @@ public class HexUtils {
         for (int n = 0; n < b.length; n++) {
             stmp = Integer.toHexString(b[n] & 0xFF);
             sb.append((stmp.length() == 1) ? "0" + stmp : stmp);
-            // sb.append(" ");
+            sb.append(" ");
         }
         return sb.toString().toUpperCase(Locale.ENGLISH).trim();
     }
+
 
     /**
      * bytes字符串转换为Byte值

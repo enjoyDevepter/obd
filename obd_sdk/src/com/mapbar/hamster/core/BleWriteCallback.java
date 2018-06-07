@@ -5,6 +5,6 @@ public interface BleWriteCallback {
 
     void onWriteSuccess(byte[] justWrite);
 
-    void onWriteFailure();
+    void onWriteFailure(byte[] bytes);
 
 }

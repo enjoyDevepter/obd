@@ -1,5 +1,7 @@
 package com.mapbar.adas;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,8 +63,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         title.setText("选择车型");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
-        getCar();
         BlueManager.getInstance().addBleCallBackListener(this);
+        getCar();
     }
 
     @Override
@@ -77,13 +79,28 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                                .setMessage("网络异常,请检查网络状态后重试!")
+                                .setTitle("网络异常")
+                                .setPositiveButton("重试", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        getCar();
+                                    }
+                                });
+                        builder.create().show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         carInfos = JSON.parseArray(result.optString("brands"), CarInfo.class);
                         Log.d(carInfos.toString());
@@ -91,6 +108,13 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void run() {
                                 show(carInfos);
+                            }
+                        });
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -256,6 +280,21 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("activate failure " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                                .setMessage("网络异常,请检查网络状态后重试!")
+                                .setTitle("网络异常")
+                                .setPositiveButton("重试", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        activate();
+                                    }
+                                });
+                        builder.create().show();
+                    }
+                });
             }
 
             @Override
@@ -326,10 +365,17 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 String responese = response.body().string();
                 Log.d("modifyCar success " + responese);
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         BlueManager.getInstance().write(ProtocolUtils.getVersion());
                         PageManager.back();
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     Log.d("modifyCar failure " + e.getMessage());
@@ -345,6 +391,13 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 // 授权结果
                 if ((Integer) data == 1) {
                     activate_success();
+                }
+                break;
+            case OBDEvent.OBD_STUDY_PROGRESS:
+                if ((Integer) data >= 0) {
+                    PageManager.go(new MainPage());
+                } else {
+                    PageManager.go(new ConfirmPage());
                 }
                 break;
         }
@@ -381,10 +434,16 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 String responese = response.body().string();
                 Log.d("activate success " + responese);
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        BlueManager.getInstance().write(ProtocolUtils.getVersion());
-                        PageManager.go(new MainPage());
+                        BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     Log.d("activate failure " + e.getMessage());

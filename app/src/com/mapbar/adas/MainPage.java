@@ -1,13 +1,19 @@
 package com.mapbar.adas;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +79,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private View pressureIcon;
     private byte[] updates;
     private OBDVersion obdVersion;
+    private ProgressBar progressBar;
+
+    private Handler mMainHandler = new Handler(Looper.getMainLooper());
+    private HandlerThread mWorkerThread;
+    private Handler mHandler;
 
     @Override
     public void onResume() {
@@ -93,8 +104,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             verify();
         }
 
-        Log.d("onResumeonResumeonResume  ");
+        mWorkerThread = new HandlerThread(MainPage.class.getSimpleName());
+        mWorkerThread.start();
+        mHandler = new WorkerHandler(mMainHandler, mWorkerThread.getLooper());
 
+        Log.d("onResumeonResumeonResume  ");
     }
 
     @Override
@@ -105,6 +119,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
             case R.id.warm:
                 showWarm();
@@ -173,6 +188,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             }
                         });
                         final SensitiveView sensitiveView = (SensitiveView) view.findViewById(R.id.sensitive);
+                        sensitiveView.setType(type);
                         sensitiveView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -267,8 +283,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 getLisense();
                 break;
             case OBDEvent.OBD_BEGIN_UPDATE:
-                // 固件升级开始
-                if ((Integer) data == 0) {
+                if ((Integer) data == 0) { // 是否可以升级
                     try {
                         Thread.sleep(500);
                         updateHeader(obdVersion);
@@ -276,7 +291,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         e.printStackTrace();
                     }
                 } else {
-                    // 传递固件信息
+                    // 固件升级开始
                     updateForOneUnit(1);
                 }
                 break;
@@ -291,6 +306,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 } else if (update.getStatus() == 2) {
                     // 升级完成，通知服务器
                     notifyUpdateSuccess();
+                    if (null != progressBar && null != dialog) {
+                        dialog.dismiss();
+                        progressBar = null;
+                    }
+                    // 开始检查胎压
+                    mHandler.sendEmptyMessage(0);
                 }
                 break;
             case OBDEvent.OBD_GET_VERSION:
@@ -302,6 +323,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 // 授权结果
                 if ((Integer) data == 1) {
                     activate_success();
+                } else {
+                    Toast.makeText(getContext(), "授权失败!", Toast.LENGTH_LONG).show();
                 }
                 break;
             case OBDEvent.OBD_UPDATE_PARAMS_SUCCESS:
@@ -309,19 +332,32 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 if (null != obdVersion) {
                     if (obdVersion.getUpdateState() == 1) {
                         updateHeader(obdVersion);
+                    } else {
+                        mHandler.sendEmptyMessage(0);
                     }
                 }
                 break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
                 if ((Integer) data != 0) {
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            pressureInfo.setVisibility(View.VISIBLE);
-                            pressureIcon.setBackgroundResource(R.drawable.unusual);
-                        }
-                    });
+                    pressureInfo.setVisibility(View.VISIBLE);
+                    pressureIcon.setBackgroundResource(R.drawable.unusual);
+                }
+                break;
+            case OBDEvent.OBD_ERROR:
+                switch ((Integer) data) {
+                    case 1:
+                        Toast.makeText(getContext(), "校验码失效", Toast.LENGTH_LONG).show();
+                        break;
+                    case 3:
+                        Toast.makeText(getContext(), "固件升级未完成", Toast.LENGTH_LONG).show();
+                        break;
+                    case 4:
+                        Toast.makeText(getContext(), "授权过期", Toast.LENGTH_LONG).show();
+                        break;
+                    case 6:
+                        Toast.makeText(getContext(), "系统繁忙，稍后再试", Toast.LENGTH_LONG).show();
+                        break;
                 }
                 break;
         }
@@ -357,9 +393,16 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 String responese = response.body().string();
                 Log.d("activate success " + responese);
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         BlueManager.getInstance().write(ProtocolUtils.getVersion());
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     Log.d("activate failure " + e.getMessage());
@@ -401,12 +444,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     switch (obdVersion.getUpdateState()) {
                         case 0:
                             // 定时获取胎压状态
-                            GlobalUtil.getHandler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
-                                }
-                            }, 3000);
+                            mHandler.sendEmptyMessage(0);
                             break;
                         case 1: // 版本参数都更新
                             BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
@@ -418,9 +456,38 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
                             break;
                     }
+                } else {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             }
         });
+    }
+
+
+    private void showUpdateProgress(final int percent) {
+        if (null == dialog) {
+            dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                    .setViewListener(new CustomDialog.ViewListener() {
+                        @Override
+                        public void bindView(View view) {
+                            progressBar = (ProgressBar) view.findViewById(R.id.progress);
+                            progressBar.setMax(percent);
+                        }
+                    })
+                    .setLayoutRes(R.layout.dailog_update)
+                    .setDimAmount(0.5f)
+                    .isCenter(true)
+                    .setCancelOutside(false)
+                    .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                    .show();
+        } else {
+            progressBar.setProgress(percent);
+        }
     }
 
     /**
@@ -453,12 +520,19 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 String responese = response.body().string();
                 Log.d("notifyUpdateSuccess success " + responese);
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
                                 Toast.makeText(GlobalUtil.getContext(), "固件升级成功", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -513,9 +587,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
         int num = updates.length % UNIT == 0 ? updates.length / UNIT : updates.length / UNIT + 1;
 
+
         if (index > num) {
             return;
         }
+
+        showUpdateProgress(index == 1 ? updates.length : (index - 1) * UNIT);
 
         byte[] date;
         if (index == num) {
@@ -560,10 +637,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 String responese = response.body().string();
                 Log.d("getLisense success " + responese);
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         String code = result.optString("rightStr");
                         BlueManager.getInstance().write(ProtocolUtils.auth(getDate().getString("sn"), code));
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     Log.d("getLisense failure " + e.getMessage());
@@ -578,19 +662,35 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Log.d("getOBDStatus fail " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                                .setMessage("网络异常,请检查网络状态后重试!")
+                                .setTitle("网络异常")
+                                .setPositiveButton("重试", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        verify();
+                                    }
+                                });
+                        builder.create().show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                Log.d("checkLocLicense success " + responese);
+                Log.d("getOBDStatus success " + responese);
                 if (verified) {
                     return;
                 }
                 verified = true;
                 try {
                     JSONObject result = new JSONObject(responese);
-                    BlueManager.getInstance().write(ProtocolUtils.verify(Long.valueOf(result.optString("server_time"))));
+                    BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -602,22 +702,23 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     public void onLocationChanged(Location location) {
         if ("gps".equalsIgnoreCase(location.getProvider())) {
             Log.d("onLocationChanged ");
-            SharedPreferences preferences = getContext().getSharedPreferences("setting", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putLong("server_time", location.getTime());
-            editor.apply();
             locationManager.removeUpdates(this);
             if (verified) {
                 return;
             }
             verified = true;
-            BlueManager.getInstance().write(ProtocolUtils.verify(location.getTime()));
+            BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(location.getTime()));
         }
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return null != progressBar ? true : super.onBackPressed();
     }
 
     @Override
@@ -628,5 +729,27 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    private static final class WorkerHandler extends Handler {
+
+        private Handler mainHandler;
+
+        WorkerHandler(Handler handler, Looper looper) {
+            super(looper);
+            mainHandler = handler;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            mainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
+                    WorkerHandler.this.sendEmptyMessage(0);
+                }
+            }, 3000);
+        }
     }
 }

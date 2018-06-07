@@ -1,5 +1,7 @@
 package com.mapbar.hamster.core;
 
+import com.mapbar.hamster.log.Log;
+
 /**
  * Created by guomin on 2018/6/2.
  */
@@ -14,7 +16,8 @@ public class ProtocolUtils {
     private static final int PROTOCAL_COMMON_05 = 0x85;
     private static final int PROTOCAL_COMMON_06 = 0x86;
 
-    public static byte[] verify(long time) {
+    public static byte[] getOBDStatus(long time) {
+        Log.d("Protocol getOBDStatus ==");
         byte[] result = new byte[13];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_00;
@@ -32,6 +35,7 @@ public class ProtocolUtils {
     }
 
     public static byte[] auth(String sn, String authCode) {
+        Log.d("Protocol auth ===");
         byte[] snBytes = sn.getBytes();
         byte[] authBytes = authCode.getBytes();
         byte[] result = new byte[snBytes.length + authBytes.length + 5];
@@ -58,6 +62,7 @@ public class ProtocolUtils {
      * @return
      */
     public static byte[] getVersion() {
+        Log.d("Protocol getVersion ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_01;
@@ -69,6 +74,7 @@ public class ProtocolUtils {
     }
 
     public static byte[] study() {
+        Log.d("Protocol study ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_02;
@@ -79,7 +85,20 @@ public class ProtocolUtils {
         return result;
     }
 
+    public static byte[] getStudyProgess() {
+        Log.d("Protocol getStudyProgess ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_02;
+        result[2] = 02;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
     public static byte[] getTirePressureStatus() {
+        Log.d("Protocol getTirePressureStatus ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_02;
@@ -91,6 +110,7 @@ public class ProtocolUtils {
     }
 
     public static byte[] setSensitive(int sensitive) {
+        Log.d("Protocol setSensitive ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_02;
@@ -102,6 +122,7 @@ public class ProtocolUtils {
     }
 
     public static byte[] playWarm(int warmType) {
+        Log.d("Protocol playWarm ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_03;
@@ -112,23 +133,8 @@ public class ProtocolUtils {
         return result;
     }
 
-    public static byte[] test(byte[] date) {
-        byte[] result = new byte[date.length + 5];
-        result[0] = PROTOCOL_HEAD_TAIL;
-        result[1] = (byte) 88;
-        result[2] = 01;
-        int cr = result[1] ^ result[2];
-        for (int i = 0; i < date.length; i++) {
-            result[3 + i] = date[i];
-            cr = cr ^ date[i];
-        }
-        result[result.length - 2] = (byte) cr;
-        result[result.length - 1] = PROTOCOL_HEAD_TAIL;
-        return result;
-    }
-
-
     public static byte[] updateInfo(byte[] version, byte[] packageSize) {
+        Log.d("Protocol updateInfo ===");
         byte[] result = new byte[version.length + packageSize.length + 5];
         byte[] temp = new byte[version.length + packageSize.length];
         System.arraycopy(version, 0, temp, 0, version.length);
@@ -148,6 +154,7 @@ public class ProtocolUtils {
 
 
     public static byte[] updateForUnit(int index, byte[] date) {
+        Log.d("Protocol updateForUnit ===");
         byte[] result = new byte[date.length + 6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_06;
@@ -171,6 +178,7 @@ public class ProtocolUtils {
      * @return
      */
     public static byte[] updateParams(String sn, String params) {
+        Log.d("Protocol updateParams ===");
         byte[] snBytes = sn.getBytes();
         byte[] authBytes = params.getBytes();
         byte[] result = new byte[snBytes.length + authBytes.length + 5];

@@ -72,4 +72,18 @@ public class OBDEvent {
      * 胎压状态更新
      */
     public static final int OBD_UPPATE_TIRE_PRESSURE_STATUS = 15;
+    /**
+     * OBD 异常
+     */
+    public static final int OBD_ERROR = 16;
+
+    /**
+     * OBD 胎压开始学习
+     */
+    public static final int OBD_STUDY = 17;
+
+    /**
+     * OBD 胎压学习进度
+     */
+    public static final int OBD_STUDY_PROGRESS = 18;
 }

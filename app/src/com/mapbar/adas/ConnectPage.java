@@ -4,6 +4,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
@@ -70,6 +71,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
                 retry.setVisibility(View.VISIBLE);
                 break;
             case OBDEvent.BLUE_CONNECTED:
+                Toast.makeText(GlobalUtil.getContext(), "连接成功", Toast.LENGTH_SHORT).show();
                 PageManager.go(new MainPage());
                 break;
         }

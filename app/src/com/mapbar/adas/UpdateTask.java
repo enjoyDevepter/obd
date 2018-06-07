@@ -137,7 +137,7 @@ public class UpdateTask extends BaseTask {
 
                     }
                 })
-                .setLayoutRes(R.layout.dailog_update)
+                .setLayoutRes(R.layout.dailog_apk_update)
                 .setDimAmount(0.5f)
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))

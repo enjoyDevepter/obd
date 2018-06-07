@@ -37,4 +37,5 @@
     <style name="order_TabLayoutTextStyle">
         <item name="android:textSize">16sp</item>
     </style>
+
 </resources>
