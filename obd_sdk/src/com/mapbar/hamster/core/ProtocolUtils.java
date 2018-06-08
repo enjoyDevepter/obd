@@ -198,5 +198,6 @@ public class ProtocolUtils {
         result[result.length - 1] = PROTOCOL_HEAD_TAIL;
         return result;
     }
+
 }
 

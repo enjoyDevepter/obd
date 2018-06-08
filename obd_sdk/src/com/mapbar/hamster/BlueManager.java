@@ -103,13 +103,16 @@ public class BlueManager {
     private BleWriteCallback bleWriteCallback = new BleWriteCallback() {
         @Override
         public void onWriteSuccess(byte[] justWrite) {
-            Log.d("onWriteSuccess");
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             write();
         }
 
         @Override
         public void onWriteFailure(byte[] date) {
-            Log.d("onWriteFailure");
             // 重新发送
             realWrite(date);
         }
@@ -117,6 +120,8 @@ public class BlueManager {
     private int mTotalNum;
     private BluetoothManager bluetoothManager;
     private byte[] result;
+    private byte[] currentProtocol;
+    private int repeat = 0;
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -308,7 +313,6 @@ public class BlueManager {
             @Override
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicWrite(gatt, characteristic, status);
-                Log.d("onCharacteristicWrite " + status);
                 Message message = new Message();
                 message.what = MSG_SPLIT_WRITE;
                 Bundle bundle = new Bundle();
@@ -348,10 +352,31 @@ public class BlueManager {
      *
      * @param data
      */
-    public void write(byte[] data) {
+    public synchronized void write(byte[] data) {
         if (null == writeCharacteristic) {
             return;
         }
+
+        boolean reset = true;
+
+        if (null != currentProtocol && currentProtocol.length == data.length) {
+            for (int i = 0; i < currentProtocol.length; i++) {
+                if (currentProtocol[i] != data[i]) {
+                    reset = false;
+                    break;
+                }
+            }
+            if (!reset) {
+                repeat = 0;
+            }
+        } else {
+            repeat = 0;
+        }
+
+        currentProtocol = new byte[data.length];
+
+        System.arraycopy(data, 0, currentProtocol, 0, data.length);
+
         if (data.length > 20) {
             split = true;
             mData = data;
@@ -470,7 +495,11 @@ public class BlueManager {
                     Bundle bundle = new Bundle();
                     message.what = MSG_VERIFY;
                     bundle.putInt("status", content[0]);
-                    bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
+                    if (bundle.getInt("status") != 2) {
+                        bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
+                    } else {
+                        bundle.putString("value", new String(Arrays.copyOfRange(content, 1, content.length)));
+                    }
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 } else if (result[2] == 02) { // 授权结果
@@ -669,11 +698,22 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_UPDATE_PARAMS_SUCCESS, bundle.getInt("status"));
+                            if (repeat < 3) {
+                                Log.d("repeat " + repeat);
+                                write(currentProtocol); // 重发
+                                repeat++;
+                            }
+                            notifyBleCallBackListener(OBDEvent.OBD_ERROR, bundle.getInt("status"));
                         }
                     });
                     break;
                 case MSG_STUDY:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.OBD_STUDY, null);
+                        }
+                    });
                     break;
                 case MSG_STUDY_PROGRESS:
                     mMainHandler.post(new Runnable() {

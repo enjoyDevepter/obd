@@ -135,6 +135,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         indexSideBar.setLetterIndexList(mLetterIndexList, false);
 
         // 设置联系人列表的信息
+        carInfos.get(0).setChoice(true);
         carAdapter = new CarAdapter(getContext(), carInfos);
         listView.setAdapter(carAdapter);
 
@@ -346,13 +347,18 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("carId", carId);
-            jsonObject.put("serialNumber", getDate().get("sn"));
+            jsonObject.put("serialNumber", getDate().get("serialNumber"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        Log.d("modifyCar input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .url(URLUtils.MODIFY_CAR_BRAND)
+                .post(requestBody)
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -367,7 +373,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        BlueManager.getInstance().write(ProtocolUtils.getVersion());
                         PageManager.back();
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
@@ -391,13 +396,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 // 授权结果
                 if ((Integer) data == 1) {
                     activate_success();
-                }
-                break;
-            case OBDEvent.OBD_STUDY_PROGRESS:
-                if ((Integer) data >= 0) {
-                    PageManager.go(new MainPage());
-                } else {
-                    PageManager.go(new ConfirmPage());
                 }
                 break;
         }
@@ -436,7 +434,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
+                        PageManager.go(new MainPage());
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override

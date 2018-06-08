@@ -1,18 +1,26 @@
 package com.mapbar.adas;
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.text.Html;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,11 +47,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -56,6 +63,7 @@ import okhttp3.Response;
 public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener, LocationListener {
     private static final int UNIT = 1024;
     CustomDialog dialog = null;
+    CustomDialog updateDialog = null;
     private volatile boolean verified;
     private String sn;
     private String boxId;
@@ -80,10 +88,51 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private byte[] updates;
     private OBDVersion obdVersion;
     private ProgressBar progressBar;
+    private DownloadManager downloadManager;
+    private long mTaskId;
 
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
     private HandlerThread mWorkerThread;
     private Handler mHandler;
+    private int time = 10;
+    private Timer timer;
+    private TimerTask timerTask;
+    private TextView save;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            DownloadManager.Query query = new DownloadManager.Query();
+            query.setFilterById(mTaskId);//筛选下载任务，传入任务ID，可变参数
+            Cursor c = downloadManager.query(query);
+            if (c.moveToFirst()) {
+                int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                switch (status) {
+                    case DownloadManager.STATUS_PAUSED:
+                    case DownloadManager.STATUS_PENDING:
+                    case DownloadManager.STATUS_RUNNING:
+                        break;
+                    case DownloadManager.STATUS_SUCCESSFUL:
+                        try {
+                            File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
+                            FileInputStream fis = new FileInputStream(file);
+                            updates = new byte[fis.available()];
+                            fis.read(updates);
+                            fis.close();
+                            Log.d(" updates.length " + updates.length);
+                            byte[] version = new byte[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+                            BlueManager.getInstance().write(ProtocolUtils.updateInfo(version, HexUtils.longToByte(updates.length)));
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case DownloadManager.STATUS_FAILED:
+                        break;
+                }
+            }
+        }
+    };
 
     @Override
     public void onResume() {
@@ -100,21 +149,35 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
 
-        if (BlueManager.getInstance().isConnected()) {
+        if (BlueManager.getInstance().isConnected() && !verified) {
             verify();
         }
 
+        if (verified) { // 已鉴权完成
+            // 获取OBD版本信息，请求服务器是否有更新
+            BlueManager.getInstance().write(ProtocolUtils.getVersion());
+        }
+
+        Log.d("onResumeonResumeonResume  ");
+    }
+
+    @Override
+    public void onStart() {
+        Log.d("onStartonStartonStartonStart");
+        super.onStart();
         mWorkerThread = new HandlerThread(MainPage.class.getSimpleName());
         mWorkerThread.start();
         mHandler = new WorkerHandler(mMainHandler, mWorkerThread.getLooper());
-
-        Log.d("onResumeonResumeonResume  ");
     }
 
     @Override
     public void onStop() {
         super.onStop();
         BlueManager.getInstance().removeCallBackListener(this);
+        mHandler.removeMessages(0);
+        mWorkerThread.quitSafely();
+        mHandler = null;
+        mWorkerThread = null;
     }
 
     @Override
@@ -133,11 +196,21 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.change_car:
                 changeCar();
                 break;
+            case R.id.save:
+                BlueManager.getInstance().write(ProtocolUtils.study());
+                if (null != dialog) {
+                    dialog.dismiss();
+                }
+                break;
         }
     }
 
     private void changeCar() {
         ChoiceCarPage choiceCarPage = new ChoiceCarPage();
+        Bundle bundle = new Bundle();
+        bundle.putString("type", "changeCar");
+        bundle.putString("serialNumber", sn);
+        choiceCarPage.setDate(bundle);
         PageManager.go(choiceCarPage);
     }
 
@@ -245,6 +318,53 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .show();
     }
 
+    private void showStudy() {
+
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        ((TextView) view.findViewById(R.id.info)).setText(Html.fromHtml("保存当前胎压后，当某个轮胎胎压<font color='#FF0000'>发生变化</font>时， 盒子会发出报警声音。<br><br> 建议检查四个轮胎胎压均为正常的情况下 再进行保存操作！"));
+                        save = (TextView) view.findViewById(R.id.save);
+                        time = 10;
+                        initTimer();
+                        timer.schedule(timerTask, 0, 1000);
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_confirm)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+    }
+
+    private void initTimer() {
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (time <= 0 && timer != null) {
+                            timer.cancel();
+                            timer = null;
+                            timerTask.cancel();
+                            timerTask = null;
+                            save.setText("保存胎压");
+                            save.setOnClickListener(MainPage.this);
+                            save.setBackgroundResource(R.drawable.disclaimer_agree_btn_bg);
+                        } else {
+                            save.setText("保存胎压(" + time + "s)");
+                        }
+                        time--;
+                    }
+                });
+            }
+        };
+
+        timer = new Timer();
+    }
+
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
@@ -285,8 +405,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.OBD_BEGIN_UPDATE:
                 if ((Integer) data == 0) { // 是否可以升级
                     try {
-                        Thread.sleep(500);
-                        updateHeader(obdVersion);
+                        Thread.sleep(2000);
+                        downloadUpdate(obdVersion);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -306,12 +426,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 } else if (update.getStatus() == 2) {
                     // 升级完成，通知服务器
                     notifyUpdateSuccess();
-                    if (null != progressBar && null != dialog) {
-                        dialog.dismiss();
+                    if (null != progressBar && null != updateDialog) {
+                        updateDialog.dismiss();
+                        updateDialog = null;
                         progressBar = null;
                     }
-                    // 开始检查胎压
-                    mHandler.sendEmptyMessage(0);
+                    showStudy();
                 }
                 break;
             case OBDEvent.OBD_GET_VERSION:
@@ -331,9 +451,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 // 判断是否需要升级固件
                 if (null != obdVersion) {
                     if (obdVersion.getUpdateState() == 1) {
-                        updateHeader(obdVersion);
+                        downloadUpdate(obdVersion);
                     } else {
-                        mHandler.sendEmptyMessage(0);
+                        showStudy();
                     }
                 }
                 break;
@@ -342,6 +462,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 if ((Integer) data != 0) {
                     pressureInfo.setVisibility(View.VISIBLE);
                     pressureIcon.setBackgroundResource(R.drawable.unusual);
+                } else {
+                    if (pressureInfo.getVisibility() == View.VISIBLE) {
+                        pressureInfo.setVisibility(View.INVISIBLE);
+                        pressureIcon.setBackgroundResource(R.drawable.normal);
+                    }
                 }
                 break;
             case OBDEvent.OBD_ERROR:
@@ -360,6 +485,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         break;
                 }
                 break;
+            case OBDEvent.OBD_STUDY:
+                mHandler.sendEmptyMessage(0);
+                break;
+            case OBDEvent.OBD_STUDY_PROGRESS:
+                if ((Integer) data >= 0) {
+                    mHandler.sendEmptyMessage(0);
+                } else {
+                    // 弹出胎压学习对话框
+                    showStudy();
+                }
+                break;
         }
     }
 
@@ -370,10 +506,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", getDate().get("sn"));
+            jsonObject.put("serialNumber", sn);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        Log.d("activate success input " + jsonObject.toString());
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
@@ -422,6 +560,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             e.printStackTrace();
         }
 
+        Log.d("checkOBDVersion input " + jsonObject.toString());
+
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
@@ -444,13 +584,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     switch (obdVersion.getUpdateState()) {
                         case 0:
                             // 定时获取胎压状态
-                            mHandler.sendEmptyMessage(0);
+//                            mHandler.sendEmptyMessage(0);
+                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                             break;
                         case 1: // 版本参数都更新
                             BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
                             break;
                         case 2: // 只有版本更新
-                            updateHeader(obdVersion);
+                            downloadUpdate(obdVersion);
                             break;
                         case 3: // 只有参数更新
                             BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
@@ -468,10 +609,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         });
     }
 
-
     private void showUpdateProgress(final int percent) {
-        if (null == dialog) {
-            dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+        if (null == updateDialog) {
+            updateDialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                     .setViewListener(new CustomDialog.ViewListener() {
                         @Override
                         public void bindView(View view) {
@@ -501,6 +641,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        Log.d("notifyUpdateSuccess input " + jsonObject.toString());
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
@@ -543,44 +685,36 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         });
     }
 
-    private void updateHeader(final OBDVersion obdVersion) {
+    private void downloadUpdate(OBDVersion obdVersion) {
+        //创建下载任务
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(obdVersion.getUrl()));
+        request.setAllowedOverRoaming(false);//漫游网络是否可以下载
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(obdVersion.getUrl());
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("POST");//设置请求方式为POST
-                    connection.setDoOutput(true);//允许写出
-                    connection.setDoInput(true);//允许读入
-                    connection.setUseCaches(false);//不使用缓存
-                    connection.connect();//连接
-                    int responseCode = connection.getResponseCode();
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        InputStream is = connection.getInputStream();
-                        FileOutputStream fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "update.bin"));
-                        byte[] buf = new byte[1024];
-                        while (-1 != is.read(buf)) {
-                            fos.write(buf, 0, buf.length);
-                            fos.flush();
-                        }
-                        FileInputStream fis = new FileInputStream(new File(Environment.getExternalStorageDirectory(), "update.bin"));
+        //设置文件类型，可以在下载结束后自动打开该文件
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        String mimeString = mimeTypeMap.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(obdVersion.getUrl()));
+        request.setMimeType(mimeString);
 
-                        is.close();
-                        updates = new byte[fis.available()];
-                        fis.read(updates);
-                        fis.close();
-                        Log.d(" updates.length " + updates.length);
-                        byte[] version = new byte[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-                        BlueManager.getInstance().write(ProtocolUtils.updateInfo(version, HexUtils.longToByte(updates.length)));
-                    }
+        //在通知栏中显示，默认就是显示的
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        request.setVisibleInDownloadsUi(true);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        //sdcard的目录下的download文件夹，必须设置
+        File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
+        if (file.exists()) {
+            file.delete();
+        }
+        request.setDestinationInExternalPublicDir("/download/", "update.bin");
+
+        //将下载请求加入下载队列
+        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        //加入下载队列后会给该任务返回一个long型的id，
+        //通过该id可以取消任务，重启任务等等，看上面源码中框起来的方法
+        mTaskId = downloadManager.enqueue(request);
+
+        //注册广播接收者，监听下载状态
+        getContext().registerReceiver(receiver,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     private void updateForOneUnit(int index) {
@@ -619,6 +753,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             e.printStackTrace();
         }
 
+        Log.d(" getLisense input " + jsonObject.toString());
+
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
@@ -640,7 +776,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         String code = result.optString("rightStr");
-                        BlueManager.getInstance().write(ProtocolUtils.auth(getDate().getString("sn"), code));
+                        BlueManager.getInstance().write(ProtocolUtils.auth(sn, code));
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
@@ -716,10 +852,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
     }
 
-    @Override
-    public boolean onBackPressed() {
-        return null != progressBar ? true : super.onBackPressed();
-    }
 
     @Override
     public void onProviderEnabled(String provider) {

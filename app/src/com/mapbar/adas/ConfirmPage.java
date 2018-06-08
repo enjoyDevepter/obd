@@ -13,7 +13,7 @@ import com.mapbar.obd.R;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@PageSetting(contentViewId = R.layout.confirm_layout)
+@PageSetting(contentViewId = R.layout.dailog_confirm)
 public class ConfirmPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
