@@ -460,8 +460,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
                 if ((Integer) data != 0) {
-                    pressureInfo.setVisibility(View.VISIBLE);
-                    pressureIcon.setBackgroundResource(R.drawable.unusual);
+                    if (pressureInfo.getVisibility() == View.INVISIBLE) {
+                        pressureInfo.setVisibility(View.VISIBLE);
+                        pressureIcon.setBackgroundResource(R.drawable.unusual);
+                    }
                 } else {
                     if (pressureInfo.getVisibility() == View.VISIBLE) {
                         pressureInfo.setVisibility(View.INVISIBLE);

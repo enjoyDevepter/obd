@@ -7,7 +7,8 @@
 
     <include layout="@layout/layout_tittle"></include>
 
-    <ScrollView
+    <com.mapbar.adas.view.CustomScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -19,31 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/disclamier_desc" />
-    </ScrollView>
-
-    <TextView
-        android:id="@+id/agree"
-        android:layout_width="300dp"
-        android:layout_height="44dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="18dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/disclaimer_agree_btn_bg"
-        android:gravity="center"
-        android:text="始终接受(下次不再提醒)"
-        android:textColor="@android:color/white"
-        android:textSize="17sp" />
-
-    <TextView
-        android:id="@+id/disagree"
-        android:layout_width="300dp"
-        android:layout_height="44dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="50dp"
-        android:background="@drawable/disclaimer_agree_btn_bg"
-        android:gravity="center"
-        android:text="拒绝以上条款"
-        android:textColor="#ff686868"
-        android:textSize="17sp" />
+    </com.mapbar.adas.view.CustomScrollView>
 
 </LinearLayout>
