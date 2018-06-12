@@ -1,10 +1,8 @@
 package com.mapbar.adas;
 
-import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -95,7 +93,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private ProgressBar progressBar;
     private DownloadManager downloadManager;
     private long mTaskId;
-
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
     private HandlerThread mWorkerThread;
     private Handler mHandler;
@@ -817,21 +814,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 Log.d("getOBDStatus fail " + e.getMessage());
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                                .setMessage("网络异常,请检查网络状态后重试!")
-                                .setTitle("网络异常")
-                                .setPositiveButton("重试", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        verify();
-                                    }
-                                });
-                        builder.create().show();
-                    }
-                });
             }
 
             @Override

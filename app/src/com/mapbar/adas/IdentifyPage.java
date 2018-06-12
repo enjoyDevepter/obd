@@ -83,6 +83,12 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("sms_check failure " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override

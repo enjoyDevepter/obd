@@ -1,7 +1,5 @@
 package com.mapbar.adas;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.widget.AdapterView;
@@ -83,16 +81,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                                .setMessage("网络异常,请检查网络状态后重试!")
-                                .setTitle("网络异常")
-                                .setPositiveButton("重试", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        getCar();
-                                    }
-                                });
-                        builder.create().show();
+                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -287,16 +276,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                                .setMessage("网络异常,请检查网络状态后重试!")
-                                .setTitle("网络异常")
-                                .setPositiveButton("重试", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        activate();
-                                    }
-                                });
-                        builder.create().show();
+                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -371,6 +351,13 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("modifyCar failure " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override

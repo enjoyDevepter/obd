@@ -284,11 +284,6 @@ public class BlueManager {
                     //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
                     writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
 //
-                    //4.将byte数据设置到特征Characteristic中去
-//                    writeCharacteristic.setValue(data);
-//
-                    //5.将设置好的特征发送出去
-//                    mBluetoothGatt.writeCharacteristic(writeCharacteristic);
                     readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
 
                     mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
