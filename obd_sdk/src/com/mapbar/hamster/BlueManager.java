@@ -87,9 +87,9 @@ public class BlueManager {
             if (null == device) {
                 return;
             }
-            Log.d("device.getName()     " + device.getName() + " device.getAddress() " + device.getAddress());
             String name = device.getName();
             if (name != null && name.startsWith("BT")) {
+                Log.d("device.getName()     " + device.getName() + " device.getAddress() " + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
                 msg.obj = device.getAddress();

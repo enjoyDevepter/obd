@@ -17,9 +17,14 @@ public class FileLoggingTree extends Timber.Tree {
 
     public FileLoggingTree(String filePath) {
         this.filePath = filePath;
-        File logFile = new File(filePath);
+        File file = new File(filePath);
         if (!new File(filePath).exists()) {
-            logFile.mkdirs();
+            file.mkdirs();
+        }
+
+        File logFile = new File(filePath, "/obd_log.txt");
+        if (logFile.exists()) {
+            logFile.delete();
         }
     }
 

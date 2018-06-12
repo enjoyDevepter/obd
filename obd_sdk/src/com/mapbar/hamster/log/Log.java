@@ -18,7 +18,7 @@ public class Log {
 
     public static void d(String message) {
         Timber.tag(TAG);
-        Timber.d(message);
+        Timber.d(message + "\n");
     }
 }
 

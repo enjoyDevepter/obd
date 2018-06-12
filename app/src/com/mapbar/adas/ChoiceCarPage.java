@@ -250,7 +250,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                     for (CarStyle carStyle : carModel.getStyles()) {
                         if (carStyle.isChoice()) {
                             carId = carStyle.getId();
-                            carName = carStyle.getName();
+                            carName = carModel.getName() + "  " + carStyle.getName();
                         }
                     }
                 }
@@ -338,7 +338,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                     for (CarStyle carStyle : carModel.getStyles()) {
                         if (carStyle.isChoice()) {
                             carId = carStyle.getId();
-                            carName = carStyle.getName();
+                            carName = carModel.getName() + "  " + carStyle.getName();
                         }
                     }
                 }

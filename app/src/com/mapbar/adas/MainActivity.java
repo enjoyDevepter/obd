@@ -14,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -113,11 +112,6 @@ public class MainActivity extends AppCompatActivity {
         setColor(this, Color.parseColor("#FF35BDB2"));
 
         BlueManager.getInstance().init(this);
-
-
-        for (int i = 0; i < 100; i++) {
-            Log.d("encrypt" + GlobalUtil.encrypt("L4K8-ZCJ8-RGKY-M5BD"));
-        }
     }
 
     @Override
