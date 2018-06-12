@@ -16,7 +16,6 @@
         android:background="@drawable/input_bg"
         android:hint="请输入手机号码"
         android:paddingLeft="10dp"
-        android:text="18600474095"
         android:textSize="17sp" />
 
     <TextView

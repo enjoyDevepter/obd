@@ -284,4 +284,14 @@ public class HexUtils {
         return formatHexString(new byte[]{data[position]});
     }
 
+
+    public static byte[] getBooleanArray(byte b) {
+        byte[] array = new byte[8];
+        for (int i = 7; i >= 0; i--) {
+            array[i] = (byte) (b & 1);
+            b = (byte) (b >> 1);
+        }
+        return array;
+    }
+
 }

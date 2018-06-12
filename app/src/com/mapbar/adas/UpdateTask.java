@@ -81,6 +81,7 @@ public class UpdateTask extends BaseTask {
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .url(URLUtils.APK_UPDATE)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .post(requestBody).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

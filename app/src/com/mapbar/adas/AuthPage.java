@@ -8,7 +8,21 @@ import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.auth_layout)
 public class AuthPage extends AppBasePage implements View.OnClickListener {
@@ -53,12 +67,12 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                choiceCar();
+                check();
                 break;
         }
     }
 
-    private void choiceCar() {
+    private void check() {
 
         String sn01 = sn_01.getText().toString();
         String sn02 = sn_02.getText().toString();
@@ -70,17 +84,53 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             return;
         }
 
-        StringBuilder sn = new StringBuilder();
+        final StringBuilder sn = new StringBuilder();
         sn.append(sn01).append("-").append(sn02).append("-").append(sn03).append("-").append(sn04);
 
-        ChoiceCarPage choiceCarPage = new ChoiceCarPage();
-        Bundle bundle = new Bundle();
-        bundle.putString("boxId", getDate().getString("boxId"));
-        bundle.putString("phone", getDate().getString("phone"));
-        bundle.putString("code", getDate().getString("code"));
-        bundle.putString("sn", sn.toString());
-        choiceCarPage.setDate(bundle);
-        PageManager.go(choiceCarPage);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", sn.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.SN_CHECK).post(requestBody).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("sn_check failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d(responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        ChoiceCarPage choiceCarPage = new ChoiceCarPage();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("boxId", getDate().getString("boxId"));
+                        bundle.putString("phone", getDate().getString("phone"));
+                        bundle.putString("code", getDate().getString("code"));
+                        bundle.putString("sn", sn.toString());
+                        choiceCarPage.setDate(bundle);
+                        PageManager.go(choiceCarPage);
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    Log.d("sn_check failure " + e.getMessage());
+                }
+            }
+        });
 
     }
 }

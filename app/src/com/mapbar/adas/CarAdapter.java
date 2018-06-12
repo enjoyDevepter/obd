@@ -52,6 +52,7 @@ public class CarAdapter extends BaseAdapter implements SectionIndexer {
             convertView = inflater.inflate(R.layout.car_item, null);
             holder.letterTV = (TextView) convertView.findViewById(R.id.tv_contact_index_letter);
             holder.nameTV = (TextView) convertView.findViewById(R.id.car_name);
+            holder.contentV = convertView.findViewById(R.id.content);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -73,6 +74,7 @@ public class CarAdapter extends BaseAdapter implements SectionIndexer {
             holder.nameTV.setText(carInfo.getRawName());
         }
         holder.nameTV.setTextColor(carInfo.isChoice() ? Color.RED : Color.parseColor("#FF5D5D5D"));
+        holder.contentV.setBackgroundColor(carInfo.isChoice() ? Color.parseColor("#ffffffff") : Color.parseColor("#FFF3F3F3"));
         return convertView;
     }
 
@@ -104,5 +106,6 @@ public class CarAdapter extends BaseAdapter implements SectionIndexer {
     private class ViewHolder {
         TextView letterTV;
         TextView nameTV;
+        View contentV;
     }
 }

@@ -62,13 +62,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                IdentifyPage page = new IdentifyPage();
-                Bundle bundle = new Bundle();
-                bundle.putString("boxId", getDate().getString("boxId"));
-                bundle.putString("phone", "18600474095");
-                page.setDate(bundle);
-                PageManager.go(page);
-//                getMSN();
+                getMSN();
                 break;
         }
     }
@@ -93,7 +87,9 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
             e.printStackTrace();
         }
         RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-        Request request = new Request.Builder().url(URLUtils.GET_SMS).post(requestBody).build();
+        Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.GET_SMS).post(requestBody).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

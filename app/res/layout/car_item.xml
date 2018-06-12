@@ -2,20 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#FFCCCCCC"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_contact_index_letter"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="15dp"
+        android:gravity="center_vertical"
         android:text="A"
         android:textColor="#FFA5A5A5"
         android:textSize="16sp" />
 
     <RelativeLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="40dp">
 

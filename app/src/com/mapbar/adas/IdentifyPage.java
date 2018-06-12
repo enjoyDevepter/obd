@@ -8,7 +8,21 @@ import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.identifying_layout)
 public class IdentifyPage extends AppBasePage implements View.OnClickListener {
@@ -42,24 +56,62 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                goAuth();
+                check();
                 break;
         }
     }
 
-    private void goAuth() {
-        String identify = content.getText().toString();
+    private void check() {
+        final String identify = content.getText().toString();
         if (GlobalUtil.isEmpty(identify)) {
             Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
             return;
         }
-        AuthPage authPage = new AuthPage();
-        Bundle bundle = new Bundle();
-        bundle.putString("boxId", getDate().getString("boxId"));
-        bundle.putString("phone", getDate().getString("phone"));
-        bundle.putString("code", identify);
-        authPage.setDate(bundle);
-        PageManager.go(authPage);
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("phone", getDate().getString("phone"));
+            jsonObject.put("code", identify);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.SMS_CHECK).post(requestBody).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("sms_check failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d(responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        AuthPage authPage = new AuthPage();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("boxId", getDate().getString("boxId"));
+                        bundle.putString("phone", getDate().getString("phone"));
+                        bundle.putString("code", identify);
+                        authPage.setDate(bundle);
+                        PageManager.go(authPage);
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    Log.d("sms_check failure " + e.getMessage());
+                }
+            }
+        });
 
     }
 }

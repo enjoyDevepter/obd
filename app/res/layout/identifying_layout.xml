@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:text="18611910343"
         android:textColor="#ff000000"
         android:textSize="19sp" />
 
@@ -36,7 +35,6 @@
         android:background="@drawable/input_bg"
         android:hint="请输入验证码"
         android:paddingLeft="10dp"
-        android:text="123456"
         android:textSize="17sp" />
 
     <TextView

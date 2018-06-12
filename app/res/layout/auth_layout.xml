@@ -22,7 +22,6 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
-            android:text="L4K8"
             android:textSize="17sp" />
 
         <View
@@ -38,7 +37,6 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
-            android:text="ZCJ8"
             android:textSize="17sp" />
 
         <View
@@ -54,7 +52,6 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
-            android:text="RGKY"
             android:textSize="17sp" />
 
         <View
@@ -70,9 +67,7 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
-            android:text="M5BD"
             android:textSize="17sp" />
-
     </LinearLayout>
 
 

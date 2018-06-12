@@ -7,6 +7,7 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.view.CustomScrollView;
+import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
@@ -74,7 +75,11 @@ public class DisclaimerPage extends AppBasePage implements CustomScrollView.ISma
                             public void onClick(View v) {
                                 dialog.dismiss();
                                 DISCALIMER_VISIBLE.set(true);
-                                PageManager.go(new MainPage());
+                                if (BlueManager.getInstance().isConnected()) {
+                                    PageManager.go(new MainPage());
+                                } else {
+                                    PageManager.go(new ConnectPage());
+                                }
                             }
                         });
 

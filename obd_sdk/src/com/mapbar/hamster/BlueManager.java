@@ -63,6 +63,7 @@ public class BlueManager {
     private static final int DISCONNECTED = 0; // 断开连接
     private static final int UN_AUTH = 2; // 未授权
     private static final int UN_ACTIVATE = 3; //未激活
+    private static final long COMMAND_TIMEOUT = 3000;
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
     private BluetoothGatt mBluetoothGatt;
@@ -543,7 +544,7 @@ public class BlueManager {
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_TIRE_PRESSURE_STATUS;
-                    bundle.putInt("status", content[0]);
+                    bundle.putByte("status", content[0]);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 } else if (result[2] == 04) { // 灵敏度确认
@@ -581,6 +582,73 @@ public class BlueManager {
 
     public static class InstanceHolder {
         private static final BlueManager INSTANCE = new BlueManager();
+    }
+
+    private static class TimeOutThread extends Thread {
+
+        private static final String TIMEOUTSYNC = "MTIMEOUTSYNC";
+
+        private boolean needStop = false;
+
+        private boolean waitForCommand = false;
+
+        @Override
+        public synchronized void start() {
+            needStop = false;
+            super.start();
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            while (!needStop) {
+
+                synchronized (TIMEOUTSYNC) {
+
+                    if (needStop) {
+                        return;
+                    }
+
+                    if (waitForCommand) {
+
+                        try {
+                            TIMEOUTSYNC.wait(COMMAND_TIMEOUT);
+
+
+                            TIMEOUTSYNC.notifyAll();
+                            TIMEOUTSYNC.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        }
+
+        public void startCommand() {
+            synchronized (TIMEOUTSYNC) {
+                waitForCommand = true;
+                TIMEOUTSYNC.notifyAll();
+            }
+        }
+
+        public void endCommand() {
+            synchronized (TIMEOUTSYNC) {
+                waitForCommand = false;
+                TIMEOUTSYNC.notifyAll();
+                try {
+                    TIMEOUTSYNC.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void cancel() {
+            needStop = true;
+            interrupt();
+        }
     }
 
     private final class WorkerHandler extends Handler {
@@ -662,7 +730,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getInt("status"));
+                            notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getByte("status"));
                         }
                     });
                     break;
@@ -699,7 +767,6 @@ public class BlueManager {
                         @Override
                         public void run() {
                             if (repeat < 3) {
-                                Log.d("repeat " + repeat);
                                 write(currentProtocol); // 重发
                                 repeat++;
                             }

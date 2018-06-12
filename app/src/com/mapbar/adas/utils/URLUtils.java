@@ -18,5 +18,6 @@ public class URLUtils {
     public static final String FIRMWARE_UPDATE = HOST + "service/update/getUpdate";
     public static final String FIRMWARE_UPDATE_SUCCESS = HOST + "service/update/updateResult";
     public static final String APK_UPDATE = HOST + "service/soft/getUpdate";
-
+    public static final String SMS_CHECK = HOST + "service/sms/check";
+    public static final String SN_CHECK = HOST + "service/serialNumber/check";
 }

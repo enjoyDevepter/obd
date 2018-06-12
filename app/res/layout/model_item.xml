@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
         android:text="名称"
         android:textColor="#FF5D5D5D"
         android:textSize="14sp" />

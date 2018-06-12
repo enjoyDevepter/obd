@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.preferences.SettingPreferencesConfig;
 import com.mapbar.adas.utils.CarHelper;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.adas.view.IndexSideBar;
@@ -46,13 +47,13 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
     IndexSideBar indexSideBar;
     @ViewInject(R.id.expandablelistView)
     ExpandableListView expandableListView;
+    String carName = "";
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.next)
     private TextView next;
     @ViewInject(R.id.back)
     private View back;
-
     private CarAdapter carAdapter;
     private CarBrandExpandableListAdapter carBrandExpandableListAdapter;
     private List<CarInfo> carInfos;
@@ -249,6 +250,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                     for (CarStyle carStyle : carModel.getStyles()) {
                         if (carStyle.isChoice()) {
                             carId = carStyle.getId();
+                            carName = carStyle.getName();
                         }
                     }
                 }
@@ -275,6 +277,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .url(URLUtils.ACTIVATE)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .post(requestBody)
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
@@ -306,6 +309,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         String code = result.optString("rightStr");
+                        SettingPreferencesConfig.CAR.set(carName);
+                        SettingPreferencesConfig.PHONE.set((String) getDate().get("phone"));
                         BlueManager.getInstance().write(ProtocolUtils.auth(getDate().getString("sn"), code));
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
@@ -322,10 +327,10 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         });
     }
 
-
     private void modifyCar() {
 
         String carId = "";
+
 
         for (CarInfo carInfo : carInfos) {
             if (carInfo.isChoice()) {
@@ -333,6 +338,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                     for (CarStyle carStyle : carModel.getStyles()) {
                         if (carStyle.isChoice()) {
                             carId = carStyle.getId();
+                            carName = carStyle.getName();
                         }
                     }
                 }
@@ -358,6 +364,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .url(URLUtils.MODIFY_CAR_BRAND)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .post(requestBody)
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
@@ -373,6 +380,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
+                        SettingPreferencesConfig.CAR.set(carName);
                         PageManager.back();
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
@@ -419,6 +427,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
 
         Request request = new Request.Builder()
                 .url(URLUtils.ACTIVATE_SUCCESS)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .post(requestBody)
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {

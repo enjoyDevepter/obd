@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.preferences.SettingPreferencesConfig;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
@@ -85,6 +86,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private View pressureInfo;
     @ViewInject(R.id.tire_pressure)
     private View pressureIcon;
+    @ViewInject(R.id.phone)
+    private TextView phoneTV;
+    @ViewInject(R.id.car_name)
+    private TextView carTV;
     private byte[] updates;
     private OBDVersion obdVersion;
     private ProgressBar progressBar;
@@ -143,7 +148,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         reset.setOnClickListener(this);
         sensitive.setOnClickListener(this);
         change.setOnClickListener(this);
-
+        phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
+        carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
 
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
@@ -459,15 +465,21 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
-                if ((Integer) data != 0) {
-                    if (pressureInfo.getVisibility() == View.INVISIBLE) {
-                        pressureInfo.setVisibility(View.VISIBLE);
-                        pressureIcon.setBackgroundResource(R.drawable.unusual);
-                    }
+                byte[] bytes = HexUtils.getBooleanArray((byte) data);
+                if (bytes[0] == 1) {
+                    Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
+
                 } else {
-                    if (pressureInfo.getVisibility() == View.VISIBLE) {
-                        pressureInfo.setVisibility(View.INVISIBLE);
-                        pressureIcon.setBackgroundResource(R.drawable.normal);
+                    if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
+                        if (pressureInfo.getVisibility() == View.INVISIBLE) {
+                            pressureInfo.setVisibility(View.VISIBLE);
+                            pressureIcon.setBackgroundResource(R.drawable.unusual);
+                        }
+                    } else {
+                        if (pressureInfo.getVisibility() == View.VISIBLE) {
+                            pressureInfo.setVisibility(View.INVISIBLE);
+                            pressureIcon.setBackgroundResource(R.drawable.normal);
+                        }
                     }
                 }
                 break;
@@ -521,6 +533,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         Request request = new Request.Builder()
                 .url(URLUtils.ACTIVATE_SUCCESS)
                 .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -570,6 +583,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         Request request = new Request.Builder()
                 .url(URLUtils.FIRMWARE_UPDATE)
                 .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -651,6 +665,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
         Request request = new Request.Builder()
                 .url(URLUtils.FIRMWARE_UPDATE_SUCCESS)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .post(requestBody)
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
@@ -763,6 +778,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         Request request = new Request.Builder()
                 .url(URLUtils.GET_LISENSE)
                 .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
                 .build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
