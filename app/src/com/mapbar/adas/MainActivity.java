@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 .addTask(new SDInitTask())
                 .addTask(new LogInitTask())
                 .addTask(new DisclaimerTask())
+                .addTask(new LocationCheckTask())
                 .addTask(new UpdateTask());
         TaskManager.getInstance().next();
 
