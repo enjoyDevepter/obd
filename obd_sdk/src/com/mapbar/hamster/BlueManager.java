@@ -53,6 +53,7 @@ public class BlueManager {
     private static final int MSG_ERROR = 9;
     private static final int MSG_STUDY = 10;
     private static final int MSG_STUDY_PROGRESS = 11;
+    private static final int MSG_OBD_DISCONNECTED = 12;
 
 
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
@@ -245,6 +246,9 @@ public class BlueManager {
                             break;
                         case BluetoothProfile.STATE_DISCONNECTED:
                             connectStatus = DISCONNECTED;
+                            Message message = new Message();
+                            message.what = MSG_OBD_DISCONNECTED;
+                            mHandler.sendMessage(message);
                             Log.d("onConnectionStateChange  STATE_DISCONNECTED");
                             disconnect();
                             break;
@@ -782,6 +786,14 @@ public class BlueManager {
                         @Override
                         public void run() {
                             notifyBleCallBackListener(OBDEvent.OBD_STUDY_PROGRESS, bundle.getInt("status"));
+                        }
+                    });
+                    break;
+                case MSG_OBD_DISCONNECTED:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
                         }
                     });
                     break;

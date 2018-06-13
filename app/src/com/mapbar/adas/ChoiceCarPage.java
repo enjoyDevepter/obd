@@ -214,6 +214,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             case R.id.next:
+                next.setClickable(false);
                 activate();
                 break;
         }
@@ -276,6 +277,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        next.setClickable(true);
                         Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -296,6 +298,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
+                                next.setClickable(true);
                                 Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });
@@ -354,6 +357,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        next.setClickable(true);
                         Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -373,6 +377,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
+                                next.setClickable(true);
                                 Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });

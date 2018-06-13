@@ -1,8 +1,10 @@
 package com.mapbar.adas;
 
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -271,14 +273,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                                 switch (sensitiveView.getType()) {
                                     case LOW:
                                         sensitiveView.setType(SensitiveView.Type.MEDIUM);
+                                        type = SensitiveView.Type.MEDIUM;
                                         BlueManager.getInstance().write(ProtocolUtils.setSensitive(02));
                                         break;
                                     case MEDIUM:
                                         sensitiveView.setType(SensitiveView.Type.Hight);
+                                        type = SensitiveView.Type.Hight;
                                         BlueManager.getInstance().write(ProtocolUtils.setSensitive(03));
                                         break;
                                     case Hight:
                                         sensitiveView.setType(SensitiveView.Type.LOW);
+                                        type = SensitiveView.Type.LOW;
                                         BlueManager.getInstance().write(ProtocolUtils.setSensitive(01));
                                         break;
                                 }
@@ -371,6 +376,24 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
+            case OBDEvent.OBD_DISCONNECTED:
+                AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                        .setMessage("OBD链接断开,请检查设备后重试!")
+                        .setTitle("OBD链接断开")
+                        .setPositiveButton("重新连接", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                BlueManager.getInstance().startScan();
+                            }
+                        })
+                        .setNegativeButton("退出应用", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                PageManager.back();
+                            }
+                        });
+                builder.create().show();
+                break;
             case OBDEvent.OBD_FIRST_USE:
                 Log.d("OBDEvent.OBD_FIRST_USE ");
                 // 激活

@@ -62,13 +62,13 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
+                next.setClickable(false);
                 getMSN();
                 break;
         }
     }
 
     private void getMSN() {
-
         final String phone = content.getText().toString();
         if (GlobalUtil.isEmpty(phone)) {
             Toast.makeText(getContext(), "请输入手机号码", Toast.LENGTH_LONG).show();
@@ -97,6 +97,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        next.setClickable(true);
                         Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -107,7 +108,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 String responese = response.body().string();
                 Log.d(responese);
                 try {
-                    JSONObject result = new JSONObject(responese);
+                    final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         IdentifyPage page = new IdentifyPage();
                         Bundle bundle = new Bundle();
@@ -115,6 +116,14 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                         bundle.putString("phone", phone);
                         page.setDate(bundle);
                         PageManager.go(page);
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                next.setClickable(true);
+                                Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     Log.d("get MSN failure " + e.getMessage());

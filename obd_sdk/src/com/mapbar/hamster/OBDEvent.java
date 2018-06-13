@@ -32,7 +32,7 @@ public class OBDEvent {
     /**
      * 蓝牙设备断开连接<br>
      */
-    public static final int BLUE_DISCONNECTED = 6;
+    public static final int OBD_DISCONNECTED = 6;
     /**
      * OBD首次使用
      */
