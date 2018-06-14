@@ -56,7 +56,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                next.setClickable(false);
                 check();
                 break;
         }
@@ -69,6 +68,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             return;
         }
 
+        next.setClickable(false);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("phone", getDate().getString("phone"));
@@ -97,6 +97,12 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 Log.d(responese);
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        next.setClickable(true);
+                    }
+                });
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
@@ -111,7 +117,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                next.setClickable(true);
                                 Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });

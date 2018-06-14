@@ -214,7 +214,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             case R.id.next:
-                next.setClickable(false);
                 activate();
                 break;
         }
@@ -252,6 +251,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             return;
         }
 
+        next.setClickable(false);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("boxId", getDate().get("boxId"));
