@@ -12,6 +12,7 @@ public class UpdateInfo {
     private String desc;
     private String url;
     private String create_time;
+    private int isMust;
 
     public int getUpdateState() {
         return updateState;
@@ -69,6 +70,14 @@ public class UpdateInfo {
         this.create_time = create_time;
     }
 
+    public int getIsMust() {
+        return isMust;
+    }
+
+    public void setIsMust(int isMust) {
+        this.isMust = isMust;
+    }
+
     @Override
     public String toString() {
         return "UpdateInfo{" +
@@ -77,7 +86,9 @@ public class UpdateInfo {
                 ", version=" + version +
                 ", size=" + size +
                 ", desc='" + desc + '\'' +
+                ", url='" + url + '\'' +
                 ", create_time='" + create_time + '\'' +
+                ", isMust=" + isMust +
                 '}';
     }
 }

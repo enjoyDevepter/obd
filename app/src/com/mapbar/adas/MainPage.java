@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -60,12 +61,17 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.mapbar.adas.view.SensitiveView.Type.Hight;
+import static com.mapbar.adas.view.SensitiveView.Type.LOW;
+import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
+
 @PageSetting(contentViewId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener, LocationListener {
     private static final int UNIT = 1024;
     CustomDialog dialog = null;
     CustomDialog updateDialog = null;
     private volatile boolean verified;
+    private volatile boolean hasCheck;
     private String sn;
     private String boxId;
     private SensitiveView.Type type = SensitiveView.Type.MEDIUM;
@@ -158,12 +164,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             verify();
         }
 
-        if (verified) { // 已鉴权完成
+        if (verified && !hasCheck) { // 已鉴权完成
             // 获取OBD版本信息，请求服务器是否有更新
+            hasCheck = true;
             BlueManager.getInstance().write(ProtocolUtils.getVersion());
         }
 
         Log.d("onResumeonResumeonResume  ");
+    }
+
+    private void showUserInfo() {
+
     }
 
     @Override
@@ -259,32 +270,31 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
+                        final SensitiveView sensitiveView = (SensitiveView) view.findViewById(R.id.sensitive);
                         view.findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                SensitiveView.Type type = sensitiveView.getType();
+                                BlueManager.getInstance().write(ProtocolUtils.setSensitive(type == LOW ? 01 : type == MEDIUM ? 02 : 03));
                                 dialog.dismiss();
                             }
                         });
-                        final SensitiveView sensitiveView = (SensitiveView) view.findViewById(R.id.sensitive);
                         sensitiveView.setType(type);
                         sensitiveView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 switch (sensitiveView.getType()) {
                                     case LOW:
-                                        sensitiveView.setType(SensitiveView.Type.MEDIUM);
-                                        type = SensitiveView.Type.MEDIUM;
-                                        BlueManager.getInstance().write(ProtocolUtils.setSensitive(02));
+                                        type = MEDIUM;
+                                        sensitiveView.setType(type);
                                         break;
                                     case MEDIUM:
-                                        sensitiveView.setType(SensitiveView.Type.Hight);
-                                        type = SensitiveView.Type.Hight;
-                                        BlueManager.getInstance().write(ProtocolUtils.setSensitive(03));
+                                        type = Hight;
+                                        sensitiveView.setType(type);
                                         break;
                                     case Hight:
-                                        sensitiveView.setType(SensitiveView.Type.LOW);
-                                        type = SensitiveView.Type.LOW;
-                                        BlueManager.getInstance().write(ProtocolUtils.setSensitive(01));
+                                        type = LOW;
+                                        sensitiveView.setType(type);
                                         break;
                                 }
                             }
@@ -407,18 +417,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case OBDEvent.OBD_NORMAL:
                 Log.d("OBDEvent.OBD_NORMAL ");
-                int typeInt = Integer.valueOf((String) data);
-                switch (typeInt) {
-                    case 0:
-                        type = SensitiveView.Type.LOW;
-                        break;
-                    case 1:
-                        type = SensitiveView.Type.MEDIUM;
-                        break;
-                    case 2:
-                        type = SensitiveView.Type.Hight;
-                        break;
-                }
+                // 解析OBD状态
+                byte[] result1 = (byte[]) data;
+                byte[] result = new byte[result1.length - 1];
+                System.arraycopy(result1, 1, result, 0, result.length);
+                parseStatus(result);
                 // 获取OBD版本信息，请求服务器是否有更新
                 BlueManager.getInstance().write(ProtocolUtils.getVersion());
                 break;
@@ -427,6 +430,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 sn = (String) data;
                 // 获取授权码
                 getLisense();
+                getUserInfo();
                 break;
             case OBDEvent.OBD_BEGIN_UPDATE:
                 if ((Integer) data == 0) { // 是否可以升级
@@ -485,23 +489,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
-                byte[] bytes = HexUtils.getBooleanArray((byte) data);
-                if (bytes[0] == 1) {
-                    Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
-
-                } else {
-                    if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
-                        if (pressureInfo.getVisibility() == View.INVISIBLE) {
-                            pressureInfo.setVisibility(View.VISIBLE);
-                            pressureIcon.setBackgroundResource(R.drawable.unusual);
-                        }
-                    } else {
-                        if (pressureInfo.getVisibility() == View.VISIBLE) {
-                            pressureInfo.setVisibility(View.INVISIBLE);
-                            pressureIcon.setBackgroundResource(R.drawable.normal);
-                        }
-                    }
-                }
+                parseStatus((byte[]) data);
                 break;
             case OBDEvent.OBD_ERROR:
                 switch ((Integer) data) {
@@ -531,6 +519,171 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
         }
+    }
+
+    /**
+     * 解析OBD状态码
+     *
+     * @param status
+     */
+    private void parseStatus(byte[] status) {
+        if (null != status && status.length == 77) {
+
+            byte[] snBytes = new byte[19];
+
+            sn = HexUtils.formatHexString(Arrays.copyOfRange(status, 0, snBytes.length));
+
+            byte[] bytes = HexUtils.getBooleanArray(status[snBytes.length]);
+            if (bytes[0] == 1) {
+                Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
+                return;
+            } else {
+                if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
+                    if (pressureInfo.getVisibility() == View.INVISIBLE) {
+                        pressureInfo.setVisibility(View.VISIBLE);
+                        pressureIcon.setBackgroundResource(R.drawable.unusual);
+                        // 上传胎压信息
+                        byte[] tire = new byte[status.length - snBytes.length];
+                        System.arraycopy(status, snBytes.length, tire, 0, tire.length);
+                        updateTireInfo(tire);
+                    }
+                } else {
+                    if (pressureInfo.getVisibility() == View.VISIBLE) {
+                        pressureInfo.setVisibility(View.INVISIBLE);
+                        pressureIcon.setBackgroundResource(R.drawable.normal);
+                    }
+                }
+            }
+
+            switch (status[snBytes.length + 1]) {
+                case 0:
+                    type = LOW;
+                    break;
+                case 1:
+                    type = SensitiveView.Type.MEDIUM;
+                    break;
+                case 2:
+                    type = Hight;
+                    break;
+            }
+
+        } else {
+            Log.d(" status error " + status.length);
+        }
+
+    }
+
+    /**
+     * 上传胎压信息
+     *
+     * @param tire
+     */
+    private void updateTireInfo(byte[] tire) {
+
+        if (null != tire && tire.length == 58) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                byte[] content = new byte[8];
+                jsonObject.put("serialNumber", sn);
+                jsonObject.put("s_status", HexUtils.formatHexString(new byte[]{tire[0]}));
+                jsonObject.put("s_level", HexUtils.formatHexString(new byte[]{tire[1]}));
+                System.arraycopy(tire, 2, content, 0, content.length);
+                jsonObject.put("study1", new String(Arrays.copyOfRange(content, 1, content.length)));
+                System.arraycopy(tire, 10, content, 0, content.length);
+                jsonObject.put("study2", new String(Arrays.copyOfRange(content, 1, content.length)));
+                System.arraycopy(tire, 18, content, 0, content.length);
+                jsonObject.put("study3", new String(Arrays.copyOfRange(content, 1, content.length)));
+                System.arraycopy(tire, 26, content, 0, content.length);
+                jsonObject.put("alarm1", new String(Arrays.copyOfRange(content, 1, content.length)));
+                System.arraycopy(tire, 34, content, 0, content.length);
+                jsonObject.put("alarm2", new String(Arrays.copyOfRange(content, 1, content.length)));
+                System.arraycopy(tire, 42, content, 0, content.length);
+                jsonObject.put("alarm3", new String(Arrays.copyOfRange(content, 1, content.length)));
+                System.arraycopy(tire, 50, content, 0, content.length);
+                jsonObject.put("alarm4", new String(Arrays.copyOfRange(content, 1, content.length)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("update_tire input " + jsonObject.toString());
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_TIRE)
+                    .post(requestBody)
+                    .addHeader("content-type", "application/json;charset:utf-8")
+                    .build();
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("update_tire failure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("update_tire success " + responese);
+                    final UserInfo userInfo = JSON.parseObject(responese, UserInfo.class);
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            SettingPreferencesConfig.PHONE.set(userInfo.getPhone());
+                            SettingPreferencesConfig.CAR.set(userInfo.getModelName() + " " + userInfo.getStyleName());
+                            phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
+                            carTV.setText(SettingPreferencesConfig.CAR.get());
+                        }
+                    });
+                }
+            });
+        }
+
+    }
+
+    /**
+     * 获取用户信息
+     */
+    private void getUserInfo() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", sn);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("getUserInfo input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.GET_USER_INFO)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("getUserInfo failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("getUserInfo success " + responese);
+                final UserInfo userInfo = JSON.parseObject(responese, UserInfo.class);
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        SettingPreferencesConfig.PHONE.set(userInfo.getPhone());
+                        SettingPreferencesConfig.CAR.set(userInfo.getModelName() + " " + userInfo.getStyleName());
+                        phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
+                        carTV.setText(SettingPreferencesConfig.CAR.get());
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -904,7 +1057,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
                     WorkerHandler.this.sendEmptyMessage(0);
                 }
-            }, 3000);
+            }, 30000);
         }
     }
 }

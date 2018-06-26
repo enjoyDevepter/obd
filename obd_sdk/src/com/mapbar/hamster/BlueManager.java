@@ -89,7 +89,7 @@ public class BlueManager {
                 return;
             }
             String name = device.getName();
-            if (name != null && name.startsWith("BT")) {
+            if (name != null && name.startsWith("Guardian")) {
                 Log.d("device.getName()     " + device.getName() + " device.getAddress() " + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
@@ -274,13 +274,13 @@ public class BlueManager {
                     List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
 
                     //可以遍历获得该设备上的服务集合，通过服务可以拿到该服务的UUID，和该服务里的所有属性Characteristic
-                    for (BluetoothGattService service : serviceList) {
-                        Log.d("service UUID  " + service.getUuid());
-                        List<BluetoothGattCharacteristic> characteristicList = service.getCharacteristics();
-                        for (BluetoothGattCharacteristic characteristic : characteristicList) {
-                            Log.d("characteristic  UUID " + characteristic.getUuid());
-                        }
-                    }
+//                    for (BluetoothGattService service : serviceList) {
+//                        Log.d("service UUID  " + service.getUuid());
+//                        List<BluetoothGattCharacteristic> characteristicList = service.getCharacteristics();
+//                        for (BluetoothGattCharacteristic characteristic : characteristicList) {
+//                            Log.d("characteristic  UUID " + characteristic.getUuid());
+//                        }
+//                    }
 
                     //2.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
                     BluetoothGattService bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
@@ -495,10 +495,16 @@ public class BlueManager {
                     Bundle bundle = new Bundle();
                     message.what = MSG_VERIFY;
                     bundle.putInt("status", content[0]);
-                    if (bundle.getInt("status") != 2) {
-                        bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
-                    } else {
-                        bundle.putString("value", new String(Arrays.copyOfRange(content, 1, content.length)));
+                    switch (bundle.getInt("status")) {
+                        case 0:
+                            bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
+                            break;
+                        case 1:
+                            bundle.putByteArray("value", content);
+                            break;
+                        case 2:
+                            bundle.putString("value", new String(Arrays.copyOfRange(content, 1, content.length)));
+                            break;
                     }
                     message.setData(bundle);
                     mHandler.sendMessage(message);
@@ -543,7 +549,7 @@ public class BlueManager {
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_TIRE_PRESSURE_STATUS;
-                    bundle.putByte("status", content[0]);
+                    bundle.putByteArray("status", content);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 } else if (result[2] == 04) { // 灵敏度确认
@@ -696,7 +702,7 @@ public class BlueManager {
                                     notifyBleCallBackListener(OBDEvent.OBD_FIRST_USE, date);
                                     break;
                                 case 1: // 设置授权正常
-                                    notifyBleCallBackListener(OBDEvent.OBD_NORMAL, date);
+                                    notifyBleCallBackListener(OBDEvent.OBD_NORMAL, bundle.getByteArray("value"));
                                     break;
                                 case 2: // 设备授权过期
                                     notifyBleCallBackListener(OBDEvent.OBD_EXPIRE, date);
@@ -729,7 +735,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getByte("status"));
+                            notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getByteArray("status"));
                         }
                     });
                     break;

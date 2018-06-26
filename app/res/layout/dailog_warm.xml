@@ -35,16 +35,16 @@
     <LinearLayout
         android:id="@+id/change"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:layout_height="40dp"
         android:layout_marginTop="32dp"
+        android:background="@drawable/click_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
             android:layout_weight="1"
             android:text="胎压发生变化"
             android:textColor="#ff42484B"
@@ -61,6 +61,7 @@
             android:layout_width="25dp"
             android:layout_height="24dp"
             android:layout_marginLeft="3dp"
+            android:layout_marginRight="30dp"
             android:background="@drawable/warm" />
 
     </LinearLayout>
@@ -68,25 +69,25 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="28dp"
         android:layout_marginRight="28dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:background="#ffC4C4C4" />
 
     <LinearLayout
         android:id="@+id/auth"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginBottom="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:background="@drawable/click_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
             android:layout_weight="1"
             android:text="授权过期"
             android:textColor="#ff42484B"
@@ -103,6 +104,7 @@
             android:layout_width="25dp"
             android:layout_height="24dp"
             android:layout_marginLeft="3dp"
+            android:layout_marginRight="30dp"
             android:background="@drawable/warm" />
 
     </LinearLayout>

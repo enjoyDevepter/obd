@@ -22,6 +22,7 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
+            android:text="VC3A"
             android:textSize="17sp" />
 
         <View
@@ -37,6 +38,7 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
+            android:text="JZN2"
             android:textSize="17sp" />
 
         <View
@@ -52,6 +54,7 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
+            android:text="BFDN"
             android:textSize="17sp" />
 
         <View
@@ -67,6 +70,7 @@
             android:layout_weight="1"
             android:background="@drawable/input_bg"
             android:paddingLeft="10dp"
+            android:text="BDNU"
             android:textSize="17sp" />
     </LinearLayout>
 

@@ -117,12 +117,16 @@ public class UpdateTask extends BaseTask {
                     @Override
                     public void bindView(View view) {
                         ((TextView) view.findViewById(R.id.desc)).setText("版本号" + updateInfo.getVersion() + "\n" + updateInfo.getDesc());
-                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
+                        if (updateInfo.getIsMust() == 1) {
+                            view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        } else {
+                            view.findViewById(R.id.cancel).setVisibility(View.GONE);
+                        }
 
                         view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
                             @Override
