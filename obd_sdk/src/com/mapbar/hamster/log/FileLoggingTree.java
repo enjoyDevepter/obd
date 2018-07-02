@@ -3,6 +3,7 @@ package com.mapbar.hamster.log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import timber.log.Timber;
 
@@ -13,28 +14,21 @@ import timber.log.Timber;
 public class FileLoggingTree extends Timber.Tree {
 
 
-    private String filePath;
+    private File file;
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+
 
     public FileLoggingTree(String filePath) {
-        this.filePath = filePath;
-        File file = new File(filePath);
-        if (!new File(filePath).exists()) {
-            file.mkdirs();
-        }
-
-        File logFile = new File(filePath, "/obd_log.txt");
-        if (logFile.exists()) {
-            logFile.delete();
-        }
+        file = new File(filePath, "/" + sdf.format(System.currentTimeMillis()) + ".txt");
+        new File(file.getParent()).mkdirs();
     }
 
     @Override
     protected void log(int priority, String tag, String message, Throwable t) {
-        if ("".equals(filePath) || null == filePath) {
+        if (null == file) {
             return;
         }
-
-        File file = new File(filePath, "/obd_log.txt");
 
         FileOutputStream fos = null;
         try {

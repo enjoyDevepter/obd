@@ -6,7 +6,8 @@ package com.mapbar.adas.utils;
 
 public class URLUtils {
 
-    public static final String HOST = "http://47.92.101.179:8020/";
+    public static final String HOST = "http://box.iccm.cn/";
+    //    public static final String HOST = "http://47.92.101.179:8020/";
     //    public static final String HOST = "http://192.168.188.104:8010/";
     public static final String ACTIVATE = HOST + "service/lisense/activation";
     public static final String ACTIVATE_SUCCESS = HOST + "service/lisense/activationResult";

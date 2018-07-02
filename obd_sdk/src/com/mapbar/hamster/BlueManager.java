@@ -75,6 +75,7 @@ public class BlueManager {
     private Handler mHandler;
     private int connectStatus;
     private boolean isScaning = false;
+    private ArrayList<String> scanResult = new ArrayList<>();
     private ArrayList<BleCallBackListener> callBackListeners = new ArrayList<>();
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         /**
@@ -89,8 +90,12 @@ public class BlueManager {
                 return;
             }
             String name = device.getName();
+            if (scanResult.contains(name)) {
+                return;
+            }
+            scanResult.add(name);
             if (name != null && name.startsWith("Guardian")) {
-                Log.d("device.getName()     " + device.getName() + " device.getAddress() " + device.getAddress());
+                Log.d("device.getName()=    " + device.getName() + " device.getAddress()=" + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
                 msg.obj = device.getAddress();
@@ -197,6 +202,8 @@ public class BlueManager {
 
         isScaning = true;
 
+        scanResult.clear();
+
         mBluetoothAdapter.startLeScan(leScanCallback);
 
         mMainHandler.postDelayed(new Runnable() {
@@ -232,26 +239,17 @@ public class BlueManager {
                 Log.d("getConnectionState " + status + "   " + newState);
 
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    switch (newState) {
-                        case BluetoothProfile.STATE_CONNECTING:
-                            Log.d("onConnectionStateChange  STATE_CONNECTING");
-                            break;
-                        case BluetoothProfile.STATE_CONNECTED:
-                            Log.d("onConnectionStateChange  STATE_CONNECTED");
-                            connectStatus = CONNECTED;
-                            mBluetoothGatt.discoverServices();
-                            break;
-                        case BluetoothProfile.STATE_DISCONNECTING:
-                            Log.d("onConnectionStateChange  STATE_DISCONNECTING");
-                            break;
-                        case BluetoothProfile.STATE_DISCONNECTED:
-                            connectStatus = DISCONNECTED;
-                            Message message = new Message();
-                            message.what = MSG_OBD_DISCONNECTED;
-                            mHandler.sendMessage(message);
-                            Log.d("onConnectionStateChange  STATE_DISCONNECTED");
-                            disconnect();
-                            break;
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        Log.d("onConnectionStateChange  STATE_CONNECTED");
+                        connectStatus = CONNECTED;
+                        mBluetoothGatt.discoverServices();
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        Log.d("onConnectionStateChange  STATE_DISCONNECTED");
+                        connectStatus = DISCONNECTED;
+                        Message message = new Message();
+                        message.what = MSG_OBD_DISCONNECTED;
+                        mHandler.sendMessage(message);
+                        disconnect();
                     }
                 } else {
                     disconnect();
@@ -327,7 +325,7 @@ public class BlueManager {
     /**
      * 断开链接
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
         if (mBluetoothGatt == null) {
             return;
         }
@@ -341,6 +339,7 @@ public class BlueManager {
             e.printStackTrace();
         }
         mBluetoothGatt.close();
+        mBluetoothGatt = null;
     }
 
     public boolean isConnected() {
@@ -389,6 +388,9 @@ public class BlueManager {
 
     private void realWrite(byte[] data) {
         Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
+        if (mBluetoothGatt == null) {
+            return;
+        }
         writeCharacteristic.setValue(data);
         mBluetoothGatt.writeCharacteristic(writeCharacteristic);
     }

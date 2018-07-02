@@ -80,7 +80,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         String sn04 = sn_04.getText().toString();
 
         if (GlobalUtil.isEmpty(sn01) || GlobalUtil.isEmpty(sn02) || GlobalUtil.isEmpty(sn03) || GlobalUtil.isEmpty(sn04)) {
-            Toast.makeText(getContext(), "请输入SN", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "请输入授权码", Toast.LENGTH_LONG).show();
             return;
         }
         next.setClickable(false);

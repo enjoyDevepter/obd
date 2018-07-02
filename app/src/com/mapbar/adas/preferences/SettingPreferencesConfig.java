@@ -19,7 +19,7 @@ public class SettingPreferencesConfig {
 
     public static final LongPreferences UPDATE_ID = new LongPreferences(SHARED_PREFERENCES_INIT, "update_id", -1l);
 
-    public static final StringPreferences PHONE = new StringPreferences(SHARED_PREFERENCES_INIT, "phone", "");
+    public static final StringPreferences PHONE = new StringPreferences(SHARED_PREFERENCES_INIT, "phone", " ");
 
-    public static final StringPreferences CAR = new StringPreferences(SHARED_PREFERENCES_INIT, "car", "");
+    public static final StringPreferences CAR = new StringPreferences(SHARED_PREFERENCES_INIT, "car", " ");
 }

@@ -71,7 +71,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     CustomDialog dialog = null;
     CustomDialog updateDialog = null;
     private volatile boolean verified;
-    private volatile boolean hasCheck;
     private String sn;
     private String boxId;
     private SensitiveView.Type type = SensitiveView.Type.MEDIUM;
@@ -164,18 +163,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             verify();
         }
 
-        if (verified && !hasCheck) { // 已鉴权完成
+        if (verified) { // 已鉴权完成
             // 获取OBD版本信息，请求服务器是否有更新
-            hasCheck = true;
             BlueManager.getInstance().write(ProtocolUtils.getVersion());
         }
 
         Log.d("onResumeonResumeonResume  ");
     }
 
-    private void showUserInfo() {
-
-    }
 
     @Override
     public void onStart() {
@@ -386,6 +381,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
+            case OBDEvent.BLUE_CONNECTED:
+                Toast.makeText(GlobalUtil.getContext(), "连接成功", Toast.LENGTH_SHORT).show();
+                break;
             case OBDEvent.OBD_DISCONNECTED:
                 AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
                         .setMessage("OBD链接断开,请检查设备后重试!")
@@ -421,7 +419,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 byte[] result1 = (byte[]) data;
                 byte[] result = new byte[result1.length - 1];
                 System.arraycopy(result1, 1, result, 0, result.length);
-                parseStatus(result);
+                parseStatus(result, true);
+                getUserInfo();
+                // 查询学习进度
+                BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                 // 获取OBD版本信息，请求服务器是否有更新
                 BlueManager.getInstance().write(ProtocolUtils.getVersion());
                 break;
@@ -455,7 +456,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     updateForOneUnit(update.getIndex() + 1);
                 } else if (update.getStatus() == 2) {
                     // 升级完成，通知服务器
-                    notifyUpdateSuccess();
+                    notifyUpdateSuccess(obdVersion);
                     if (null != progressBar && null != updateDialog) {
                         updateDialog.dismiss();
                         updateDialog = null;
@@ -483,13 +484,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     if (obdVersion.getUpdateState() == 1) {
                         downloadUpdate(obdVersion);
                     } else {
+                        notifyUpdateSuccess(obdVersion);
                         showStudy();
                     }
                 }
                 break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
-                parseStatus((byte[]) data);
+                parseStatus((byte[]) data, false);
                 break;
             case OBDEvent.OBD_ERROR:
                 switch ((Integer) data) {
@@ -526,17 +528,16 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
      *
      * @param status
      */
-    private void parseStatus(byte[] status) {
+    private void parseStatus(byte[] status, boolean update) {
         if (null != status && status.length == 77) {
 
             byte[] snBytes = new byte[19];
 
-            sn = HexUtils.formatHexString(Arrays.copyOfRange(status, 0, snBytes.length));
+            sn = new String(Arrays.copyOfRange(status, 0, snBytes.length));
 
             byte[] bytes = HexUtils.getBooleanArray(status[snBytes.length]);
             if (bytes[0] == 1) {
                 Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
-                return;
             } else {
                 if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
                     if (pressureInfo.getVisibility() == View.INVISIBLE) {
@@ -546,6 +547,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         byte[] tire = new byte[status.length - snBytes.length];
                         System.arraycopy(status, snBytes.length, tire, 0, tire.length);
                         updateTireInfo(tire);
+
+                        if (update) { // 避免首次检测OBD时胎压异常，到账重复上传。
+                            update = false;
+                        }
                     }
                 } else {
                     if (pressureInfo.getVisibility() == View.VISIBLE) {
@@ -553,16 +558,23 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         pressureIcon.setBackgroundResource(R.drawable.normal);
                     }
                 }
+
+                if (update) {
+                    // 上传胎压信息
+                    byte[] tire = new byte[status.length - snBytes.length];
+                    System.arraycopy(status, snBytes.length, tire, 0, tire.length);
+                    updateTireInfo(tire);
+                }
             }
 
             switch (status[snBytes.length + 1]) {
-                case 0:
+                case 1:
                     type = LOW;
                     break;
-                case 1:
+                case 2:
                     type = SensitiveView.Type.MEDIUM;
                     break;
-                case 2:
+                case 3:
                     type = Hight;
                     break;
             }
@@ -588,19 +600,19 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 jsonObject.put("s_status", HexUtils.formatHexString(new byte[]{tire[0]}));
                 jsonObject.put("s_level", HexUtils.formatHexString(new byte[]{tire[1]}));
                 System.arraycopy(tire, 2, content, 0, content.length);
-                jsonObject.put("study1", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("study1", new String(content));
                 System.arraycopy(tire, 10, content, 0, content.length);
-                jsonObject.put("study2", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("study2", new String(content));
                 System.arraycopy(tire, 18, content, 0, content.length);
-                jsonObject.put("study3", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("study3", new String(content));
                 System.arraycopy(tire, 26, content, 0, content.length);
-                jsonObject.put("alarm1", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("alarm1", new String(content));
                 System.arraycopy(tire, 34, content, 0, content.length);
-                jsonObject.put("alarm2", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("alarm2", new String(content));
                 System.arraycopy(tire, 42, content, 0, content.length);
-                jsonObject.put("alarm3", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("alarm3", new String(content));
                 System.arraycopy(tire, 50, content, 0, content.length);
-                jsonObject.put("alarm4", new String(Arrays.copyOfRange(content, 1, content.length)));
+                jsonObject.put("alarm4", new String(content));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -625,16 +637,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 public void onResponse(Call call, Response response) throws IOException {
                     String responese = response.body().string();
                     Log.d("update_tire success " + responese);
-                    final UserInfo userInfo = JSON.parseObject(responese, UserInfo.class);
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            SettingPreferencesConfig.PHONE.set(userInfo.getPhone());
-                            SettingPreferencesConfig.CAR.set(userInfo.getModelName() + " " + userInfo.getStyleName());
-                            phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
-                            carTV.setText(SettingPreferencesConfig.CAR.get());
-                        }
-                    });
                 }
             });
         }
@@ -774,7 +776,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         case 0:
                             // 定时获取胎压状态
 //                            mHandler.sendEmptyMessage(0);
-                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
+//                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                             break;
                         case 1: // 版本参数都更新
                             BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
@@ -819,14 +821,21 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         }
     }
 
+    private void notifyParamsSuccess() {
+
+    }
+
+
     /**
-     * 通知服务器升级完成
+     * 通知服务器固件升级完成
      */
-    private void notifyUpdateSuccess() {
+    private void notifyUpdateSuccess(OBDVersion obdVersion) {
 
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", sn);
+            jsonObject.put("bVersion", obdVersion.getbVersion());
+            jsonObject.put("pVersion", obdVersion.getpVersion());
         } catch (JSONException e) {
             e.printStackTrace();
         }
