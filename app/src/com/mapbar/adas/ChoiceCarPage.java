@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.app.ProgressDialog;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.widget.AdapterView;
@@ -56,6 +57,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
     private CarBrandExpandableListAdapter carBrandExpandableListAdapter;
     private List<CarInfo> carInfos;
 
+    private ProgressDialog progressDialog;
+
     @Override
     public void onResume() {
         super.onResume();
@@ -63,6 +66,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         next.setOnClickListener(this);
         back.setOnClickListener(this);
         BlueManager.getInstance().addBleCallBackListener(this);
+        progressDialog = ProgressDialog.show(getContext(), "", "正在加载...", false);
         getCar();
     }
 
@@ -78,6 +82,9 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
@@ -89,6 +96,9 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {

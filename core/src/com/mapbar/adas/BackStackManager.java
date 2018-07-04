@@ -39,6 +39,11 @@ public class BackStackManager {
         historyList.add(page);
     }
 
+    /**
+     * 弹栈
+     *
+     * @return
+     */
     public int pop() {
         BasePage prev = getPrev();
 
@@ -54,14 +59,14 @@ public class BackStackManager {
             prev = getPrev();
             if (!current.getPrev().equals(prev)) {
                 if (backPage.isToHistory()) {
-                    current.back(backPage.getId(),false);
+                    current.back(backPage.getId(), false);
                 } else {
-                    current.back(-1,true);
+                    current.back(-1, true);
                 }
                 ((FragmentPage) current).remove();
             }
 
-            if(prev.isSkip()){
+            if (prev.isSkip()) {
                 return pop();
             } else {
                 backPage = current;
@@ -174,7 +179,7 @@ public class BackStackManager {
      */
     public BasePage findPageAndSkipBetweenPages(@NonNull Class<? extends BasePage> clazz) {
         BasePage targetPage = null;
-        List<BasePage> tempPageList = new ArrayList<BasePage>();
+        List<BasePage> tempPageList = new ArrayList<>();
         for (int i = size() - 1; i >= 0; i--) {
             BasePage historyPage = historyList.get(i);
             if (clazz.isInstance(historyPage)) {

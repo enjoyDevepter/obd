@@ -21,6 +21,17 @@
         android:layout_height="1dp"
         android:background="#ff5F6876" />
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="升级过程中请勿退出应用"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="16sp" />
+
     <ProgressBar
         android:id="@+id/progress"
         style="@android:style/Widget.ProgressBar.Horizontal"
