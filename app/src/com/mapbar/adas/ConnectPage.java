@@ -11,6 +11,7 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
 @PageSetting(contentViewId = R.layout.connect_layout, toHistory = false)
@@ -56,6 +57,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
             case R.id.retry:
                 animationDrawable.start();
                 retry.setClickable(false);
+                retry.setVisibility(View.INVISIBLE);
                 BlueManager.getInstance().startScan();
                 break;
 
@@ -66,6 +68,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.BLUE_SCAN_FINISHED:
+                Log.d("OBDEvent.BLUE_SCAN_FINISHED");
                 animationDrawable.stop();
                 retry.setClickable(true);
                 retry.setVisibility(View.VISIBLE);

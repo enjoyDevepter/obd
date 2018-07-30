@@ -12,7 +12,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="12dp"
         android:layout_marginTop="12dp"
-        android:text="保存胎压"
+        android:text="胎压校准"
         android:textColor="#ff42484B"
         android:textSize="18sp" />
 
@@ -23,15 +23,25 @@
 
 
     <TextView
-        android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="36dp"
         android:layout_marginRight="36dp"
         android:layout_marginTop="22dp"
-        android:text="保存当前胎压后，当某个轮胎胎压发生变化时， 盒子会发出报警声音。\n\n 建议检查四个轮胎胎压均为正常的情况下 再进行保存操作！"
+        android:text="请您检查并确认当前四个轮胎胎压是正常的，而后再点击“校准”按钮。否则会漏报或误报!"
+        android:textColor="#FFFF0000"
+        android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="5dp"
+        android:text="当您完成校准之后，胎压盒子会记录当前胎压并认为它是正常的。当胎压再次发生变化时，盒子就会报警！"
         android:textColor="#ff3D424C"
         android:textSize="16sp" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,7 +58,7 @@
             android:layout_weight="1"
             android:background="@drawable/disclaimer_agree_btn_bg"
             android:gravity="center"
-            android:text="保存"
+            android:text="校准"
             android:textColor="#FFFFFFFF"
             android:textSize="18sp" />
 
@@ -61,7 +71,7 @@
             android:layout_weight="1"
             android:background="@drawable/disclaimer_disagree_btn_bg"
             android:gravity="center"
-            android:text="不保存"
+            android:text="取消"
             android:textColor="#ff3D424C"
             android:textSize="18sp" />
 

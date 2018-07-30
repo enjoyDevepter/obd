@@ -1,7 +1,10 @@
 package com.mapbar.adas;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
@@ -12,14 +15,9 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.adas.preferences.SettingPreferencesConfig;
 import com.mapbar.adas.utils.CarHelper;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.adas.view.IndexSideBar;
-import com.mapbar.hamster.BleCallBackListener;
-import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.OBDEvent;
-import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
@@ -32,13 +30,11 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.choice_car_layout)
-public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.brand)
     ListView listView;
@@ -65,7 +61,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         title.setText("选择车型");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
-        BlueManager.getInstance().addBleCallBackListener(this);
         progressDialog = ProgressDialog.show(getContext(), "", "正在加载...", false);
         getCar();
     }
@@ -73,7 +68,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
     @Override
     public void onStop() {
         super.onStop();
-        BlueManager.getInstance().removeCallBackListener(this);
     }
 
     private void getCar() {
@@ -88,9 +82,20 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                                .setMessage("网络异常,请检查网络状态后重试!")
+                                .setTitle("网络异常")
+                                .setNegativeButton("重试", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        getCar();
+                                    }
+                                })
+                                .create().show();
+                        next.setClickable(true);
                     }
                 });
+
             }
 
             @Override
@@ -234,13 +239,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
             return;
         }
 
-        // 修改车型
-        if (getDate() != null && !GlobalUtil.isEmpty((String) getDate().get("type"))) {
-            modifyCar();
-            return;
-        }
-
-
         String carId = "";
 
         for (CarInfo carInfo : carInfos) {
@@ -262,202 +260,17 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener, 
         }
 
         next.setClickable(false);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("boxId", getDate().get("boxId"));
-            jsonObject.put("phone", getDate().get("phone"));
-            jsonObject.put("code", getDate().get("code"));
-            jsonObject.put("carId", carId);
-            jsonObject.put("serialNumber", getDate().get("sn"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-        Request request = new Request.Builder()
-                .url(URLUtils.ACTIVATE)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .post(requestBody)
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("activate failure " + e.getMessage());
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        next.setClickable(true);
-                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("activate success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        String code = result.optString("rightStr");
-                        SettingPreferencesConfig.CAR.set(carName);
-                        SettingPreferencesConfig.PHONE.set((String) getDate().get("phone"));
-                        BlueManager.getInstance().write(ProtocolUtils.auth(getDate().getString("sn"), code));
-                    } else {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                next.setClickable(true);
-                                Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    Log.d("activate failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    private void modifyCar() {
-
-        String carId = "";
-
-
-        for (CarInfo carInfo : carInfos) {
-            if (carInfo.isChoice()) {
-                for (CarModel carModel : carInfo.getModels()) {
-                    for (CarStyle carStyle : carModel.getStyles()) {
-                        if (carStyle.isChoice()) {
-                            carId = carStyle.getId();
-                            carName = carModel.getName() + "  " + carStyle.getName();
-                        }
-                    }
-                }
-            }
-        }
-
-        if (GlobalUtil.isEmpty(carId)) {
-            Toast.makeText(getContext(), "请选择车型", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("carId", carId);
-            jsonObject.put("serialNumber", getDate().get("serialNumber"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("modifyCar input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-        Request request = new Request.Builder()
-                .url(URLUtils.MODIFY_CAR_BRAND)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .post(requestBody)
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("modifyCar failure " + e.getMessage());
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        next.setClickable(true);
-                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("modifyCar success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        SettingPreferencesConfig.CAR.set(carName);
-                        PageManager.back();
-                    } else {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                next.setClickable(true);
-                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    Log.d("modifyCar failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onEvent(int event, Object data) {
-        switch (event) {
-            case OBDEvent.OBD_AUTH_RESULT:
-                // 授权结果
-                if ((Integer) data == 1) {
-                    activate_success();
-                }
-                break;
-        }
-    }
-
-
-    /**
-     * 激活成功
-     */
-    private void activate_success() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", getDate().get("sn"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.ACTIVATE_SUCCESS)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .post(requestBody)
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("activate failure " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("activate success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        PageManager.go(new MainPage());
-                    } else {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    Log.d("activate failure " + e.getMessage());
-                }
-            }
-        });
+        // 跳转到车型确认界面
+        ConfirmCarPage confirmCarPage = new ConfirmCarPage();
+        Bundle bundle = new Bundle();
+        bundle.putString("boxId", getDate().getString("boxId"));
+        bundle.putString("phone", getDate().getString("phone"));
+        bundle.putString("code", getDate().getString("code"));
+        bundle.putString("sn", getDate().getString("sn").toString());
+        bundle.putString("carId", carId);
+        bundle.putString("carName", carName);
+        confirmCarPage.setDate(bundle);
+        PageManager.go(confirmCarPage);
     }
 }

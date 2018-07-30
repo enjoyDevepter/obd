@@ -5,30 +5,29 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.adas.utils.CustomDialog;
-import com.mapbar.adas.view.CustomScrollView;
 import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.DISCALIMER_VISIBLE;
 
 @PageSetting(transparent = true, toHistory = false, contentViewId = R.layout.disclaimer_layout)
-public class DisclaimerPage extends AppBasePage implements CustomScrollView.ISmartScrollChangedListener {
-    CustomDialog dialog = null;
+public class DisclaimerPage extends AppBasePage implements View.OnClickListener {
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
-    @ViewInject(R.id.scrollView)
-    private CustomScrollView scrollView;
+    @ViewInject(R.id.agree)
+    private View agree;
+    @ViewInject(R.id.disagree)
+    private View disagree;
 
     @Override
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
         title.setText("免责声明");
-        scrollView.setScanScrollChangedListener(this);
+        agree.setOnClickListener(this);
+        disagree.setOnClickListener(this);
     }
 
     @Override
@@ -41,60 +40,21 @@ public class DisclaimerPage extends AppBasePage implements CustomScrollView.ISma
         super.onStop();
     }
 
+
     @Override
-    public void onScrolledToBottom() {
-        Log.d("onScrolledToBottom  ");
-        if (null == dialog) {
-            showConfirm();
-        } else if (null != dialog && !dialog.isAdded()) {
-            dialog.show();
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.agree:
+                DISCALIMER_VISIBLE.set(true);
+                if (BlueManager.getInstance().isConnected()) {
+                    PageManager.go(new MainPage());
+                } else {
+                    PageManager.go(new ConnectPage());
+                }
+                break;
+            case R.id.disagree:
+                PageManager.back();
+                break;
         }
-
-    }
-
-    @Override
-    public void onScrolledToTop() {
-        Log.d("onScrolledToTop  ");
-    }
-
-    @Override
-    public void onScrolled() {
-        Log.d("onScrolled  ");
-        if (null != dialog && dialog.isVisible()) {
-            dialog.dismiss();
-        }
-    }
-
-    private void showConfirm() {
-        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                .setViewListener(new CustomDialog.ViewListener() {
-                    @Override
-                    public void bindView(View view) {
-                        view.findViewById(R.id.agree).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                                DISCALIMER_VISIBLE.set(true);
-                                if (BlueManager.getInstance().isConnected()) {
-                                    PageManager.go(new MainPage());
-                                } else {
-                                    PageManager.go(new ConnectPage());
-                                }
-                            }
-                        });
-
-                        view.findViewById(R.id.disagree).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                                PageManager.back();
-                            }
-                        });
-
-                    }
-                })
-                .setLayoutRes(R.layout.dailog_disclaim)
-                .setDimAmount(0.3f)
-                .show();
     }
 }

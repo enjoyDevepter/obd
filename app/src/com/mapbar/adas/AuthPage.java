@@ -1,5 +1,7 @@
 package com.mapbar.adas;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -104,8 +106,16 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        next.setClickable(true);
-                        Toast.makeText(getContext(), "网络异常,请检查网络状态后重试!", Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                                .setMessage("网络异常,请检查网络状态后重试!")
+                                .setTitle("网络异常")
+                                .setNegativeButton("重试", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        check();
+                                    }
+                                })
+                                .create().show();
                     }
                 });
             }

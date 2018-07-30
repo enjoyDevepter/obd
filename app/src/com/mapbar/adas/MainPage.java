@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.text.Html;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.ProgressBar;
@@ -62,7 +61,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.mapbar.adas.view.SensitiveView.Type.Hight;
+import static com.mapbar.adas.view.SensitiveView.Type.HIGHT;
 import static com.mapbar.adas.view.SensitiveView.Type.LOW;
 import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
 
@@ -87,8 +86,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private View warm;
     @ViewInject(R.id.reset)
     private View reset;
-    @ViewInject(R.id.change_car)
-    private View change;
     @ViewInject(R.id.tire_pressure_info)
     private View pressureInfo;
     @ViewInject(R.id.tire_pressure)
@@ -161,7 +158,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         warm.setOnClickListener(this);
         reset.setOnClickListener(this);
         sensitive.setOnClickListener(this);
-        change.setOnClickListener(this);
         phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
         carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
@@ -214,9 +210,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.reset:
                 showReset();
                 break;
-            case R.id.change_car:
-                changeCar();
-                break;
             case R.id.save:
                 BlueManager.getInstance().write(ProtocolUtils.study());
                 if (null != dialog) {
@@ -224,15 +217,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
         }
-    }
-
-    private void changeCar() {
-        ChoiceCarPage choiceCarPage = new ChoiceCarPage();
-        Bundle bundle = new Bundle();
-        bundle.putString("type", "changeCar");
-        bundle.putString("serialNumber", sn);
-        choiceCarPage.setDate(bundle);
-        PageManager.go(choiceCarPage);
     }
 
     private void showWarm() {
@@ -285,23 +269,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             }
                         });
                         sensitiveView.setType(type);
-                        sensitiveView.setOnClickListener(new View.OnClickListener() {
+                        sensitiveView.setOnItemChoiceListener(new SensitiveView.OnItemChoiceListener() {
                             @Override
-                            public void onClick(View v) {
-                                switch (sensitiveView.getType()) {
-                                    case LOW:
-                                        type = MEDIUM;
-                                        sensitiveView.setType(type);
-                                        break;
-                                    case MEDIUM:
-                                        type = Hight;
-                                        sensitiveView.setType(type);
-                                        break;
-                                    case Hight:
-                                        type = LOW;
-                                        sensitiveView.setType(type);
-                                        break;
-                                }
+                            public void onChoice(SensitiveView.Type t) {
+                                type = t;
                             }
                         });
                     }
@@ -347,7 +318,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
-                        ((TextView) view.findViewById(R.id.info)).setText(Html.fromHtml("保存当前胎压后，当某个轮胎胎压<font color='#FF0000'>发生变化</font>时， 盒子会发出报警声音。<br><br> 建议检查四个轮胎胎压均为正常的情况下 再进行保存操作！"));
                         save = (TextView) view.findViewById(R.id.save);
                         time = 10;
                         initTimer();
@@ -373,11 +343,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             timer = null;
                             timerTask.cancel();
                             timerTask = null;
-                            save.setText("保存胎压");
+                            save.setText("校准");
                             save.setOnClickListener(MainPage.this);
                             save.setBackgroundResource(R.drawable.disclaimer_agree_btn_bg);
                         } else {
-                            save.setText("保存胎压(" + time + "s)");
+                            save.setText("校准(" + time + "s)");
                         }
                         time--;
                     }
@@ -445,24 +415,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 sn = (String) data;
                 getUserInfo();
-                new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                        .setMessage("OBD盒子已过期,请重新授权!")
-                        .setTitle("盒子过期")
-                        .setNegativeButton("授权", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // 获取授权码
-                                getLisense();
-                            }
-                        })
-                        .setCancelable(false)
-                        .setPositiveButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                PageManager.back();
-                            }
-                        }).create().show();
-
+                // 获取授权码
+                getLisense();
                 break;
             case OBDEvent.OBD_BEGIN_UPDATE:
                 if ((Integer) data == 0) { // 是否可以升级
@@ -615,12 +569,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     type = SensitiveView.Type.MEDIUM;
                     break;
                 case 3:
-                    type = Hight;
+                    type = HIGHT;
                     break;
             }
             if (bytes[1] == 1) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                        .setMessage("应用升级未完成，请确保网络后重启应用!")
+                        .setMessage("应用升级未完成，请确认网络链接正常!")
                         .setTitle("升级中断")
                         .setNegativeButton("确定", new DialogInterface.OnClickListener() {
                             @Override
@@ -1028,7 +982,28 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d("getLisense failure " + e.getMessage());
+                mMainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        new AlertDialog.Builder(GlobalUtil.getMainActivity())
+                                .setMessage("OBD盒子已过期,请开启网络重新授权!")
+                                .setTitle("盒子过期")
+                                .setNegativeButton("授权", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // 获取授权码
+                                        getLisense();
+                                    }
+                                })
+                                .setCancelable(false)
+                                .setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        PageManager.back();
+                                    }
+                                }).create().show();
+                    }
+                });
             }
 
             @Override

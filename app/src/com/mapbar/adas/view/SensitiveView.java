@@ -8,28 +8,36 @@ import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.mapbar.adas.utils.OBDUtils;
+import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
+
+import static com.mapbar.adas.view.SensitiveView.Type.HIGHT;
+import static com.mapbar.adas.view.SensitiveView.Type.LOW;
+import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
 
 /**
  * Created by guomin on 2018/5/29.
  */
 
-public class SensitiveView extends View {
+public class SensitiveView extends View implements View.OnTouchListener {
 
     private Paint paint;
 
     private TextPaint textPaint;
 
-    private Type type = Type.MEDIUM;
+    private Type type = MEDIUM;
 
     private int cricle_radius = OBDUtils.getDimens(this.getContext(), R.dimen.sensitive_radius);
     private int sensitive_padding = OBDUtils.getDimens(this.getContext(), R.dimen.sensitive_padding);
     private int sensitive_divider = OBDUtils.getDimens(this.getContext(), R.dimen.sensitive_divider);
 
     private int singleStrWidth;
+
+    private OnItemChoiceListener onItemChoiceListener;
 
     public SensitiveView(Context context) {
         this(context, null);
@@ -55,13 +63,14 @@ public class SensitiveView extends View {
         textPaint.setTextSize(OBDUtils.getDimens(context, R.dimen.sensitive_text_size));
         textPaint.setAlpha(Paint.ANTI_ALIAS_FLAG);
         singleStrWidth = (int) textPaint.measureText("低");
+
+        this.setOnTouchListener(this);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         int width = getWidth();
-        int height = getHeight();
 
         // 绘制连接线
         Path path = new Path();
@@ -97,7 +106,7 @@ public class SensitiveView extends View {
                 paint.setColor(Color.parseColor("#FFDCDCDC"));
 
                 break;
-            case Hight:
+            case HIGHT:
                 path.lineTo(width - sensitive_padding - cricle_radius, sensitive_padding + cricle_radius / 2);
                 path.lineTo(width - sensitive_padding - cricle_radius, sensitive_padding + cricle_radius / 2 + cricle_radius);
                 path.lineTo(sensitive_padding + cricle_radius, sensitive_padding + cricle_radius / 2 + cricle_radius);
@@ -119,6 +128,10 @@ public class SensitiveView extends View {
         canvas.drawText("高", width - sensitive_padding - cricle_radius - singleStrWidth / 2, sensitive_padding + 2 * cricle_radius + sensitive_divider + textPaint.getFontMetrics().descent, paint);
     }
 
+    public void setOnItemChoiceListener(OnItemChoiceListener onItemChoiceListener) {
+        this.onItemChoiceListener = onItemChoiceListener;
+    }
+
     public Type getType() {
         return this.type;
     }
@@ -128,10 +141,45 @@ public class SensitiveView extends View {
         invalidate();
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int x = (int) event.getX();
+        int width = getWidth();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("MotionEvent.ACTION_DOWN");
+                if (x >= 0 && x < width / 3) {
+                    setType(LOW);
+                } else if (x > width / 3 && x <= width * 2 / 3) {
+                    setType(MEDIUM);
+                } else {
+                    setType(HIGHT);
+                }
+                if (null != onItemChoiceListener) {
+                    onItemChoiceListener.onChoice(type);
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.d("MotionEvent.ACTION_MOVE");
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d("MotionEvent.ACTION_UP");
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                Log.d("MotionEvent.ACTION_CANCEL");
+                break;
+        }
+        return false;
+    }
+
     public enum Type {
         LOW,
         MEDIUM,
-        Hight,
+        HIGHT,
+    }
 
+    public interface OnItemChoiceListener {
+        void onChoice(Type type);
     }
 }

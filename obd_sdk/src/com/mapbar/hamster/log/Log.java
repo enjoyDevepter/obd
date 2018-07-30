@@ -13,7 +13,7 @@ public class Log {
     public final static String TAG = "OBD_CORE";
 
     static {
-//        Timber.plant(new Timber.DebugTree());
+        Timber.plant(new Timber.DebugTree());
         Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + "/obd"));
     }
 

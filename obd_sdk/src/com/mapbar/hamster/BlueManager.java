@@ -674,6 +674,11 @@ public class BlueManager {
                         @Override
                         public void run() {
                             stopScan();
+                            try {
+                                Thread.sleep(1500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             connect(address);
                         }
                     });
