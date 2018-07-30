@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -86,14 +87,21 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private View warm;
     @ViewInject(R.id.reset)
     private View reset;
-    @ViewInject(R.id.tire_pressure_info)
-    private View pressureInfo;
-    @ViewInject(R.id.tire_pressure)
-    private View pressureIcon;
     @ViewInject(R.id.phone)
     private TextView phoneTV;
     @ViewInject(R.id.car_name)
     private TextView carTV;
+    @ViewInject(R.id.left_top)
+    private View leftTop;
+    @ViewInject(R.id.left_buttom)
+    private View leftButtom;
+    @ViewInject(R.id.right_top)
+    private View rightTop;
+    @ViewInject(R.id.right_buttom)
+    private View rightButtom;
+    private AnimationDrawable highAnimationDrawable;
+    private AnimationDrawable lowAnimationDrawable;
+
     private byte[] updates;
     private OBDVersion obdVersion;
     private ProgressBar progressBar;
@@ -106,6 +114,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private Timer timer;
     private TimerTask timerTask;
     private TextView save;
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -533,24 +542,66 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             if (bytes[0] == 1) {
                 Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
             } else {
+                // 左前，右前，左后，右后
                 if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
-                    if (pressureInfo.getVisibility() == View.INVISIBLE) {
-                        pressureInfo.setVisibility(View.VISIBLE);
-                        pressureIcon.setBackgroundResource(R.drawable.unusual);
-                        // 上传胎压信息
-                        byte[] tire = new byte[status.length - snBytes.length];
-                        System.arraycopy(status, snBytes.length, tire, 0, tire.length);
-                        updateTireInfo(tire);
+                    if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
+                        return;
+                    }
+                    if (bytes[7] == 1) {
+                        leftTop.setBackgroundResource(R.drawable.high_bg);
+                        highAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
+                        rightButtom.setBackgroundResource(R.drawable.low_bg);
+                        lowAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
+                    } else if (bytes[6] == 1) {
+                        rightTop.setBackgroundResource(R.drawable.high_bg);
+                        highAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
+                        leftButtom.setBackgroundResource(R.drawable.low_bg);
+                        lowAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
+                    } else if (bytes[5] == 1) {
+                        leftButtom.setBackgroundResource(R.drawable.high_bg);
+                        highAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
+                        rightTop.setBackgroundResource(R.drawable.low_bg);
+                        lowAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
+                    } else if (bytes[4] == 1) {
+                        rightButtom.setBackgroundResource(R.drawable.high_bg);
+                        highAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
+                        leftTop.setBackgroundResource(R.drawable.low_bg);
+                        lowAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
+                    }
+                    if (highAnimationDrawable != null && !highAnimationDrawable.isRunning()) {
+                        highAnimationDrawable.start();
+                    }
 
-                        if (update) { // 避免首次检测OBD时胎压异常，导致重复上传。
-                            update = false;
-                        }
+                    if (lowAnimationDrawable != null && !lowAnimationDrawable.isRunning()) {
+                        lowAnimationDrawable.start();
                     }
+
+                    // 上传胎压信息
+                    byte[] tire = new byte[status.length - snBytes.length];
+                    System.arraycopy(status, snBytes.length, tire, 0, tire.length);
+                    updateTireInfo(tire);
+
+                    if (update) { // 避免首次检测OBD时胎压异常，导致重复上传。
+                        update = false;
+                    }
+//                    }
                 } else {
-                    if (pressureInfo.getVisibility() == View.VISIBLE) {
-                        pressureInfo.setVisibility(View.INVISIBLE);
-                        pressureIcon.setBackgroundResource(R.drawable.normal);
+                    if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
+                        highAnimationDrawable.stop();
+                        highAnimationDrawable = null;
                     }
+                    if (lowAnimationDrawable != null && lowAnimationDrawable.isRunning()) {
+                        lowAnimationDrawable.stop();
+                        lowAnimationDrawable = null;
+                    }
+                    leftTop.setBackgroundResource(R.drawable.t_nromal);
+                    leftButtom.setBackgroundResource(R.drawable.t_nromal);
+                    rightTop.setBackgroundResource(R.drawable.t_nromal);
+                    rightButtom.setBackgroundResource(R.drawable.t_nromal);
+//                    if (pressureInfo.getVisibility() == View.VISIBLE) {
+//                        pressureInfo.setVisibility(View.INVISIBLE);
+//                        pressureIcon.setBackgroundResource(R.drawable.normal);
+//                    }
                 }
 
                 if (update) {
