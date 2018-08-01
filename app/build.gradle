@@ -7,8 +7,8 @@ android {
         applicationId "com.wedrive.welink.adas"
         minSdkVersion 18
         targetSdkVersion 22
-        versionCode 1100
-        versionName "2.0"
+        versionCode 1000
+        versionName "1.0"
     }
 
     signingConfigs {
