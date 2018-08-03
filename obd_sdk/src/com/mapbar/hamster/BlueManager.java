@@ -448,7 +448,7 @@ public class BlueManager {
     void analyzeProtocol(byte[] data) {
 
         if (null != data && data.length > 0) {
-            if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL) { // 消息开头
+            if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL && data.length != 1) { // 消息开头
                 if (data[data.length - 1] == ProtocolUtils.PROTOCOL_HEAD_TAIL) {
                     // 完整消息
                     validateAndNotify(data);
