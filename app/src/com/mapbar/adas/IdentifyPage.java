@@ -70,7 +70,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             return;
         }
 
-        next.setClickable(false);
+        next.setEnabled(false);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("phone", getDate().getString("phone"));
@@ -99,7 +99,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                                     }
                                 })
                                 .create().show();
-                        next.setClickable(true);
                     }
                 });
             }
@@ -111,7 +110,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        next.setClickable(true);
                     }
                 });
                 try {
@@ -128,6 +126,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
+                                next.setEnabled(true);
                                 Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });

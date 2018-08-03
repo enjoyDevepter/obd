@@ -85,7 +85,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请输入授权码", Toast.LENGTH_LONG).show();
             return;
         }
-        next.setClickable(false);
+        next.setEnabled(false);
         final StringBuilder sn = new StringBuilder();
         sn.append(sn01).append("-").append(sn02).append("-").append(sn03).append("-").append(sn04);
 
@@ -124,12 +124,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 Log.d(responese);
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        next.setClickable(true);
-                    }
-                });
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
@@ -145,6 +139,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
+                                next.setEnabled(true);
                                 Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });

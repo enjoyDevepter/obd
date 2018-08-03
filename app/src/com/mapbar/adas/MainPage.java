@@ -355,7 +355,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             timerTask = null;
                             save.setText("校准");
                             save.setOnClickListener(MainPage.this);
-                            save.setBackgroundResource(R.drawable.disclaimer_agree_btn_bg);
+                            save.setBackgroundResource(R.drawable.btn_bg);
                         } else {
                             save.setText("校准(" + time + "s)");
                         }
@@ -601,10 +601,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     leftButtom.setBackgroundResource(R.drawable.t_nromal);
                     rightTop.setBackgroundResource(R.drawable.t_nromal);
                     rightButtom.setBackgroundResource(R.drawable.t_nromal);
-//                    if (pressureInfo.getVisibility() == View.VISIBLE) {
-//                        pressureInfo.setVisibility(View.INVISIBLE);
-//                        pressureIcon.setBackgroundResource(R.drawable.normal);
-//                    }
                 }
 
                 if (update) {

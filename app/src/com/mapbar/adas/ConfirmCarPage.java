@@ -41,6 +41,8 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
     private TextView carInfo;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.goback)
+    private View goBack;
 
     @Override
     public void onResume() {
@@ -48,6 +50,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
         title.setText("确认车型");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
+        goBack.setOnClickListener(this);
         if (null != getDate()) {
             carName = getDate().get("carName").toString();
             carInfo.setText(carName);
@@ -66,6 +69,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.back:
+            case R.id.goback:
                 PageManager.back();
                 break;
             case R.id.next:
@@ -75,9 +79,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
     }
 
     private void activate() {
-
-
-        next.setClickable(false);
+        next.setEnabled(false);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("boxId", getDate().get("boxId"));
@@ -133,7 +135,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                next.setClickable(true);
+                                next.setEnabled(true);
                                 Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
                             }
                         });

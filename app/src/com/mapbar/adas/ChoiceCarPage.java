@@ -92,7 +92,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                                     }
                                 })
                                 .create().show();
-                        next.setClickable(true);
                     }
                 });
 
@@ -258,8 +257,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请选择车型", Toast.LENGTH_LONG).show();
             return;
         }
-
-        next.setClickable(false);
 
         // 跳转到车型确认界面
         ConfirmCarPage confirmCarPage = new ConfirmCarPage();

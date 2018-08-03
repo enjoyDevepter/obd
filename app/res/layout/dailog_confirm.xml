@@ -50,7 +50,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="30dp"
         android:layout_marginTop="50dp"
-        android:background="@drawable/disclaimer_disagree_btn_bg"
+        android:background="@drawable/btn_bg"
         android:gravity="center"
         android:text="校准"
         android:textColor="#ff3D424C"

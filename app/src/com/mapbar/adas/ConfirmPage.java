@@ -81,7 +81,7 @@ public class ConfirmPage extends AppBasePage implements View.OnClickListener {
                             timerTask = null;
                             save.setText("保存胎压");
                             save.setOnClickListener(ConfirmPage.this);
-                            save.setBackgroundResource(R.drawable.disclaimer_agree_btn_bg);
+                            save.setBackgroundResource(R.drawable.btn_bg);
                         } else {
                             save.setText("保存胎压(" + time + "s)");
                         }
