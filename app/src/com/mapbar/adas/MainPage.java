@@ -30,6 +30,7 @@ import com.alibaba.fastjson.JSON;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.preferences.SettingPreferencesConfig;
+import com.mapbar.adas.utils.AlarmManager;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
@@ -513,6 +514,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case OBDEvent.OBD_STUDY:
+                AlarmManager.getInstance().play(R.raw.begin);
                 mHandler.sendEmptyMessage(0);
                 break;
             case OBDEvent.OBD_STUDY_PROGRESS:
@@ -576,6 +578,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         lowAnimationDrawable.start();
                     }
 
+                    AlarmManager.getInstance().play(R.raw.warm);
+
                     // 上传胎压信息
                     byte[] tire = new byte[status.length - snBytes.length];
                     System.arraycopy(status, snBytes.length, tire, 0, tire.length);
@@ -584,7 +588,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     if (update) { // 避免首次检测OBD时胎压异常，导致重复上传。
                         update = false;
                     }
-//                    }
                 } else {
                     if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
                         highAnimationDrawable.stop();

@@ -61,7 +61,8 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.back:
-                PageManager.back();
+                // 退出应用
+                PageManager.finishActivity(MainActivity.getInstance());
                 break;
             case R.id.next:
                 getMSN();

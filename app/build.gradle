@@ -4,19 +4,19 @@ android {
     compileSdkVersion 22
     buildToolsVersion '25.0.3'
     defaultConfig {
-        applicationId "com.wedrive.welink.adas"
+        applicationId "com.miyuan.obd"
         minSdkVersion 18
         targetSdkVersion 22
-        versionCode 1000
+        versionCode 1100
         versionName "1.0"
     }
 
     signingConfigs {
         release {
-            storeFile file("../key/mapbar2009.keystore")
-            storePassword "mapbar2009"
-            keyAlias "mapbar2009.keystore"
-            keyPassword "mapbar2009"
+            storeFile file("../key/miyuan_android.keystore")
+            storePassword "miyuan2018"
+            keyAlias "miyuan_android"
+            keyPassword "miyuan2018"
         }
     }
 
