@@ -11,6 +11,7 @@ android {
         versionName "1.0"
     }
 
+
     signingConfigs {
         release {
             storeFile file("../key/miyuan_android.keystore")
@@ -57,6 +58,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 //    compile 'com.jaeger.statusbarutil:library:1.5.1'
     compile project(path: ':core')
+    compile project(path: ':zxing_lib')
     compile project(path: ':obd_sdk')
     compile 'com.android.support:multidex:1.0.1'
     compile 'org.greenrobot:eventbus:3.0.0'

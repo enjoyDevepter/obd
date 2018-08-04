@@ -71,6 +71,12 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
         }
     }
 
+    @Override
+    public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
+        return true;
+    }
+
     private void getMSN() {
         final String phone = content.getText().toString();
         if (GlobalUtil.isEmpty(phone)) {

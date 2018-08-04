@@ -1,11 +1,13 @@
 package com.mapbar.adas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.client.android.CaptureActivity;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
@@ -35,6 +37,8 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
     private TextView next;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.scan)
+    private View scanV;
     @ViewInject(R.id.sn_01)
     private EditText sn_01;
     @ViewInject(R.id.sn_02)
@@ -51,6 +55,20 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         title.setText("输入授权码");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
+        scanV.setOnClickListener(this);
+
+        if (getDate() != null && null != getDate().get("sn")) {
+            String sn = (String) getDate().get("sn");
+            String[] sns = sn.split("-");
+            if (sns.length < 4) {
+                Toast.makeText(getContext(), "识别错误", Toast.LENGTH_LONG).show();
+                return;
+            }
+            sn_01.setText(sns[0]);
+            sn_02.setText(sns[1]);
+            sn_03.setText(sns[2]);
+            sn_04.setText(sns[3]);
+        }
     }
 
     @Override
@@ -71,6 +89,10 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 break;
             case R.id.next:
                 check();
+                break;
+            case R.id.scan:
+                Intent intent = new Intent(GlobalUtil.getMainActivity(), CaptureActivity.class);
+                GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
                 break;
         }
     }

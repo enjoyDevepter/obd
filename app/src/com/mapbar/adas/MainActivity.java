@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,7 +13,9 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.google.zxing.client.android.CaptureActivity;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.obd.R;
 
@@ -176,5 +179,23 @@ public class MainActivity extends AppCompatActivity {
             splashView = null;
         }
         getWindow().setBackgroundDrawable(null);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (data != null) {
+                String result = data.getStringExtra(CaptureActivity.SCANRESULT);
+                if (result != null) {
+                    Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+                    Bundle bundle = BackStackManager.getInstance().getCurrent().getDate();
+                    if (bundle == null) {
+                        bundle = new Bundle();
+                    }
+                    bundle.putString("sn", result);
+                }
+            }
+        }
     }
 }
