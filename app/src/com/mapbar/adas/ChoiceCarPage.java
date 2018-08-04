@@ -1,8 +1,6 @@
 package com.mapbar.adas;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +14,8 @@ import com.alibaba.fastjson.JSON;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CarHelper;
+import com.mapbar.adas.utils.CustomDialog;
+import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.adas.view.IndexSideBar;
 import com.mapbar.obd.R;
@@ -51,7 +51,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     private CarAdapter carAdapter;
     private CarBrandExpandableListAdapter carBrandExpandableListAdapter;
     private List<CarInfo> carInfos;
-
+    private CustomDialog dialog;
     private ProgressDialog progressDialog;
 
     @Override
@@ -81,16 +81,25 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                                .setMessage("网络异常,请检查网络状态后重试!")
-                                .setTitle("网络异常")
-                                .setNegativeButton("重试", new DialogInterface.OnClickListener() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        getCar();
+                                    public void bindView(View view) {
+                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                getCar();
+                                            }
+                                        });
                                     }
                                 })
-                                .create().show();
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
                     }
                 });
 

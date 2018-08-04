@@ -1,11 +1,9 @@
 package com.mapbar.adas;
 
-import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -377,22 +375,29 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 Toast.makeText(GlobalUtil.getContext(), "连接成功", Toast.LENGTH_SHORT).show();
                 break;
             case OBDEvent.OBD_DISCONNECTED:
-                AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                        .setMessage("OBD链接断开,请检查设备后重试!")
-                        .setTitle("OBD链接断开")
-                        .setPositiveButton("重新连接", new DialogInterface.OnClickListener() {
+
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                BlueManager.getInstance().startScan();
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.confirm))).setText("重新连接");
+                                ((TextView) (view.findViewById(R.id.info))).setText("OBD链接断开,请检查设备后重试!");
+                                ((TextView) (view.findViewById(R.id.title))).setText("OBD链接断开");
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        BlueManager.getInstance().startScan();
+                                    }
+                                });
                             }
                         })
-                        .setNegativeButton("退出应用", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                PageManager.back();
-                            }
-                        });
-                builder.create().show();
+                        .setLayoutRes(R.layout.dailog_common_warm)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
                 break;
             case OBDEvent.OBD_FIRST_USE:
                 Log.d("OBDEvent.OBD_FIRST_USE ");
@@ -625,34 +630,42 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     break;
             }
             // 验证是否已经学习完成,并播报语音
-            String studyStutus = new String(Arrays.copyOfRange(status, snBytes.length + 2, 24));
+            String studyStutus = HexUtils.formatHexString(Arrays.copyOfRange(status, snBytes.length + 2, snBytes.length + 2 + 24));
+            Log.d("STUDYSTATUS " + STUDYSTATUS.get());
+            Log.d("studyStutus " + studyStutus);
             if (GlobalUtil.isEmpty(STUDYSTATUS.get())) {
                 STUDYSTATUS.set(studyStutus);
             } else {
                 if (!studyStutus.equals(STUDYSTATUS.get())) {
+                    STUDYSTATUS.set(studyStutus);
                     AlarmManager.getInstance().play(R.raw.finish);
                 }
             }
 
             if (bytes[1] == 1) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                        .setMessage("应用升级未完成，请确认网络链接正常!")
-                        .setTitle("升级中断")
-                        .setNegativeButton("确定", new DialogInterface.OnClickListener() {
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // 获取OBD版本信息，请求服务器是否有更新
-                                BlueManager.getInstance().write(ProtocolUtils.getVersion());
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.confirm))).setText("确定");
+                                ((TextView) (view.findViewById(R.id.info))).setText("应用升级未完成，请确认网络链接正常!");
+                                ((TextView) (view.findViewById(R.id.title))).setText("升级中断");
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        // 获取OBD版本信息，请求服务器是否有更新
+                                        BlueManager.getInstance().write(ProtocolUtils.getVersion());
+                                    }
+                                });
                             }
                         })
-                        .setCancelable(false)
-                        .setPositiveButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                PageManager.back();
-                            }
-                        });
-                builder.create().show();
+                        .setLayoutRes(R.layout.dailog_common_warm)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
             } else {
                 if (checkVersion) {
                     // 获取OBD版本信息，请求服务器是否有更新
@@ -1047,23 +1060,30 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 mMainHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                                .setMessage("OBD盒子已过期,请开启网络重新授权!")
-                                .setTitle("盒子过期")
-                                .setNegativeButton("授权", new DialogInterface.OnClickListener() {
+
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // 获取授权码
-                                        getLisense();
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("授权");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("OBD盒子已过期,请开启网络重新授权!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("盒子过期");
+                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                // 获取授权码
+                                                getLisense();
+                                            }
+                                        });
                                     }
                                 })
-                                .setCancelable(false)
-                                .setPositiveButton("取消", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        PageManager.back();
-                                    }
-                                }).create().show();
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
                     }
                 });
             }
@@ -1098,6 +1118,34 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                verify();
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setCancelOutside(false)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+
+                    }
+                });
                 Log.d("getOBDStatus fail " + e.getMessage());
             }
 

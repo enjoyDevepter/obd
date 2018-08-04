@@ -1,7 +1,5 @@
 package com.mapbar.adas;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -10,6 +8,8 @@ import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.utils.CustomDialog;
+import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
@@ -37,6 +37,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
     private TextView next;
     @ViewInject(R.id.back)
     private View back;
+    private CustomDialog dialog;
 
     @Override
     public void onResume() {
@@ -99,19 +100,30 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("get MSN failure " + e.getMessage());
+
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        new AlertDialog.Builder(GlobalUtil.getMainActivity())
-                                .setMessage("网络异常,请检查网络状态后重试!")
-                                .setTitle("网络异常")
-                                .setNegativeButton("重试", new DialogInterface.OnClickListener() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        getMSN();
+                                    public void bindView(View view) {
+                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                getMSN();
+                                            }
+                                        });
                                     }
                                 })
-                                .create().show();
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+
                     }
                 });
             }
