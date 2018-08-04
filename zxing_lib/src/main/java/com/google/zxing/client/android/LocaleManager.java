@@ -50,12 +50,13 @@ public final class LocaleManager {
     /**
      * Book search is offered everywhere that web search is available.
      */
-    private static final Map<String, String> GOOGLE_BOOK_SEARCH_COUNTRY_TLD = GOOGLE_COUNTRY_TLD;
+    private static final Map<String, String> GOOGLE_BOOK_SEARCH_COUNTRY_TLD;
     private static final Collection<String> TRANSLATED_HELP_ASSET_LANGUAGES =
             Arrays.asList("de", "en", "es", "fr", "it", "ja", "ko", "nl", "pt", "ru", "uk", "zh-rCN", "zh-rTW", "zh-rHK");
 
     static {
         GOOGLE_COUNTRY_TLD = new HashMap<>();
+        GOOGLE_BOOK_SEARCH_COUNTRY_TLD = GOOGLE_COUNTRY_TLD;
         GOOGLE_COUNTRY_TLD.put("AR", "com.ar"); // ARGENTINA
         GOOGLE_COUNTRY_TLD.put("AU", "com.au"); // AUSTRALIA
         GOOGLE_COUNTRY_TLD.put("BR", "com.br"); // BRAZIL
