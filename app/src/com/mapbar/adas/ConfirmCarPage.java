@@ -183,6 +183,9 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
             e.printStackTrace();
         }
 
+        Log.d("activate input  " + jsonObject.toString());
+
+
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
