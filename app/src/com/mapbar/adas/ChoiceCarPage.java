@@ -18,7 +18,6 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CarHelper;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.adas.view.IndexSideBar;
-import com.mapbar.hamster.log.Log;
 import com.mapbar.obd.R;
 
 import org.json.JSONException;
@@ -107,7 +106,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         carInfos = JSON.parseArray(result.optString("brands"), CarInfo.class);
-                        Log.d(carInfos.toString());
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {

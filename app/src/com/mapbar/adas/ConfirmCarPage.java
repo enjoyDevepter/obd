@@ -80,6 +80,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
 
     private void activate() {
         next.setEnabled(false);
+
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("boxId", getDate().get("boxId"));
@@ -90,7 +91,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener,
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        Log.d("activate input " + jsonObject.toString());
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()

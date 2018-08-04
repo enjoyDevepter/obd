@@ -78,6 +78,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.d("sms_check input " + jsonObject.toString());
         RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .addHeader("content-type", "application/json;charset:utf-8")
@@ -107,11 +108,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 Log.d(responese);
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                    }
-                });
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {

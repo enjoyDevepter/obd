@@ -89,6 +89,8 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
             e.printStackTrace();
         }
         next.setEnabled(false);
+        Log.d("get MSN input " + jsonObject.toString());
+
         RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .addHeader("content-type", "application/json;charset:utf-8")

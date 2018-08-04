@@ -95,6 +95,8 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.d("check sn input " + jsonObject.toString());
+
         RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         Request request = new Request.Builder()
                 .addHeader("content-type", "application/json;charset:utf-8")

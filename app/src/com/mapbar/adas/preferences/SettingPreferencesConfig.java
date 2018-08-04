@@ -23,4 +23,6 @@ public class SettingPreferencesConfig {
 
     public static final StringPreferences CAR = new StringPreferences(SHARED_PREFERENCES_INIT, "car", " ");
 
+    public static final StringPreferences STUDYSTATUS = new StringPreferences(SHARED_PREFERENCES_INIT, "study_status", "");
+
 }

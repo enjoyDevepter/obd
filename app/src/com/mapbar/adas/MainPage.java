@@ -63,6 +63,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.STUDYSTATUS;
 import static com.mapbar.adas.view.SensitiveView.Type.HIGHT;
 import static com.mapbar.adas.view.SensitiveView.Type.LOW;
 import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
@@ -115,6 +116,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private Timer timer;
     private TimerTask timerTask;
     private TextView save;
+
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -622,6 +624,16 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     type = HIGHT;
                     break;
             }
+            // 验证是否已经学习完成,并播报语音
+            String studyStutus = new String(Arrays.copyOfRange(status, snBytes.length + 2, 24));
+            if (GlobalUtil.isEmpty(STUDYSTATUS.get())) {
+                STUDYSTATUS.set(studyStutus);
+            } else {
+                if (!studyStutus.equals(STUDYSTATUS.get())) {
+                    AlarmManager.getInstance().play(R.raw.finish);
+                }
+            }
+
             if (bytes[1] == 1) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(GlobalUtil.getMainActivity())
                         .setMessage("应用升级未完成，请确认网络链接正常!")
