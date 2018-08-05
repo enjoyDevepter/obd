@@ -16,7 +16,7 @@ import static com.mapbar.adas.log.MapbarStorageUtil.getCurrentValidMapbarPath;
  */
 public class GlobalConfig extends IEConfig {
 
-    private static final String LOG_FILE_NAME = "new_adas.log";
+    private static final String LOG_FILE_NAME = "new_obd.log";
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
     /**

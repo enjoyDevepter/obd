@@ -8,11 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -67,16 +63,14 @@ import static com.mapbar.adas.view.SensitiveView.Type.LOW;
 import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
 
 @PageSetting(contentViewId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
-public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener, LocationListener {
+public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     private static final int UNIT = 1024;
     CustomDialog dialog = null;
     CustomDialog updateDialog = null;
-    private volatile boolean verified;
     private volatile boolean isUpdate = false;
     private String sn;
     private String boxId;
     private SensitiveView.Type type = SensitiveView.Type.MEDIUM;
-    private LocationManager locationManager;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.title_text)
@@ -164,7 +158,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText(R.string.app_name);
+        title.setText("智驾卫士");
         warm.setOnClickListener(this);
         reset.setOnClickListener(this);
         sensitive.setOnClickListener(this);
@@ -172,18 +166,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
 
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
-
-        if (BlueManager.getInstance().isConnected() && !verified) {
-            progressDialog = ProgressDialog.show(getContext(), "", "正在同步盒子信息", false);
-            verify();
-        }
-
-        if (verified) { // 已鉴权完成
-            // 获取OBD版本信息，请求服务器是否有更新
-            BlueManager.getInstance().write(ProtocolUtils.getVersion());
-        }
+        // 获取OBD版本信息，请求服务器是否有更新
+        BlueManager.getInstance().write(ProtocolUtils.getVersion());
+        getUserInfo();
         Log.d("onResumeonResumeonResume  ");
     }
 
@@ -371,70 +356,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.BLUE_CONNECTED:
-                Toast.makeText(GlobalUtil.getContext(), "连接成功", Toast.LENGTH_SHORT).show();
-                break;
-            case OBDEvent.OBD_DISCONNECTED:
-
-                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                        .setViewListener(new CustomDialog.ViewListener() {
-                            @Override
-                            public void bindView(View view) {
-                                ((TextView) (view.findViewById(R.id.confirm))).setText("重新连接");
-                                ((TextView) (view.findViewById(R.id.info))).setText("OBD链接断开,请检查设备后重试!");
-                                ((TextView) (view.findViewById(R.id.title))).setText("OBD链接断开");
-                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        BlueManager.getInstance().startScan();
-                                    }
-                                });
-                            }
-                        })
-                        .setLayoutRes(R.layout.dailog_common_warm)
-                        .setCancelOutside(false)
-                        .setDimAmount(0.5f)
-                        .isCenter(true)
-                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                        .show();
-                break;
-            case OBDEvent.OBD_FIRST_USE:
-                Log.d("OBDEvent.OBD_FIRST_USE ");
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
-                // 激活
-                boxId = (String) data;
-                Log.d("boxId  " + boxId);
-                PhonePage phonePage = new PhonePage();
-                Bundle bundle = new Bundle();
-                bundle.putString("boxId", boxId);
-                phonePage.setDate(bundle);
-                PageManager.go(phonePage);
-                break;
-            case OBDEvent.OBD_NORMAL:
-                Log.d("OBDEvent.OBD_NORMAL ");
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
-                // 解析OBD状态
-                byte[] result1 = (byte[]) data;
-                byte[] result = new byte[result1.length - 1];
-                System.arraycopy(result1, 1, result, 0, result.length);
-                parseStatus(result, true, true);
-                getUserInfo();
-                break;
-            case OBDEvent.OBD_EXPIRE:
-                Log.d("OBDEvent.OBD_EXPIRE ");
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
-                sn = (String) data;
-                getUserInfo();
-                // 获取授权码
-                getLisense();
-                break;
             case OBDEvent.OBD_BEGIN_UPDATE:
                 if ((Integer) data == 0) { // 是否可以升级
                     try {
@@ -1153,10 +1074,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 Log.d("getOBDStatus success " + responese);
-                if (verified) {
-                    return;
-                }
-                verified = true;
                 try {
                     JSONObject result = new JSONObject(responese);
                     BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
@@ -1165,35 +1082,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
             }
         });
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if ("gps".equalsIgnoreCase(location.getProvider())) {
-            Log.d("onLocationChanged ");
-            locationManager.removeUpdates(this);
-            if (verified) {
-                return;
-            }
-            verified = true;
-            BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(location.getTime()));
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 
     private final class WorkerHandler extends Handler {

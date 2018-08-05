@@ -1,0 +1,39 @@
+package com.mapbar.adas;
+
+import android.view.View;
+import android.widget.TextView;
+
+import com.mapbar.adas.anno.PageSetting;
+import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.obd.R;
+
+@PageSetting(contentViewId = R.layout.obd_device_check_layout, toHistory = false)
+public class OBDeviceCheckPage extends AppBasePage implements View.OnClickListener {
+
+    @ViewInject(R.id.title_text)
+    private TextView title;
+    @ViewInject(R.id.back)
+    private View back;
+    @ViewInject(R.id.confirm)
+    private View confrimV;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        back.setVisibility(View.GONE);
+        title.setText("插入OBD");
+        confrimV.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.confirm:
+                BlueManager.getInstance().startScan();
+                PageManager.go(new ConnectPage());
+                break;
+        }
+    }
+
+}

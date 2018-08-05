@@ -47,9 +47,10 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
             case R.id.agree:
                 DISCALIMER_VISIBLE.set(true);
                 if (BlueManager.getInstance().isConnected()) {
-                    PageManager.go(new MainPage());
+                    PageManager.go(new OBDAuthPage());
                 } else {
-                    PageManager.go(new ConnectPage());
+                    BlueManager.getInstance().stopScan();
+                    PageManager.go(new OBDeviceCheckPage());
                 }
                 break;
             case R.id.disagree:

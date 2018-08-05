@@ -16,10 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
+import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.OBDEvent;
 import com.mapbar.obd.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BleCallBackListener {
 
     private static MainActivity INSTANCE = null;
     public boolean first = true;
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             addTasks();
         }
         setFirst(false);
+        BlueManager.getInstance().addBleCallBackListener(this);
     }
 
     @Override
@@ -131,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         BlueManager.getInstance().disconnect();
         MainActivity.INSTANCE = null;
+        BlueManager.getInstance().removeCallBackListener(this);
     }
 
     public boolean isFirst() {
@@ -188,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 String result = data.getStringExtra(CaptureActivity.SCANRESULT);
                 if (result != null) {
-                    Toast.makeText(this, result, Toast.LENGTH_LONG).show();
                     Bundle bundle = BackStackManager.getInstance().getCurrent().getDate();
                     if (bundle == null) {
                         bundle = new Bundle();
@@ -196,6 +199,17 @@ public class MainActivity extends AppCompatActivity {
                     bundle.putString("sn", result);
                 }
             }
+        }
+    }
+
+    @Override
+    public void onEvent(int event, Object data) {
+        switch (event) {
+            case OBDEvent.OBD_DISCONNECTED:
+                Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
+                BlueManager.getInstance().startScan();
+                PageManager.go(new ConnectPage());
+                break;
         }
     }
 }

@@ -25,9 +25,10 @@ public class DisclaimerTask extends BaseTask {
             PageManager.go(new DisclaimerPage());
         } else {
             if (BlueManager.getInstance().isConnected()) {
-                PageManager.go(new MainPage());
+                PageManager.go(new OBDAuthPage());
             } else {
-                PageManager.go(new ConnectPage());
+                BlueManager.getInstance().stopScan();
+                PageManager.go(new OBDeviceCheckPage());
             }
         }
         complate();

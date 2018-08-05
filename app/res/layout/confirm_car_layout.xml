@@ -47,9 +47,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
@@ -57,12 +54,12 @@
             android:id="@+id/goback"
             android:layout_width="0dp"
             android:layout_height="44dp"
-            android:layout_marginRight="10dp"
+            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:background="@drawable/next_bg"
+            android:background="@drawable/go_back_bg"
             android:gravity="center"
-            android:text="返回"
-            android:textColor="#FFFFFFFF"
+            android:text="重新选择"
+            android:textColor="#ff000000"
             android:textSize="18sp" />
 
         <TextView
@@ -70,9 +67,9 @@
             android:layout_width="0dp"
             android:layout_height="44dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_bg"
+            android:background="@drawable/buttom_bg"
             android:gravity="center"
-            android:text="确认"
+            android:text="确认无误"
             android:textColor="#FFFFFFFF"
             android:textSize="18sp" />
 

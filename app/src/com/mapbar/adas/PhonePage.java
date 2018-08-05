@@ -62,8 +62,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.back:
-                // 退出应用
-                PageManager.finishActivity(MainActivity.getInstance());
+                PageManager.back();
                 break;
             case R.id.next:
                 getMSN();
@@ -71,11 +70,6 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
         }
     }
 
-    @Override
-    public boolean onBackPressed() {
-        PageManager.finishActivity(MainActivity.getInstance());
-        return true;
-    }
 
     private void getMSN() {
         final String phone = content.getText().toString();

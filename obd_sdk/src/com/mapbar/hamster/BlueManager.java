@@ -215,7 +215,7 @@ public class BlueManager {
 
     }
 
-    synchronized void stopScan() {
+    public synchronized void stopScan() {
         if (null == mBluetoothAdapter || !isScaning) {
             return;
         }

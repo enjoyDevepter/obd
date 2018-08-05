@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_tittle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:gravity="center_horizontal"
+        android:text="胎压匹配检测失败！\n\n胎压匹配检测必须在车辆打火状态下进行！"
+        android:textColor="#ffff0000"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:text="可能的原因：\n1、车辆未打火，请您打火后点击重试按钮！\n\n2、您选择的车型与车辆实际车型不符！请您联系经销商或厂家客服！"
+        android:textColor="#FF000000"
+        android:textSize="15sp" />
+
+</LinearLayout>
