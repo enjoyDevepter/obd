@@ -49,7 +49,7 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
                 if (BlueManager.getInstance().isConnected()) {
                     PageManager.go(new OBDAuthPage());
                 } else {
-                    BlueManager.getInstance().stopScan();
+                    BlueManager.getInstance().stopScan(false);
                     PageManager.go(new OBDeviceCheckPage());
                 }
                 break;

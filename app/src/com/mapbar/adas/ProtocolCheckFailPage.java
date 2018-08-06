@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +10,7 @@ import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.core.HexUtils;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.obd.R;
 
 @PageSetting(contentViewId = R.layout.protocol_check_fail_layout, toHistory = false)
@@ -23,7 +25,9 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText("胎压匹配检查");
+        title.setText("匹配结果");
+        showProgress();
+        BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
     }
 
     @Override
@@ -56,13 +60,22 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
      * 检查协议
      */
     private void protocolCheck(byte[] result) {
+
         byte[] bytes = HexUtils.getBooleanArray(result[19]);
         if (bytes[0] == 1) {
             // 车型不支持
-            PageManager.go(new ProtocolCheckFailPage());
+            BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
         } else {
+            dismissProgress();
             // 支持
-            PageManager.go(new ProtocolCheckSuccessPage());
+            ProtocolCheckSuccessPage page = new ProtocolCheckSuccessPage();
+            Bundle bundle = new Bundle();
+            if (getDate() != null) {
+                bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
+            }
+            bundle.putString("sn", getDate().getString("sn").toString());
+            page.setDate(bundle);
+            PageManager.go(page);
         }
     }
 }

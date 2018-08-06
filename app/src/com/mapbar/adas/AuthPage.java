@@ -108,6 +108,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请输入授权码", Toast.LENGTH_LONG).show();
             return;
         }
+        showProgress();
         next.setEnabled(false);
         final StringBuilder sn = new StringBuilder();
         sn.append(sn01).append("-").append(sn02).append("-").append(sn03).append("-").append(sn04);
@@ -128,6 +129,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("sn_check failure " + e.getMessage());
+                dismissProgress();
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
@@ -159,6 +161,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 String responese = response.body().string();
                 Log.d(responese);
                 try {
+                    dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         ChoiceCarPage choiceCarPage = new ChoiceCarPage();

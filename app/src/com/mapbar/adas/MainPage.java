@@ -1,7 +1,6 @@
 package com.mapbar.adas;
 
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -67,9 +66,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private static final int UNIT = 1024;
     CustomDialog dialog = null;
     CustomDialog updateDialog = null;
-    private volatile boolean isUpdate = false;
     private String sn;
-    private String boxId;
     private SensitiveView.Type type = SensitiveView.Type.MEDIUM;
     @ViewInject(R.id.back)
     private View back;
@@ -151,9 +148,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         }
     };
 
-    private ProgressDialog progressDialog;
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -166,9 +160,16 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
 
+        getUserInfo();
+
+        if (getDate() != null) {
+            if (getDate().getBoolean("showStudy")) {
+                showStudy();
+                return;
+            }
+        }
         // 获取OBD版本信息，请求服务器是否有更新
         BlueManager.getInstance().write(ProtocolUtils.getVersion());
-        getUserInfo();
         Log.d("onResumeonResumeonResume  ");
     }
 
@@ -206,10 +207,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 showReset();
                 break;
             case R.id.save:
-                BlueManager.getInstance().write(ProtocolUtils.study());
                 if (null != dialog) {
                     dialog.dismiss();
                 }
+                BlueManager.getInstance().write(ProtocolUtils.study());
                 break;
         }
     }
@@ -279,6 +280,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .show();
     }
 
+    @Override
+    public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
+        return true;
+    }
+
     private void showReset() {
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                 .setViewListener(new CustomDialog.ViewListener() {
@@ -321,6 +328,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 })
                 .setLayoutRes(R.layout.dailog_confirm)
                 .setDimAmount(0.5f)
+                .setCancelOutside(false)
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
                 .show();
@@ -365,7 +373,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         e.printStackTrace();
                     }
                 } else {
-                    isUpdate = true;
                     // 固件升级开始
                     updateForOneUnit(1);
                 }
@@ -384,7 +391,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         file.delete();
                     }
                     // 升级完成，通知服务器
-                    isUpdate = false;
                     notifyUpdateSuccess(obdVersion);
                     if (null != progressBar && null != updateDialog) {
                         updateDialog.dismiss();
@@ -397,18 +403,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.OBD_GET_VERSION:
                 OBDVersionInfo version = (OBDVersionInfo) data;
                 sn = version.getSn();
-                // 查询学习进度
-                BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
-
                 checkOBDVersion(version);
-                break;
-            case OBDEvent.OBD_AUTH_RESULT:
-                // 授权结果
-                if ((Integer) data == 1) {
-                    activate_success();
-                } else {
-                    Toast.makeText(getContext(), "授权失败!", Toast.LENGTH_LONG).show();
-                }
                 break;
             case OBDEvent.OBD_UPDATE_PARAMS_SUCCESS:
                 // 判断是否需要升级固件
@@ -552,8 +547,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             }
             // 验证是否已经学习完成,并播报语音
             String studyStutus = HexUtils.formatHexString(Arrays.copyOfRange(status, snBytes.length + 2, snBytes.length + 2 + 24));
-            Log.d("STUDYSTATUS " + STUDYSTATUS.get());
-            Log.d("studyStutus " + studyStutus);
             if (GlobalUtil.isEmpty(STUDYSTATUS.get())) {
                 STUDYSTATUS.set(studyStutus);
             } else {
@@ -664,7 +657,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private void getUserInfo() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn);
+            jsonObject.put("serialNumber", getDate().get("sn"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -699,57 +692,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         carTV.setText(SettingPreferencesConfig.CAR.get());
                     }
                 });
-            }
-        });
-    }
-
-    /**
-     * 激活成功
-     */
-    private void activate_success() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", sn);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("activate success input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.ACTIVATE_SUCCESS)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("activate failure " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("activate success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if ("000".equals(result.optString("status"))) {
-                                BlueManager.getInstance().write(ProtocolUtils.getVersion());
-                            } else {
-                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                } catch (JSONException e) {
-                    Log.d("activate failure " + e.getMessage());
-                }
             }
         });
     }
@@ -793,7 +735,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             switch (obdVersion.getUpdateState()) {
                                 case 0:
                                     // 定时获取胎压状态
-//                            mHandler.sendEmptyMessage(0);
+                                    mHandler.sendEmptyMessage(0);
 //                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                                     break;
                                 case 1: // 版本参数都更新
@@ -955,135 +897,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         BlueManager.getInstance().write(ProtocolUtils.updateForUnit(index, date));
     }
 
-
-    private void getLisense() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", sn);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("getLisense input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.GET_LISENSE)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mMainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                                .setViewListener(new CustomDialog.ViewListener() {
-                                    @Override
-                                    public void bindView(View view) {
-                                        ((TextView) (view.findViewById(R.id.confirm))).setText("授权");
-                                        ((TextView) (view.findViewById(R.id.info))).setText("OBD盒子已过期,请开启网络重新授权!");
-                                        ((TextView) (view.findViewById(R.id.title))).setText("盒子过期");
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                // 获取授权码
-                                                getLisense();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setLayoutRes(R.layout.dailog_common_warm)
-                                .setCancelOutside(false)
-                                .setDimAmount(0.5f)
-                                .isCenter(true)
-                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                                .show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("getLisense success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        String code = result.optString("rightStr");
-                        BlueManager.getInstance().write(ProtocolUtils.auth(sn, code));
-                    } else {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    Log.d("getLisense failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    private void verify() {
-        final Request request = new Request.Builder().url(URLUtils.GET_TIME).build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                                .setViewListener(new CustomDialog.ViewListener() {
-                                    @Override
-                                    public void bindView(View view) {
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                verify();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setLayoutRes(R.layout.dailog_common_warm)
-                                .setDimAmount(0.5f)
-                                .isCenter(true)
-                                .setCancelOutside(false)
-                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                                .show();
-
-                    }
-                });
-                Log.d("getOBDStatus fail " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("getOBDStatus success " + responese);
-                try {
-                    JSONObject result = new JSONObject(responese);
-                    BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     private final class WorkerHandler extends Handler {
 
         private Handler mainHandler;
@@ -1099,12 +912,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             mainHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (!isUpdate) {
-                        BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
-                        WorkerHandler.this.sendEmptyMessage(0);
-                    }
+                    BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
+                    WorkerHandler.this.sendEmptyMessage(0);
                 }
-            }, 30000);
+            }, 5000);
         }
     }
 }

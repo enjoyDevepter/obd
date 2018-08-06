@@ -45,7 +45,6 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
         title.setText("输入手机号");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
-
     }
 
     @Override
@@ -82,7 +81,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请输入正确的手机号码", Toast.LENGTH_LONG).show();
             return;
         }
-
+        showProgress();
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("phone", phone);
@@ -104,6 +103,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -133,6 +133,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 String responese = response.body().string();
                 Log.d(responese);
                 try {
+                    dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         IdentifyPage page = new IdentifyPage();

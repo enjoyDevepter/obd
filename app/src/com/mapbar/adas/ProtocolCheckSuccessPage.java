@@ -1,25 +1,23 @@
 package com.mapbar.adas;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.hamster.BlueManager;
 import com.mapbar.obd.R;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 @PageSetting(contentViewId = R.layout.protocol_check_success_layout, toHistory = false)
-public class ProtocolCheckSuccessPage extends AppBasePage implements View.OnClickListener {
+public class ProtocolCheckSuccessPage extends AppBasePage {
 
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
-    @ViewInject(R.id.confirm)
-    private View confrimV;
     @ViewInject(R.id.time)
     private TextView timeTV;
 
@@ -31,22 +29,10 @@ public class ProtocolCheckSuccessPage extends AppBasePage implements View.OnClic
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText("胎压匹配检查");
-        confrimV.setOnClickListener(this);
-
-        time = 10;
+        title.setText("匹配结果");
+        time = 6;
         initTimer();
         timer.schedule(timerTask, 0, 1000);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.confirm:
-                BlueManager.getInstance().startScan();
-                PageManager.go(new ConnectPage());
-                break;
-        }
     }
 
     private void initTimer() {
@@ -62,7 +48,16 @@ public class ProtocolCheckSuccessPage extends AppBasePage implements View.OnClic
                             timer = null;
                             timerTask.cancel();
                             timerTask = null;
-                            PageManager.go(new MainPage());
+                            MainPage page = new MainPage();
+                            if (getDate() != null) {
+                                Bundle bundle = new Bundle();
+                                bundle.putString("sn", (String) getDate().getString("sn"));
+                                if (getDate() != null) {
+                                    bundle.putBoolean("showStudy", getDate().get("showStudy") == null ? false : (boolean) getDate().get("showStudy"));
+                                }
+                                page.setDate(bundle);
+                            }
+                            PageManager.go(page);
                         }
                         time--;
                     }

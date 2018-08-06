@@ -209,18 +209,18 @@ public class BlueManager {
         mMainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                stopScan();
+                stopScan(false);
             }
         }, 10000);
 
     }
 
-    public synchronized void stopScan() {
+    public synchronized void stopScan(boolean find) {
         if (null == mBluetoothAdapter || !isScaning) {
             return;
         }
         isScaning = false;
-        notifyBleCallBackListener(OBDEvent.BLUE_SCAN_FINISHED, null);
+        notifyBleCallBackListener(OBDEvent.BLUE_SCAN_FINISHED, find);
         mBluetoothAdapter.stopLeScan(leScanCallback);
     }
 
@@ -673,7 +673,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            stopScan();
+                            stopScan(true);
                             try {
                                 Thread.sleep(1500);
                             } catch (InterruptedException e) {

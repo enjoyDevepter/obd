@@ -5,7 +5,6 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.hamster.BlueManager;
 import com.mapbar.obd.R;
 
 @PageSetting(contentViewId = R.layout.obd_device_check_layout, toHistory = false)
@@ -30,7 +29,6 @@ public class OBDeviceCheckPage extends AppBasePage implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                BlueManager.getInstance().startScan();
                 PageManager.go(new ConnectPage());
                 break;
         }

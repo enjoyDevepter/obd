@@ -14,13 +14,13 @@ public class SdcardUtil {
 
     //// TODO: 12/5/16 需要将以下常量移到 MapbarStorageUtil 类中进行统一管理；
     // todo：还有一个原因就是， SdcardUtil 类只是一个基础工具类，不应该将业务相关代码放入其中，但是，目前违章查询也耦合了此项，故而暂时不做移动
-    public static String productPath = "/adas/";
-    public static String offlineDataPath = "/adas/";
+    public static String productPath = "/obd/";
+    public static String offlineDataPath = "/obd/";
     public static String mVirtualHeader = "/mnt";
-    public static String poiImagePath = "/adas/poi/image";
-    public static String productpathNoSlash = "/adas";
-    public static String offlineDataNoSlash = "/adas";
-    public static String oldProductPath = "/mapbar/";
+    public static String poiImagePath = "/obd/poi/image";
+    public static String productpathNoSlash = "/obd";
+    public static String offlineDataNoSlash = "/obd";
+    public static String oldProductPath = "/obd/";
 
     private static SdcardUtil mInstance;
 

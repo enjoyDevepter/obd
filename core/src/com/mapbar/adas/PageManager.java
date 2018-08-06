@@ -10,10 +10,10 @@ import android.support.annotation.NonNull;
  */
 public class PageManager {
 
+    private static BackStackManager backStackManager = BackStackManager.getInstance();
+
     private PageManager() {
     }
-
-    private static BackStackManager backStackManager = BackStackManager.getInstance();
 
     public static void go(@NonNull BasePage page) {
 
@@ -49,6 +49,17 @@ public class PageManager {
             System.gc();
             System.exit(0);
         }
+    }
+
+    public static void clearHistoryAndGo(@NonNull BasePage page) {
+        BasePage curPage = backStackManager.getCurrent();
+        while (!backStackManager.isLast()) {
+            int id = backStackManager.pop();
+            curPage.back(id, true);
+        }
+        backStackManager.setCurrent(page);
+        page.init();
+        page.show();
     }
 
 

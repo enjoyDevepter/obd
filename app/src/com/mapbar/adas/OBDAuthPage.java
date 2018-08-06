@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -33,7 +34,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@PageSetting(contentViewId = R.layout.obd_auth_layout, toHistory = false)
+@PageSetting(contentViewId = R.layout.obd_auth_layout)
 public class OBDAuthPage extends AppBasePage implements BleCallBackListener, LocationListener {
 
     @ViewInject(R.id.title_text)
@@ -68,6 +69,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
      * 授权
      */
     private void verify() {
+        showProgress();
         final Request request = new Request.Builder().url(URLUtils.GET_TIME).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -76,6 +78,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -136,6 +139,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.OBD_FIRST_USE:
+                dismissProgress();
                 Log.d("OBDEvent.OBD_FIRST_USE ");
                 // 激活
                 String boxId = (String) data;
@@ -179,13 +183,30 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
      * 检查协议
      */
     private void protocolCheck(byte[] result) {
+        dismissProgress();
+        byte[] snBytes = new byte[19];
+        sn = new String(Arrays.copyOfRange(result, 0, snBytes.length));
         byte[] bytes = HexUtils.getBooleanArray(result[19]);
         if (bytes[0] == 1) {
             // 车型不支持
-            PageManager.go(new ProtocolCheckFailPage());
+            ProtocolCheckFailPage page = new ProtocolCheckFailPage();
+            Bundle bundle = new Bundle();
+            bundle.putString("sn", sn);
+            if (getDate() != null) {
+                bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
+            }
+            page.setDate(bundle);
+            PageManager.go(page);
         } else {
             // 支持
-            PageManager.go(new ProtocolCheckSuccessPage());
+            ProtocolCheckSuccessPage page = new ProtocolCheckSuccessPage();
+            Bundle bundle = new Bundle();
+            if (getDate() != null) {
+                bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
+            }
+            bundle.putString("sn", sn);
+            page.setDate(bundle);
+            PageManager.go(page);
         }
     }
 
@@ -219,7 +240,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-
+                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -232,6 +253,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                             public void onClick(View v) {
                                                 dialog.dismiss();
                                                 // 获取授权码
+                                                showProgress();
                                                 getLisense(sn);
                                             }
                                         });
@@ -275,6 +297,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         GlobalUtil.getHandler().post(new Runnable() {
             @Override
             public void run() {
+                dismissProgress();
                 dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                         .setViewListener(new CustomDialog.ViewListener() {
                             @Override
@@ -328,6 +351,30 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("activate failure " + e.getMessage());
+                dismissProgress();
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.confirm))).setText("重试");
+                                ((TextView) (view.findViewById(R.id.info))).setText("网络异常,请检查网络状态后重试!");
+                                ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        showProgress();
+                                        authSuccess();
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.dailog_common_warm)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
             }
 
             @Override

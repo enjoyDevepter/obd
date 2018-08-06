@@ -70,7 +70,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
             return;
         }
-
+        showProgress();
         next.setEnabled(false);
         JSONObject jsonObject = new JSONObject();
         try {
@@ -91,6 +91,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -119,6 +120,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 String responese = response.body().string();
                 Log.d(responese);
                 try {
+                    dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         AuthPage authPage = new AuthPage();

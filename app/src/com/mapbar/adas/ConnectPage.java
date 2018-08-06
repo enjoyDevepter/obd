@@ -32,6 +32,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
         back.setVisibility(View.GONE);
         title.setText("方舟卫士");
         retry.setOnClickListener(this);
+        BlueManager.getInstance().startScan();
         BlueManager.getInstance().addBleCallBackListener(this);
     }
 
@@ -66,12 +67,20 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.BLUE_SCAN_FINISHED:
-                Log.d("OBDEvent.BLUE_SCAN_FINISHED");
-                animationDrawable.stop();
-                retry.setClickable(true);
-                retry.setVisibility(View.VISIBLE);
+                Log.d("OBDEvent.BLUE_SCAN_FINISHED " + data);
+                if (!(boolean) data) {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            animationDrawable.stop();
+                            retry.setClickable(true);
+                            retry.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
                 break;
             case OBDEvent.BLUE_CONNECTED:
+                Log.d("OBDEvent.BLUE_CONNECTED");
                 PageManager.go(new OBDAuthPage());
                 break;
         }
