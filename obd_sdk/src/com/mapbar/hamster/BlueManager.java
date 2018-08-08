@@ -76,6 +76,7 @@ public class BlueManager {
     private Handler mHandler;
     private int connectStatus;
     private boolean isScaning = false;
+    private volatile boolean canGo = true;
     private ArrayList<String> scanResult = new ArrayList<>();
     private ArrayList<BleCallBackListener> callBackListeners = new ArrayList<>();
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
@@ -134,7 +135,7 @@ public class BlueManager {
     /**
      * 待发送指令
      */
-    private LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue();
+    private LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue(1);
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -373,7 +374,7 @@ public class BlueManager {
             return;
         }
 
-        if (queue.size() == 0) {
+        if (queue.size() == 0 && canGo) {
             queue.add(data);
             return;
         }
@@ -440,6 +441,7 @@ public class BlueManager {
     }
 
     private void realWrite(byte[] data) {
+        canGo = false;
         Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
         if (mBluetoothGatt == null) {
             return;
@@ -531,7 +533,8 @@ public class BlueManager {
      */
     private void validateAndNotify(byte[] result) {
         byte[] msg = instructList.pollLast();
-        if (msg != null) {
+        canGo = true;
+        if (msg != null && queue.size() == 0) {
             queue.add(msg);
         }
 

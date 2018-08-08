@@ -935,7 +935,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
                     WorkerHandler.this.sendEmptyMessage(0);
                 }
-            }, 3000);
+            }, 5000);
         }
     }
 }
