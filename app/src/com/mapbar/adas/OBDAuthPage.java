@@ -192,7 +192,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             ProtocolCheckFailPage page = new ProtocolCheckFailPage();
             Bundle bundle = new Bundle();
             bundle.putString("sn", sn);
-            if (getDate() != null) {
+            if (getDate() != null && getDate().containsKey("showStudy")) {
                 bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
             }
             page.setDate(bundle);
@@ -201,7 +201,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             // 支持
             ProtocolCheckSuccessPage page = new ProtocolCheckSuccessPage();
             Bundle bundle = new Bundle();
-            if (getDate() != null) {
+            if (getDate() != null && getDate().containsKey("showStudy")) {
                 bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
             }
             bundle.putString("sn", sn);

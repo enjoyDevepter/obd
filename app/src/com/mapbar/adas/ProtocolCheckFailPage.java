@@ -71,9 +71,13 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             ProtocolCheckSuccessPage page = new ProtocolCheckSuccessPage();
             Bundle bundle = new Bundle();
             if (getDate() != null) {
-                bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
+                if (getDate().containsKey("showStudy")) {
+                    bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
+                }
+                if (getDate().containsKey("sn")) {
+                    bundle.putString("sn", String.valueOf(getDate().getString("sn")));
+                }
             }
-            bundle.putString("sn", getDate().getString("sn").toString());
             page.setDate(bundle);
             PageManager.go(page);
         }

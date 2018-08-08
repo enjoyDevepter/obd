@@ -191,6 +191,15 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         mWorkerThread.quitSafely();
         mHandler = null;
         mWorkerThread = null;
+
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        if (timerTask != null) {
+            timerTask.cancel();
+            timerTask = null;
+        }
     }
 
     @Override
@@ -209,6 +218,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.save:
                 if (null != dialog) {
                     dialog.dismiss();
+                }
+                if (getDate() != null) {
+                    if (getDate().getBoolean("showStudy")) {
+                        getDate().putBoolean("showStudy", false);
+                    }
                 }
                 BlueManager.getInstance().write(ProtocolUtils.study());
                 break;
@@ -315,6 +329,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     }
 
     private void showStudy() {
+        if (dialog != null && dialog.isVisible()) {
+            time = 10;
+            initTimer();
+            timer.schedule(timerTask, 0, 1000);
+            return;
+        }
 
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                 .setViewListener(new CustomDialog.ViewListener() {
@@ -915,7 +935,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
                     WorkerHandler.this.sendEmptyMessage(0);
                 }
-            }, 5000);
+            }, 8000);
         }
     }
 }

@@ -45,6 +45,12 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     }
 
     @Override
+    public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
+        return true;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         BlueManager.getInstance().removeCallBackListener(this);

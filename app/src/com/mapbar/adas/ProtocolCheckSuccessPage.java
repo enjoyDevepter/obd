@@ -51,9 +51,9 @@ public class ProtocolCheckSuccessPage extends AppBasePage {
                             MainPage page = new MainPage();
                             if (getDate() != null) {
                                 Bundle bundle = new Bundle();
-                                bundle.putString("sn", (String) getDate().getString("sn"));
-                                if (getDate() != null) {
-                                    bundle.putBoolean("showStudy", getDate().get("showStudy") == null ? false : (boolean) getDate().get("showStudy"));
+                                bundle.putString("sn", getDate().getString("sn"));
+                                if (getDate().containsKey("showStudy")) {
+                                    bundle.putBoolean("showStudy", (Boolean) getDate().get("showStudy"));
                                 }
                                 page.setDate(bundle);
                             }
