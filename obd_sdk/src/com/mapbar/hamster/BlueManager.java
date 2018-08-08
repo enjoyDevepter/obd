@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by guomin on 2018/3/8.
@@ -103,7 +104,7 @@ public class BlueManager {
             }
         }
     };
-    private boolean split;
+    private volatile boolean split;
     private byte[] mData;
     private int mCount = 20;
     private Queue<byte[]> mDataQueue;
@@ -129,9 +130,20 @@ public class BlueManager {
     private byte[] result;
     private byte[] currentProtocol;
     private int repeat = 0;
+    private LinkedList<byte[]> instructList;
+    /**
+     * 待发送指令
+     */
+    private LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue();
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sentToBox();
+            }
+        }, "sendMessage").start();
     }
 
     public static BlueManager getInstance() {
@@ -252,6 +264,7 @@ public class BlueManager {
                         disconnect();
                     }
                 } else {
+
                     disconnect();
                 }
             }
@@ -347,11 +360,51 @@ public class BlueManager {
     }
 
     /**
+     * 发送指令
+     *
+     * @param data
+     */
+    public synchronized void send(byte[] data) {
+        // 判断该指令是否和待发送队列中最后一个指令相同，如果相同则不放入，不相同则加入，判断date中第2、3位是否一致既可
+
+        if (instructList == null) {
+            instructList = new LinkedList<>();
+            queue.add(data);
+            return;
+        }
+
+        if (queue.size() == 0) {
+            queue.add(data);
+            return;
+        }
+
+        byte[] last = instructList.pollLast();
+        if (last != null && data[1] == last[1] && data[2] == last[2]) {
+            return;
+        }
+        instructList.addLast(data);
+    }
+
+    /**
+     * 蓝牙通信
+     */
+    public void sentToBox() {
+        while (true) {
+            try {
+                byte[] message = queue.take();
+                write(message);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * 发送数据
      *
      * @param data
      */
-    public synchronized void write(byte[] data) {
+    private synchronized void write(byte[] data) {
         if (null == writeCharacteristic) {
             return;
         }
@@ -473,7 +526,16 @@ public class BlueManager {
         }
     }
 
+    /**
+     * @param result
+     */
     private void validateAndNotify(byte[] result) {
+        byte[] msg = instructList.pollLast();
+        if (msg != null) {
+            queue.add(msg);
+        }
+
+
         int cr = result[1];
         for (int i = 2; i < result.length - 2; i++) {
             cr = cr ^ result[i];
@@ -589,73 +651,6 @@ public class BlueManager {
 
     public static class InstanceHolder {
         private static final BlueManager INSTANCE = new BlueManager();
-    }
-
-    private static class TimeOutThread extends Thread {
-
-        private static final String TIMEOUTSYNC = "MTIMEOUTSYNC";
-
-        private boolean needStop = false;
-
-        private boolean waitForCommand = false;
-
-        @Override
-        public synchronized void start() {
-            needStop = false;
-            super.start();
-        }
-
-        @Override
-        public void run() {
-            super.run();
-            while (!needStop) {
-
-                synchronized (TIMEOUTSYNC) {
-
-                    if (needStop) {
-                        return;
-                    }
-
-                    if (waitForCommand) {
-
-                        try {
-                            TIMEOUTSYNC.wait(COMMAND_TIMEOUT);
-
-
-                            TIMEOUTSYNC.notifyAll();
-                            TIMEOUTSYNC.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }
-            }
-        }
-
-        public void startCommand() {
-            synchronized (TIMEOUTSYNC) {
-                waitForCommand = true;
-                TIMEOUTSYNC.notifyAll();
-            }
-        }
-
-        public void endCommand() {
-            synchronized (TIMEOUTSYNC) {
-                waitForCommand = false;
-                TIMEOUTSYNC.notifyAll();
-                try {
-                    TIMEOUTSYNC.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void cancel() {
-            needStop = true;
-            interrupt();
-        }
     }
 
     private final class WorkerHandler extends Handler {

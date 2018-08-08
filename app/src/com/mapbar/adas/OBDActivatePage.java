@@ -127,7 +127,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                         String code = result.optString("rightStr");
                         SettingPreferencesConfig.CAR.set(carName);
                         SettingPreferencesConfig.PHONE.set(String.valueOf(getDate().get("phone")));
-                        BlueManager.getInstance().write(ProtocolUtils.auth(getDate().getString("sn"), code));
+                        BlueManager.getInstance().send(ProtocolUtils.auth(getDate().getString("sn"), code));
                     }
                 } catch (JSONException e) {
                     Log.d("activate failure " + e.getMessage());
@@ -256,7 +256,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                                 case 1:
                                 case 2:
                                 case 3: // 只有参数更新
-                                    BlueManager.getInstance().write(ProtocolUtils.updateParams(version.getSn(), obdVersion.getParams()));
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(version.getSn(), obdVersion.getParams()));
                                     break;
                             }
                         } else {
@@ -322,7 +322,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        BlueManager.getInstance().write(ProtocolUtils.getVersion());
+                        BlueManager.getInstance().send(ProtocolUtils.getVersion());
                     } else {
                         Log.d("activate failure");
                     }

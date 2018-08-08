@@ -60,7 +60,7 @@ public class ConfirmPage extends AppBasePage implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.save:
-                BlueManager.getInstance().write(ProtocolUtils.study());
+                BlueManager.getInstance().send(ProtocolUtils.study());
                 PageManager.go(new MainPage());
                 break;
 

@@ -132,7 +132,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             GlobalUtil.getHandler().post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    BlueManager.getInstance().write(ProtocolUtils.updateInfo(version, HexUtils.longToByte(updates.length)));
+                                    BlueManager.getInstance().send(ProtocolUtils.updateInfo(version, HexUtils.longToByte(updates.length)));
                                 }
                             });
                         } catch (FileNotFoundException e) {
@@ -169,7 +169,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             }
         }
         // 获取OBD版本信息，请求服务器是否有更新
-        BlueManager.getInstance().write(ProtocolUtils.getVersion());
+        BlueManager.getInstance().send(ProtocolUtils.getVersion());
         Log.d("onResumeonResumeonResume  ");
     }
 
@@ -224,7 +224,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         getDate().putBoolean("showStudy", false);
                     }
                 }
-                BlueManager.getInstance().write(ProtocolUtils.study());
+                BlueManager.getInstance().send(ProtocolUtils.study());
                 break;
         }
     }
@@ -237,14 +237,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         view.findViewById(R.id.change).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().write(ProtocolUtils.playWarm(02));
+                                BlueManager.getInstance().send(ProtocolUtils.playWarm(02));
                             }
                         });
 
                         view.findViewById(R.id.auth).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().write(ProtocolUtils.playWarm(01));
+                                BlueManager.getInstance().send(ProtocolUtils.playWarm(01));
                             }
                         });
 
@@ -274,7 +274,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             @Override
                             public void onClick(View v) {
                                 SensitiveView.Type type = sensitiveView.getType();
-                                BlueManager.getInstance().write(ProtocolUtils.setSensitive(type == LOW ? 01 : type == MEDIUM ? 02 : 03));
+                                BlueManager.getInstance().send(ProtocolUtils.setSensitive(type == LOW ? 01 : type == MEDIUM ? 02 : 03));
                                 dialog.dismiss();
                             }
                         });
@@ -308,7 +308,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         view.findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().write(ProtocolUtils.study());
+                                BlueManager.getInstance().send(ProtocolUtils.study());
                                 dialog.dismiss();
                             }
                         });
@@ -589,7 +589,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                                     public void onClick(View v) {
                                         dialog.dismiss();
                                         // 获取OBD版本信息，请求服务器是否有更新
-                                        BlueManager.getInstance().write(ProtocolUtils.getVersion());
+                                        BlueManager.getInstance().send(ProtocolUtils.getVersion());
                                     }
                                 });
                             }
@@ -603,7 +603,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             } else {
                 if (checkVersion) {
                     // 获取OBD版本信息，请求服务器是否有更新
-                    BlueManager.getInstance().write(ProtocolUtils.getVersion());
+                    BlueManager.getInstance().send(ProtocolUtils.getVersion());
                 }
             }
 
@@ -759,13 +759,13 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 //                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                                     break;
                                 case 1: // 版本参数都更新
-                                    BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
                                     break;
                                 case 2: // 只有版本更新
                                     downloadUpdate(obdVersion);
                                     break;
                                 case 3: // 只有参数更新
-                                    BlueManager.getInstance().write(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
                                     break;
                             }
                         } else {
@@ -914,7 +914,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         }
         System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
 
-        BlueManager.getInstance().write(ProtocolUtils.updateForUnit(index, date));
+        BlueManager.getInstance().send(ProtocolUtils.updateForUnit(index, date));
     }
 
     private final class WorkerHandler extends Handler {
@@ -932,10 +932,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             mainHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
+                    BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
                     WorkerHandler.this.sendEmptyMessage(0);
                 }
-            }, 8000);
+            }, 3000);
         }
     }
 }

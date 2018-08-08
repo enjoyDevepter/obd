@@ -113,7 +113,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                         return;
                     }
                     verified = true;
-                    BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
+                    BlueManager.getInstance().send(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -277,7 +277,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         String code = result.optString("rightStr");
-                        BlueManager.getInstance().write(ProtocolUtils.auth(sn, code));
+                        BlueManager.getInstance().send(ProtocolUtils.auth(sn, code));
                     } else {
                         authFail(result.optString("message"));
                     }
@@ -385,7 +385,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         // 协议匹配检查（通过获取胎压信息）
-                        BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
+                        BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
                     } else {
                         Log.d("activate failure" + result.optString("message"));
                     }
@@ -405,7 +405,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 return;
             }
             verified = true;
-            BlueManager.getInstance().write(ProtocolUtils.getOBDStatus(location.getTime()));
+            BlueManager.getInstance().send(ProtocolUtils.getOBDStatus(location.getTime()));
         }
     }
 

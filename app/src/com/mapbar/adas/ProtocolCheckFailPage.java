@@ -27,7 +27,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         back.setVisibility(View.GONE);
         title.setText("匹配结果");
         showProgress();
-        BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
+        BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         byte[] bytes = HexUtils.getBooleanArray(result[19]);
         if (bytes[0] == 1) {
             // 车型不支持
-            BlueManager.getInstance().write(ProtocolUtils.getTirePressureStatus());
+            BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
         } else {
             dismissProgress();
             // 支持
