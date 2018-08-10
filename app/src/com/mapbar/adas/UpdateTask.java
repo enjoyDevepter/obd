@@ -164,7 +164,7 @@ public class UpdateTask extends BaseTask {
                 if (uri != null) {
                     //对比下载的apk版本和本地应用版本
                     if (compare(getApkInfo(uri.getPath()))) {
-                        installApk(uri);
+                        installApk();
                     } else {
                         downloadManager.remove(downloadId);
                         startDownload(url);
@@ -264,27 +264,7 @@ public class UpdateTask extends BaseTask {
     }
 
 
-    private void installApk(final Uri uri) {
-
-
-//        File file = new File(
-//                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-//                , "myApp.apk");
-//        Intent intent = new Intent(Intent.ACTION_VIEW);
-//        // 由于没有在Activity环境下启动Activity,设置下面的标签
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        if (Build.VERSION.SDK_INT >= 24) { //判读版本是否在7.0以上
-//            //参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致   参数3  共享的文件
-//            Uri apkUri =
-//                    FileProvider.getUriForFile(GlobalUtil.getContext(), "com.mapbar.obd.fileprovider", file);
-//            //添加这一句表示对目标应用临时授权该Uri所代表的文件
-//            Log.d("apkUri " + apkUri);
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-//        } else {
-//            intent.setDataAndType(Uri.fromFile(file),
-//                    "application/vnd.android.package-archive");
-//        }
+    private void installApk() {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath(), "app.apk");
         Log.d("file.exists() " + file.exists());
         Log.d("file.getPath() " + file.getPath());
@@ -312,7 +292,7 @@ public class UpdateTask extends BaseTask {
                 //下载完成
                 GlobalUtil.getContext().unregisterReceiver(downLoadBroadCastReceiver);
                 //跳到安装界面
-                installApk(getDownloadUri(id));
+                installApk();
             }
         }
     }
