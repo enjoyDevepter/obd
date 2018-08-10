@@ -11,7 +11,7 @@ import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 @PageSetting(contentViewId = R.layout.protocol_check_fail_layout, toHistory = false)
 public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackListener {

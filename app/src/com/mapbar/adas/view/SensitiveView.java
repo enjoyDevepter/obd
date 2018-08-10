@@ -13,7 +13,7 @@ import android.view.View;
 
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import static com.mapbar.adas.view.SensitiveView.Type.HIGHT;
 import static com.mapbar.adas.view.SensitiveView.Type.LOW;

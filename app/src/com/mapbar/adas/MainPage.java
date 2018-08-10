@@ -36,7 +36,7 @@ import com.mapbar.hamster.Update;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import java.util.Timer;
 import java.util.TimerTask;

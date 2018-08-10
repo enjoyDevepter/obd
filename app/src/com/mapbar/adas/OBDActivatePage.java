@@ -18,7 +18,7 @@ import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.OBDVersionInfo;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

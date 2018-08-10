@@ -9,7 +9,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,11 +20,12 @@ import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -184,7 +187,12 @@ public class UpdateTask extends BaseTask {
         request.setTitle("");
         request.setVisibleInDownloadsUi(true);
         //设置下载的路径
-        request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory().getAbsolutePath(), url.substring(url.lastIndexOf("/")));
+        //创建目录
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).mkdir();
+
+        //设置文件存放路径
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "app.apk");
+
         //将下载请求加入下载队列，加入下载队列后会给该任务返回一个long型的id，通过该id可以取消任务，重启任务、获取下载的文件等等
         downloadId = downloadManager.enqueue(request);
 
@@ -256,11 +264,44 @@ public class UpdateTask extends BaseTask {
     }
 
 
-    private void installApk(Uri uri) {
-        Intent installIntent = new Intent(Intent.ACTION_VIEW);
-        installIntent.setDataAndType(uri, "application/vnd.android.package-archive");
-        installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        GlobalUtil.getContext().startActivity(installIntent);
+    private void installApk(final Uri uri) {
+
+
+//        File file = new File(
+//                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//                , "myApp.apk");
+//        Intent intent = new Intent(Intent.ACTION_VIEW);
+//        // 由于没有在Activity环境下启动Activity,设置下面的标签
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        if (Build.VERSION.SDK_INT >= 24) { //判读版本是否在7.0以上
+//            //参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致   参数3  共享的文件
+//            Uri apkUri =
+//                    FileProvider.getUriForFile(GlobalUtil.getContext(), "com.mapbar.obd.fileprovider", file);
+//            //添加这一句表示对目标应用临时授权该Uri所代表的文件
+//            Log.d("apkUri " + apkUri);
+//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+//        } else {
+//            intent.setDataAndType(Uri.fromFile(file),
+//                    "application/vnd.android.package-archive");
+//        }
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath(), "app.apk");
+        Log.d("file.exists() " + file.exists());
+        Log.d("file.getPath() " + file.getPath());
+        Intent install = new Intent(Intent.ACTION_VIEW);
+        if (Build.VERSION.SDK_INT >= 24) {//判读版本是否在7.0以上
+            Uri apkUri = FileProvider.getUriForFile(GlobalUtil.getContext(), "com.miyuan.obd.fileprovider", file);//在AndroidManifest中的android:authorities值
+            Log.d("apkUri " + apkUri);
+            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            install.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//添加这一句表示对目标应用临时授权该Uri所代表的文件
+            install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        } else {
+            install.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        GlobalUtil.getContext().startActivity(install);
+
     }
 
     private class DownLoadBroadCastReceiver extends BroadcastReceiver {

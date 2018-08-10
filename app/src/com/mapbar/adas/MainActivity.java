@@ -19,7 +19,7 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 public class MainActivity extends AppCompatActivity implements BleCallBackListener {
 

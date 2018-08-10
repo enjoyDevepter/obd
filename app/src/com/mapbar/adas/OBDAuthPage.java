@@ -19,7 +19,7 @@ import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,31 +75,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismissProgress();
-                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                                .setViewListener(new CustomDialog.ViewListener() {
-                                    @Override
-                                    public void bindView(View view) {
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                verify();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setLayoutRes(R.layout.dailog_common_warm)
-                                .setDimAmount(0.5f)
-                                .isCenter(true)
-                                .setCancelOutside(false)
-                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                                .show();
-                    }
-                });
                 Log.d("getOBDStatus fail " + e.getMessage());
             }
 
@@ -248,12 +223,14 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                         ((TextView) (view.findViewById(R.id.confirm))).setText("授权");
                                         ((TextView) (view.findViewById(R.id.info))).setText("OBD盒子已过期,请开启网络重新授权!");
                                         ((TextView) (view.findViewById(R.id.title))).setText("盒子过期");
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
                                                 // 获取授权码
                                                 showProgress();
+                                                confirm.setEnabled(false);
                                                 getLisense(sn);
                                             }
                                         });

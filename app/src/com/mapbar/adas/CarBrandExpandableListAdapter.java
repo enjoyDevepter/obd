@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import java.util.ArrayList;
 

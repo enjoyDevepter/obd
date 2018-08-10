@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 /**
  * Created by guomin on 2018/3/12.

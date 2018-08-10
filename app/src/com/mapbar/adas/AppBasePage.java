@@ -3,7 +3,7 @@ package com.mapbar.adas;
 
 import com.mapbar.adas.view.CustomProgressDailog;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 public abstract class AppBasePage extends FragmentPage {
 

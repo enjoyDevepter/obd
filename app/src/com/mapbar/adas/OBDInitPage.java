@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 @PageSetting(contentViewId = R.layout.obd_init_layout)
 public class OBDInitPage extends AppBasePage implements View.OnClickListener {

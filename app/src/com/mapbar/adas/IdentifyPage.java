@@ -12,7 +12,7 @@ import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

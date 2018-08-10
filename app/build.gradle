@@ -8,7 +8,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 22
         versionCode 1100
-        versionName "1.0"
+        versionName "2.0"
     }
 
 
@@ -18,6 +18,7 @@ android {
             storePassword "miyuan2018"
             keyAlias "miyuan_android"
             keyPassword "miyuan2018"
+            v2SigningEnabled false
         }
     }
 

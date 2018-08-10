@@ -254,6 +254,7 @@ public class BlueManager {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
                         Log.d("onConnectionStateChange  STATE_CONNECTED");
+                        canGo = true;
                         connectStatus = CONNECTED;
                         mBluetoothGatt.discoverServices();
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -265,7 +266,10 @@ public class BlueManager {
                         disconnect();
                     }
                 } else {
-
+                    connectStatus = DISCONNECTED;
+                    Message message = new Message();
+                    message.what = MSG_OBD_DISCONNECTED;
+                    mHandler.sendMessage(message);
                     disconnect();
                 }
             }

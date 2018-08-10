@@ -10,7 +10,7 @@ import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.log.Log;
-import com.mapbar.obd.R;
+import com.miyuan.obd.R;
 
 @PageSetting(contentViewId = R.layout.connect_layout, toHistory = false)
 public class ConnectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
