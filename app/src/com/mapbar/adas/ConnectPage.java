@@ -30,7 +30,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText("方舟卫士");
+        title.setText("连接盒子");
         retry.setOnClickListener(this);
         BlueManager.getInstance().startScan();
         BlueManager.getInstance().addBleCallBackListener(this);

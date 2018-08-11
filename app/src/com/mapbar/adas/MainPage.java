@@ -152,7 +152,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText("智驾卫士");
+        title.setText("方舟盒子");
         warm.setOnClickListener(this);
         reset.setOnClickListener(this);
         sensitive.setOnClickListener(this);
