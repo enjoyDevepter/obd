@@ -22,9 +22,20 @@
         android:layout_width="match_parent"
         android:layout_height="260dp"
         android:layout_gravity="center"
-        android:layout_marginTop="68dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/obd_connect"
         android:scaleType="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:text="各类车型OBD常见接口位置如下图所示 \n市面上90%车型OBD接口都在1、2、3位置，弯腰即可看见"
+        android:textSize="20sp" />
 
     <View
         android:layout_width="match_parent"
