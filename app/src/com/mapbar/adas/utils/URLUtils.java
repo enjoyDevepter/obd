@@ -22,6 +22,5 @@ public class URLUtils {
     public static final String SN_CHECK = HOST + "service/serialNumber/check";
     public static final String GET_USER_INFO = HOST + "service/box/getUserInfo";
     public static final String UPDATE_TIRE = HOST + "service/data/uploadData";
-
-
+    public static final String UPDATE_ERROR_FILE = HOST + "service/data/uploadData";
 }

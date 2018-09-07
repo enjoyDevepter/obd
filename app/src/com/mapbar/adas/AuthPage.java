@@ -33,6 +33,8 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.next)
     private TextView next;
     @ViewInject(R.id.back)
@@ -56,6 +58,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         next.setOnClickListener(this);
         back.setOnClickListener(this);
         scanV.setOnClickListener(this);
+        reportV.setOnClickListener(this);
 
         if (getDate() != null && null != getDate().get("sn")) {
             String sn = (String) getDate().get("sn");
@@ -93,6 +96,8 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             case R.id.scan:
                 Intent intent = new Intent(GlobalUtil.getMainActivity(), CaptureActivity.class);
                 GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
+                break;
+            case R.id.report:
                 break;
         }
     }
@@ -164,14 +169,12 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                     dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        ChoiceCarPage choiceCarPage = new ChoiceCarPage();
+                        PhonePage page = new PhonePage();
                         Bundle bundle = new Bundle();
                         bundle.putString("boxId", getDate().getString("boxId"));
-                        bundle.putString("phone", getDate().getString("phone"));
-                        bundle.putString("code", getDate().getString("code"));
                         bundle.putString("sn", sn.toString());
-                        choiceCarPage.setDate(bundle);
-                        PageManager.go(choiceCarPage);
+                        page.setDate(bundle);
+                        PageManager.go(page);
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override

@@ -29,6 +29,7 @@ public class ProtocolCheckSuccessPage extends AppBasePage {
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
+        back.setVisibility(View.GONE);
         title.setText("匹配结果");
         time = 6;
         initTimer();

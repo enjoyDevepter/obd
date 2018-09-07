@@ -17,6 +17,8 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
     private View confirmV;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
 
     @Override
     public void onResume() {
@@ -44,11 +46,11 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
                 PageManager.back();
                 break;
             case R.id.confirm:
-                PhonePage page = new PhonePage();
+                AuthPage authPage = new AuthPage();
                 Bundle bundle = new Bundle();
                 bundle.putString("boxId", getDate().getString("boxId"));
-                page.setDate(bundle);
-                PageManager.go(page);
+                authPage.setDate(bundle);
+                PageManager.go(authPage);
                 break;
         }
     }

@@ -14,6 +14,8 @@ public class OBDeviceCheckPage extends AppBasePage implements View.OnClickListen
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.confirm)
     private View confrimV;
 
@@ -23,6 +25,7 @@ public class OBDeviceCheckPage extends AppBasePage implements View.OnClickListen
         back.setVisibility(View.GONE);
         title.setText("插入OBD");
         confrimV.setOnClickListener(this);
+        reportV.setOnClickListener(this);
     }
 
     @Override
@@ -30,6 +33,8 @@ public class OBDeviceCheckPage extends AppBasePage implements View.OnClickListen
         switch (v.getId()) {
             case R.id.confirm:
                 PageManager.go(new ConnectPage());
+                break;
+            case R.id.report:
                 break;
         }
     }

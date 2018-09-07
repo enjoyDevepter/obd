@@ -31,7 +31,6 @@ import com.mapbar.adas.view.SensitiveView;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
-import com.mapbar.hamster.OBDVersionInfo;
 import com.mapbar.hamster.Update;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
@@ -72,6 +71,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private View back;
     @ViewInject(R.id.title_text)
     private TextView title;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.sensitive)
     private View sensitive;
     @ViewInject(R.id.warm)
@@ -155,6 +156,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         title.setText("汽车卫士");
         warm.setOnClickListener(this);
         reset.setOnClickListener(this);
+        reportV.setOnClickListener(this);
         sensitive.setOnClickListener(this);
         phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
         carTV.setText(SettingPreferencesConfig.CAR.get());
@@ -225,6 +227,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                 }
                 BlueManager.getInstance().send(ProtocolUtils.study());
+                break;
+            case R.id.report:
                 break;
         }
     }
@@ -421,9 +425,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case OBDEvent.OBD_GET_VERSION:
-                OBDVersionInfo version = (OBDVersionInfo) data;
-                sn = version.getSn();
-                checkOBDVersion(version);
+//                OBDVersionInfo version = (OBDVersionInfo) data;
+//                sn = version.getSn();
+//                checkOBDVersion(version);
                 break;
             case OBDEvent.OBD_UPDATE_PARAMS_SUCCESS:
                 // 判断是否需要升级固件
@@ -716,13 +720,13 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         });
     }
 
-    private void checkOBDVersion(OBDVersionInfo version) {
+    private void checkOBDVersion(/*OBDVersionInfo version*/) {
 
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", sn);
-            jsonObject.put("bVersion", version.getVersion());
-            jsonObject.put("pVersion", version.getCar_no());
+//            jsonObject.put("bVersion", version.getVersion());
+//            jsonObject.put("pVersion", version.getCar_no());
         } catch (JSONException e) {
             e.printStackTrace();
         }

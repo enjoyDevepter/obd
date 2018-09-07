@@ -3,12 +3,14 @@ package com.mapbar.adas;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -19,6 +21,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 
 public class GlobalUtil {
@@ -51,6 +54,19 @@ public class GlobalUtil {
 
     public static void setOkHttpClient(OkHttpClient okHttpClient) {
         GlobalUtil.okHttpClient = okHttpClient;
+    }
+
+    public static void uploadError(String sn) {
+        if (null != getOkHttpClient()) {
+            File errorDir = new File(Environment.getExternalStorageDirectory().getPath() + "/obd");
+            if (null != errorDir.listFiles()) {
+                MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
+                multipartBodyBuilder.setType(MultipartBody.FORM);
+                for (File file : errorDir.listFiles()) {
+//                    multipartBodyBuilder.addFormDataPart(RequestBody.create(MEDIA_TYPE_PNG, file)))
+                }
+            }
+        }
     }
 
     public static Resources getResources() {

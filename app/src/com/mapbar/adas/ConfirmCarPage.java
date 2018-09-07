@@ -22,6 +22,8 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
     private View back;
     @ViewInject(R.id.goback)
     private View goBack;
+    @ViewInject(R.id.report)
+    private View reportV;
 
     @Override
     public void onResume() {
@@ -29,6 +31,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
         title.setText("确认车型");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
+        reportV.setOnClickListener(this);
         goBack.setOnClickListener(this);
         if (null != getDate()) {
             carName = getDate().get("carName").toString();
@@ -42,6 +45,8 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
             case R.id.back:
             case R.id.goback:
                 PageManager.back();
+                break;
+            case R.id.report:
                 break;
             case R.id.next:
                 OBDActivatePage page = new OBDActivatePage();

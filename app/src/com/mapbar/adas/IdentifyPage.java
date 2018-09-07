@@ -37,6 +37,8 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
     private TextView next;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.phone)
     private TextView phone;
     private CustomDialog dialog;
@@ -123,13 +125,14 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                     dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        AuthPage authPage = new AuthPage();
+                        ChoiceCarPage choiceCarPage = new ChoiceCarPage();
                         Bundle bundle = new Bundle();
                         bundle.putString("boxId", getDate().getString("boxId"));
                         bundle.putString("phone", getDate().getString("phone"));
+                        bundle.putString("sn", getDate().getString("sn"));
                         bundle.putString("code", identify);
-                        authPage.setDate(bundle);
-                        PageManager.go(authPage);
+                        choiceCarPage.setDate(bundle);
+                        PageManager.go(choiceCarPage);
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override

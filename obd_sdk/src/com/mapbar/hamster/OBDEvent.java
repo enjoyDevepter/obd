@@ -86,4 +86,43 @@ public class OBDEvent {
      * OBD 胎压学习进度
      */
     public static final int OBD_STUDY_PROGRESS = 18;
+
+
+    /**
+     * 未注册
+     */
+    public static final int UNREGISTERED = 100; //未注册
+    /**
+     * 未授权或者授权过期
+     */
+    public static final int AUTHORIZATION = 110; //未授权或者授权过期
+    public static final int AUTHORIZATION_SUCCESS = 111; //未授权或者授权过期
+    public static final int AUTHORIZATION_FAIL = 112; //未授权或者授权过期
+
+    /**
+     * 无车型参数
+     */
+    public static final int NO_PARAM = 120; // 无车型参数
+    public static final int PARAM_UPDATE_SUCESS = 121; // 无车型参数
+    public static final int PARAM_UPDATE_FAIL = 122; // 无车型参数
+    /**
+     * 当前胎压不匹配
+     */
+    public static final int CURRENT_MISMATCHING = 130; // 当前胎压不匹配
+    /**
+     * 之前胎压匹配成功过
+     */
+    public static final int BEFORE_MISMATCHING = 140; // 之前是否胎压匹配过
+    /**
+     * 未校准
+     */
+    public static final int UN_ADJUST = 150; // 未完成校准
+    /**
+     * BoxId不合法，盗版
+     */
+    public static final int UN_LEGALITY = 160; // BoxId 不合法
+    /**
+     * 胎压盒子正常
+     */
+    public static final int NORMAL = 170; // 胎压盒子可以正常使用
 }

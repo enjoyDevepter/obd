@@ -21,6 +21,8 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     private View back;
     @ViewInject(R.id.connect)
     private View connect;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.retry)
     private View retry;
 
@@ -30,6 +32,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
+        reportV.setVisibility(View.GONE);
         title.setText("连接盒子");
         retry.setOnClickListener(this);
         BlueManager.getInstance().startScan();

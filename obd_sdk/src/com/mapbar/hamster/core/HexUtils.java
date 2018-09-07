@@ -148,6 +148,15 @@ public class HexUtils {
         return b;
     }
 
+    public static short byteToShort(byte[] b) {
+        short s = 0;
+        short s0 = (short) (b[0] & 0xff);// 最低位
+        short s1 = (short) (b[1] & 0xff);
+        s1 <<= 8;
+        s = (short) (s0 | s1);
+        return s;
+    }
+
     /**
      * @param
      * @return 长整型

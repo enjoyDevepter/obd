@@ -17,12 +17,15 @@ public class OBDInitPage extends AppBasePage implements View.OnClickListener {
     private View confirmTV;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
 
     @Override
     public void onResume() {
         super.onResume();
         title.setText("初始化盒子");
         confirmTV.setOnClickListener(this);
+        reportV.setOnClickListener(this);
         back.setOnClickListener(this);
     }
 
@@ -44,6 +47,8 @@ public class OBDInitPage extends AppBasePage implements View.OnClickListener {
                 bundle.putString("boxId", getDate().getString("boxId"));
                 page.setDate(bundle);
                 PageManager.go(page);
+                break;
+            case R.id.report:
                 break;
         }
     }

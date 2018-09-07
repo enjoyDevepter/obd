@@ -16,6 +16,7 @@ import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
@@ -35,23 +36,27 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.obd_auth_layout)
-public class OBDAuthPage extends AppBasePage implements BleCallBackListener, LocationListener {
+public class OBDAuthPage extends AppBasePage implements BleCallBackListener, LocationListener, View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
     private volatile boolean verified;
     private CustomDialog dialog;
 
     private LocationManager locationManager;
 
     private String sn;
+    private boolean expire;
 
     @Override
     public void onResume() {
         super.onResume();
         title.setText("授权检查");
+        reportV.setOnClickListener(this);
         back.setVisibility(View.GONE);
         verify();
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
@@ -63,7 +68,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         super.onStart();
         BlueManager.getInstance().addBleCallBackListener(this);
     }
-
 
     /**
      * 授权
@@ -109,36 +113,46 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         return true;
     }
 
-
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.OBD_FIRST_USE:
+            case OBDEvent.UNREGISTERED://未注册
                 dismissProgress();
-                Log.d("OBDEvent.OBD_FIRST_USE ");
+                Log.d("OBDEvent.UNREGISTERED ");
                 // 激活
-                String boxId = (String) data;
-                Log.d("boxId  " + boxId);
+                OBDStatusInfo obdStatusInfo = (OBDStatusInfo) data;
+                Log.d("obdStatusInfo  " + obdStatusInfo);
                 OBDInitPage obdInitPage = new OBDInitPage();
                 Bundle bundle = new Bundle();
-                bundle.putString("boxId", boxId);
+                bundle.putString("boxId", obdStatusInfo.getBoxId());
                 obdInitPage.setDate(bundle);
                 PageManager.go(obdInitPage);
                 break;
-            case OBDEvent.OBD_NORMAL:
-                Log.d("OBDEvent.OBD_NORMAL ");
-                // 解析OBD状态
-                byte[] result1 = (byte[]) data;
-                byte[] result = new byte[result1.length - 1];
-                System.arraycopy(result1, 1, result, 0, result.length);
-                protocolCheck(result);
-                break;
-            case OBDEvent.OBD_EXPIRE:
-                Log.d("OBDEvent.OBD_EXPIRE " + data);
+            case OBDEvent.AUTHORIZATION: //未授权或者授权过期
                 // 获取授权码
-                sn = (String) data;
-                getLisense(sn);
+                getLisense((String) data);
                 break;
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                authSuccess();
+                break;
+            case OBDEvent.AUTHORIZATION_FAIL:
+                authFail("授权失败!请联系客服!");
+            case OBDEvent.NORMAL:
+                break;
+//            case OBDEvent.OBD_NORMAL:
+//                Log.d("OBDEvent.OBD_NORMAL ");
+//                // 解析OBD状态
+//                byte[] result1 = (byte[]) data;
+//                byte[] result = new byte[result1.length - 1];
+//                System.arraycopy(result1, 1, result, 0, result.length);
+//                protocolCheck(result);
+//                break;
+//            case OBDEvent.OBD_EXPIRE:
+//                Log.d("OBDEvent.OBD_EXPIRE " + data);
+//                // 获取授权码
+//                sn = (String) data;
+//                getLisense(sn);
+//                break;
             case OBDEvent.OBD_AUTH_RESULT:
                 Log.d("OBDEvent.OBD_AUTH_RESULT " + data);
                 // 授权结果
@@ -399,5 +413,14 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.report:
+
+                break;
+        }
     }
 }

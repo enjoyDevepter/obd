@@ -31,6 +31,8 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.content)
     private EditText content;
     @ViewInject(R.id.next)
@@ -45,6 +47,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
         title.setText("输入手机号");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
+        reportV.setOnClickListener(this);
     }
 
     @Override
@@ -65,6 +68,8 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 break;
             case R.id.next:
                 getMSN();
+                break;
+            case R.id.report:
                 break;
         }
     }
@@ -139,6 +144,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                         IdentifyPage page = new IdentifyPage();
                         Bundle bundle = new Bundle();
                         bundle.putString("boxId", getDate().getString("boxId"));
+                        bundle.putString("sn", getDate().getString("sn"));
                         bundle.putString("phone", phone);
                         page.setDate(bundle);
                         PageManager.go(page);

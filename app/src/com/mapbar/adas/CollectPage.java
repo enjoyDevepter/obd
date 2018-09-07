@@ -1,6 +1,5 @@
 package com.mapbar.adas;
 
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -8,25 +7,25 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
 
-@PageSetting(contentViewId = R.layout.fire_confirm_layout)
-public class FireConfirmPage extends AppBasePage implements View.OnClickListener {
+@PageSetting(contentViewId = R.layout.collect_layout)
+public class CollectPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
-    @ViewInject(R.id.confirm)
-    private View confirmV;
     @ViewInject(R.id.back)
     private View back;
-    @ViewInject(R.id.report)
-    private View reportV;
+    @ViewInject(R.id.speed20)
+    private View speed20;
+    @ViewInject(R.id.speed20To60)
+    private View speed20To60V;
+    @ViewInject(R.id.speed60)
+    private View speed60V;
 
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("确认车辆已打火");
-        confirmV.setOnClickListener(this);
+        title.setText("数据采集");
         back.setOnClickListener(this);
-
     }
 
     @Override
@@ -45,13 +44,8 @@ public class FireConfirmPage extends AppBasePage implements View.OnClickListener
             case R.id.back:
                 PageManager.back();
                 break;
-            case R.id.confirm:
-                InstallationGuidePage page = new InstallationGuidePage();
-                Bundle bundle = new Bundle();
-                bundle.putString("boxId", getDate().getString("boxId"));
-                page.setDate(bundle);
-                PageManager.go(page);
-                break;
         }
     }
+
+
 }

@@ -15,7 +15,7 @@ import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
-import com.mapbar.hamster.OBDVersionInfo;
+import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
@@ -41,8 +41,9 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
     private CustomDialog dialog;
-    private String sn;
 
     @Override
     public void onResume() {
@@ -139,20 +140,15 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.OBD_GET_VERSION:
-                OBDVersionInfo version = (OBDVersionInfo) data;
-                sn = version.getSn();
-                checkOBDVersion(version);
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                OBDStatusInfo obdStatusInfo = (OBDStatusInfo) data;
+                activateSuccess(obdStatusInfo);
                 break;
-            case OBDEvent.OBD_AUTH_RESULT:
-                // 授权结果
-                if ((Integer) data == 1) {
-                    Log.d("activateSuccess  ");
-                    activateSuccess();
-                }
+            case OBDEvent.AUTHORIZATION_FAIL:
                 break;
-            case OBDEvent.OBD_UPDATE_PARAMS_SUCCESS:
-                notifyUpdateSuccess(obdVersion);
+            case OBDEvent.NO_PARAM: // 无车型参数
+                OBDStatusInfo obdStatus = (OBDStatusInfo) data;
+                checkOBDVersion(obdStatus);
                 break;
         }
     }
@@ -161,13 +157,13 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
     /**
      * 通知服务器固件升级完成
      */
-    private void notifyUpdateSuccess(OBDVersion obdVersion) {
+    private void notifyUpdateSuccess(OBDStatusInfo obdStatusInfo) {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn);
-            jsonObject.put("bVersion", obdVersion.getbVersion());
-            jsonObject.put("pVersion", obdVersion.getpVersion());
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
+            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -216,13 +212,13 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
         });
     }
 
-    private void checkOBDVersion(final OBDVersionInfo version) {
+    private void checkOBDVersion(final OBDStatusInfo obdStatusInfo) {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", version.getSn());
-            jsonObject.put("bVersion", version.getVersion());
-            jsonObject.put("pVersion", version.getCar_no());
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
+            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -256,7 +252,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                                 case 1:
                                 case 2:
                                 case 3: // 只有参数更新
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(version.getSn(), obdVersion.getParams()));
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
                                     break;
                             }
                         } else {
@@ -271,11 +267,11 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
     /**
      * 激活成功
      */
-    private void activateSuccess() {
+    private void activateSuccess(final OBDStatusInfo obdStatusInfo) {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", getDate().get("sn"));
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -302,7 +298,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                                     public void onClick(View v) {
                                         dialog.dismiss();
                                         showProgress();
-                                        activate();
+                                        activateSuccess(obdStatusInfo);
                                     }
                                 });
                             }
@@ -322,7 +318,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        BlueManager.getInstance().send(ProtocolUtils.getVersion());
                     } else {
                         Log.d("activate failure");
                     }

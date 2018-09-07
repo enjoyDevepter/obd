@@ -24,6 +24,8 @@ public class ConfirmPage extends AppBasePage implements View.OnClickListener {
     private View back;
     @ViewInject(R.id.save)
     private TextView save;
+    @ViewInject(R.id.report)
+    private View reportV;
     private int time = 10;
     private Timer timer;
     private TimerTask timerTask;

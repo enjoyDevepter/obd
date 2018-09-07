@@ -44,6 +44,24 @@ public class BlueManager {
     public static final String KEY_WRITE_BUNDLE_VALUE = "write_value";
     private static final int STOP_SCAN_AND_CONNECT = 0;
     private static final int MSG_SPLIT_WRITE = 1;
+    private static final int MSG_OBD_DISCONNECTED = 12;
+
+
+    private static final int MSG_ERROR = 20; // 错误
+    private static final int MSG_UNREGISTERED = 30; //未注册
+    private static final int MSG_AUTHORIZATION = 40; //未授权或者授权过期
+    private static final int MSG_AUTHORIZATION_SUCCESS = 41; //授权成功
+    private static final int MSG_AUTHORIZATION_FAIL = 42; //授权成功
+    private static final int MSG_NO_PARAM = 50; // 无车型参数
+    private static final int MSG_PARAM_UPDATE_SUCCESS = 51; // 车型参数更新成功
+    private static final int MSG_PARAM_UPDATE_FAIL = 53; // 车型参数更新失败
+    private static final int MSG_CURRENT_MISMATCHING = 60; // 当前胎压不匹配
+    private static final int MSG_BEFORE_MISMATCHING = 70; // 之前是否胎压匹配过
+    private static final int MSG_UN_ADJUST = 80; // 未完成校准
+    private static final int MSG_UN_LEGALITY = 90; // BoxId 不合法
+    private static final int MSG_NORMAL = 100; // 胎压盒子可以正常使用
+
+
     private static final int MSG_VERIFY = 2;
     private static final int MSG_AUTH_RESULT = 3;
     private static final int MSG_OBD_VERSION = 4;
@@ -51,10 +69,8 @@ public class BlueManager {
     private static final int MSG_BEGIN_TO_UPDATE = 6;
     private static final int MSG_UPDATE_FOR_ONE_UNIT = 7;
     private static final int MSG_PARAMS_UPDATE_SUCESS = 8;
-    private static final int MSG_ERROR = 9;
     private static final int MSG_STUDY = 10;
     private static final int MSG_STUDY_PROGRESS = 11;
-    private static final int MSG_OBD_DISCONNECTED = 12;
 
 
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
@@ -136,6 +152,16 @@ public class BlueManager {
      * 待发送指令
      */
     private LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue(1);
+    /**
+     * 上一包是否接受完成
+     */
+    private boolean unfinish = true;
+    /**
+     * 完整包
+     */
+    private byte[] full;
+    private int currentIndex;
+    private int count;
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -166,17 +192,15 @@ public class BlueManager {
     }
 
     void notifyBleCallBackListener(int event, Object data) {
-        for (BleCallBackListener callBackListener : callBackListeners) {
-            callBackListener.onEvent(event, data);
+        if (callBackListeners != null && callBackListeners.size() > 0) {
+            for (int i = callBackListeners.size() - 1; i > 0; i--) {
+                callBackListeners.get(i).onEvent(event, data);
+            }
         }
     }
 
     public boolean removeCallBackListener(BleCallBackListener listener) {
         return callBackListeners.remove(listener);
-    }
-
-    public void setBleWriteCallback(BleWriteCallback bleWriteCallback) {
-        this.bleWriteCallback = bleWriteCallback;
     }
 
     @SuppressLint("ServiceCast")
@@ -289,21 +313,11 @@ public class BlueManager {
                     //拿到该服务 1,通过UUID拿到指定的服务  2,可以拿到该设备上所有服务的集合
                     List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
 
-                    //可以遍历获得该设备上的服务集合，通过服务可以拿到该服务的UUID，和该服务里的所有属性Characteristic
-//                    for (BluetoothGattService service : serviceList) {
-//                        Log.d("service UUID  " + service.getUuid());
-//                        List<BluetoothGattCharacteristic> characteristicList = service.getCharacteristics();
-//                        for (BluetoothGattCharacteristic characteristic : characteristicList) {
-//                            Log.d("characteristic  UUID " + characteristic.getUuid());
-//                        }
-//                    }
-
                     //2.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
                     BluetoothGattService bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
 //
                     //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
                     writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
-//
                     readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
 
                     mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
@@ -454,7 +468,6 @@ public class BlueManager {
         mBluetoothGatt.writeCharacteristic(writeCharacteristic);
     }
 
-
     private Queue<byte[]> splitByte(byte[] data, int count) {
         Queue<byte[]> byteQueue = new LinkedList<>();
         if (data != null) {
@@ -504,29 +517,36 @@ public class BlueManager {
      *
      * @param data
      */
-    void analyzeProtocol(byte[] data) {
+    synchronized void analyzeProtocol(byte[] data) {
 
         if (null != data && data.length > 0) {
-            if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL && data.length != 1) { // 消息开头
-                if (data[data.length - 1] == ProtocolUtils.PROTOCOL_HEAD_TAIL) {
-                    // 完整消息
-                    validateAndNotify(data);
-                } else {
-                    // 消息不完整
-                    result = new byte[data.length];
-                    System.arraycopy(data, 0, result, 0, data.length);
+            if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL && data.length != 1 && unfinish && data.length >= 7) {
+                // 获取包长度
+                byte[] len = new byte[]{data[4], data[3]};
+                count = HexUtils.byteToShort(len);
+                if (data.length == count + 7) {  //为完整一包
+                    full = new byte[count + 5];
+                    System.arraycopy(data, 1, full, 0, full.length);
+                    validateAndNotify(full);
+                } else if (data.length < count + 7) {
+                    unfinish = false;
+                    full = new byte[count + 5];
+                    currentIndex = data.length - 1;
+                    System.arraycopy(data, 1, full, 0, data.length - 1);
+                } else if (data.length > count + 7) {
+                    return;
                 }
             } else {
-                if (null != result) {
-                    byte[] temp = new byte[result.length];
-                    System.arraycopy(result, 0, temp, 0, result.length);
-                    result = new byte[temp.length + data.length];
-                    System.arraycopy(temp, 0, result, 0, temp.length);
-                    System.arraycopy(data, 0, result, temp.length, data.length);
-                }
-                if (data[data.length - 1] == ProtocolUtils.PROTOCOL_HEAD_TAIL) {
-                    // 消息结尾
-                    validateAndNotify(result);
+                if ((currentIndex + data.length - 1) == count + 5) { // 最后一包
+                    unfinish = true;
+                    System.arraycopy(data, 0, full, currentIndex, data.length - 1);
+                    validateAndNotify(full);
+                } else if ((currentIndex + data.length - 1) < count + 5) { // 包不完整
+                    // 未完成
+                    System.arraycopy(data, 0, full, currentIndex, data.length);
+                    currentIndex += data.length;
+                } else {
+                    return;
                 }
             }
         }
@@ -543,116 +563,210 @@ public class BlueManager {
         }
 
 
-        int cr = result[1];
-        for (int i = 2; i < result.length - 2; i++) {
+        int cr = result[0];
+        for (int i = 1; i < result.length - 1; i++) {
             cr = cr ^ result[i];
         }
-        if (cr != result[result.length - 2]) {
+        if (cr != result[result.length - 1]) {
             result = null;
         } else {
-            Log.d("content  " + HexUtils.formatHexString(Arrays.copyOfRange(result, 3, result.length - 2)));
-            byte[] content = new byte[result.length - 5];
-            System.arraycopy(result, 3, content, 0, content.length);
-            if (result[1] == 00) {
-                if (result[2] == 00) { // 通用错误
+            byte[] content = new byte[result.length - 1];
+            System.arraycopy(result, 0, content, 0, content.length);
+            Log.d("content  " + HexUtils.formatHexString(content));
+            if (result[0] == 00) {
+                if (result[1] == 00) { // 通用错误
+
+                } else if (result[1] == 01) { // 获取终端状态
+                    OBDStatusInfo obdStatusInfo = new OBDStatusInfo();
+                    obdStatusInfo.setBoxId(HexUtils.formatHexString(Arrays.copyOfRange(content, 12, 24)));
+                    obdStatusInfo.setSn(new String(Arrays.copyOfRange(content, 24, 43)));
+                    obdStatusInfo.setbVersion(new String(Arrays.copyOfRange(content, 43, 55)));
+                    obdStatusInfo.setpVersion(new String(Arrays.copyOfRange(content, 55, 67)));
+                    obdStatusInfo.setSensitive((content[11] & 0xff));
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
-                    message.what = MSG_ERROR;
-                    bundle.putInt("status", content[0]);
+                    bundle.putSerializable("obd_status_info", obdStatusInfo);
                     message.setData(bundle);
-                    mHandler.sendMessage(message);
-                } else if (result[2] == 01) { // 获取终端状态
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_VERIFY;
-                    bundle.putInt("status", content[0]);
-                    switch (bundle.getInt("status")) {
-                        case 0:
-                            bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
-                            break;
-                        case 1:
-                            bundle.putByteArray("value", content);
-                            break;
-                        case 2:
-                            bundle.putString("value", new String(Arrays.copyOfRange(content, 1, content.length)));
-                            break;
+                    // 判断是否注册
+                    if (result[2] == 00) { // 未注册
+                        message.what = MSG_UNREGISTERED;
+                        mHandler.sendMessage(message);
+                        return;
                     }
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                } else if (result[2] == 02) { // 授权结果
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_AUTH_RESULT;
-                    bundle.putInt("status", content[0]);
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                }
+                    // 判断是否授权
+                    if ((result[3] & 15) == 0) { // 未授权或者授权过期
+                        message.what = MSG_AUTHORIZATION;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
 
-            } else if (result[1] == 01) {
-                if (result[2] == 01) { // 获取终端版本
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_OBD_VERSION;
-                    bundle.putString("sn", new String(Arrays.copyOfRange(content, 0, 19)));
-                    bundle.putString("version", new String(Arrays.copyOfRange(content, 19, 31)));
-                    bundle.putString("car_no", new String(Arrays.copyOfRange(content, 31, 43)));
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                }
-            } else if (result[1] == 02) {
-                if (result[2] == 01) { // 学习模式确认
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_STUDY;
-                    bundle.putInt("status", content[0]);
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
+                    if ((result[3] >> 4) == 0) { // 授权成功
+                        message.what = MSG_AUTHORIZATION_SUCCESS;
+                        mHandler.sendMessage(message);
+                    } else {
+                        message.what = MSG_AUTHORIZATION_FAIL;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
 
-                } else if (result[2] == 02) { // 学习进度确认
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_STUDY_PROGRESS;
-                    bundle.putInt("status", content[0]);
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
+                    // 判断是否存在车型参数
+                    if ((result[4] & 15) == 00) { // 未车型参数
+                        message.what = MSG_NO_PARAM;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
+                    // 判断车型参数是否更新成功
+                    if ((result[4] >> 4) == 00) { // 车型参数更新成功
+                        message.what = MSG_PARAM_UPDATE_SUCCESS;
+                        mHandler.sendMessage(message);
+                    } else {
+                        message.what = MSG_PARAM_UPDATE_FAIL;
+                        mHandler.sendMessage(message);
+                    }
 
-                } else if (result[2] == 03) { // 轮胎状态
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_TIRE_PRESSURE_STATUS;
-                    bundle.putByteArray("status", content);
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                } else if (result[2] == 04) { // 灵敏度确认
-                }
+                    // 判断当前胎压是否匹配
+                    if (result[5] == 00) { // 当前胎压不匹配
+                        message.what = MSG_CURRENT_MISMATCHING;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
+                    // 判断之前胎压是否匹配
+                    if (result[6] == 00) { // 之前胎压不匹配
+                        message.what = MSG_BEFORE_MISMATCHING;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
+                    // 判断是否完成校准
+                    if (result[7] == 00) { // 校准状态
+                        message.what = MSG_UN_ADJUST;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
+                    // 判断BoxId是否合法
+                    if (result[8] == 00) { // boxId是否合法
+                        message.what = MSG_UN_LEGALITY;
+                        mHandler.sendMessage(message);
+                        return;
+                    }
 
-            } else if (result[1] == 03) {
-                if (result[2] == 01) { // 报警结果确认
-                }
-            } else if (result[1] == 05) {
-                if (result[2] == 01) { // 车型参数更新确认
-                    Message message = mHandler.obtainMessage();
-                    message.what = MSG_PARAMS_UPDATE_SUCESS;
-                    mHandler.sendMessage(message);
-                }
-            } else if (result[1] == 06) {
-                if (result[2] == 01) { // 固件升级确认
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_BEGIN_TO_UPDATE;
-                    bundle.putInt("status", content[0]);
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
-                } else if (result[2] == 02) { // 升级包刷写反馈
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    message.what = MSG_UPDATE_FOR_ONE_UNIT;
-                    bundle.putInt("index", content[0]);
-                    bundle.putInt("status", content[1]);
-                    message.setData(bundle);
-                    mHandler.sendMessage(message);
+                    Message normalMessage = mHandler.obtainMessage();
+                    Bundle normalBundle = new Bundle();
+                    normalBundle.putSerializable("obd_status_info", obdStatusInfo);
+                    normalMessage.setData(bundle);
+                    normalMessage.what = MSG_NORMAL;
+                    mHandler.sendMessage(normalMessage);
+
+//                    // 灵敏度状态
+//                    if (result[9] == 00) { // 之前胎压不匹配
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putInt("sensitive",(content[9] & 0xff));
+//                        message.what = MSG_SENSITIVE;
+//                        message.setData(bundle);
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
                 }
             }
+//                if (result[1] == 00) { // 通用错误
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_ERROR;
+//                    bundle.putInt("status", content[0]);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                } else if (result[2] == 01) { // 获取终端状态
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_VERIFY;
+//                    bundle.putInt("status", content[0]);
+//                    switch (bundle.getInt("status")) {
+//                        case 0:
+//                            bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
+//                            break;
+//                        case 1:
+//                            bundle.putByteArray("value", content);
+//                            break;
+//                        case 2:
+//                            bundle.putString("value", new String(Arrays.copyOfRange(content, 1, content.length)));
+//                            break;
+//                    }
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                } else if (result[2] == 02) { // 授权结果
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_AUTH_RESULT;
+//                    bundle.putInt("status", content[0]);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                }
+//
+//            } else if (result[1] == 01) {
+//                if (result[2] == 01) { // 获取终端版本
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_OBD_VERSION;
+//                    bundle.putString("sn", new String(Arrays.copyOfRange(content, 0, 19)));
+//                    bundle.putString("version", new String(Arrays.copyOfRange(content, 19, 31)));
+//                    bundle.putString("car_no", new String(Arrays.copyOfRange(content, 31, 43)));
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                }
+//            } else if (result[1] == 02) {
+//                if (result[2] == 01) { // 学习模式确认
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_STUDY;
+//                    bundle.putInt("status", content[0]);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//
+//                } else if (result[2] == 02) { // 学习进度确认
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_STUDY_PROGRESS;
+//                    bundle.putInt("status", content[0]);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//
+//                } else if (result[2] == 03) { // 轮胎状态
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_TIRE_PRESSURE_STATUS;
+//                    bundle.putByteArray("status", content);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                } else if (result[2] == 04) { // 灵敏度确认
+//                }
+//
+//            } else if (result[1] == 03) {
+//                if (result[2] == 01) { // 报警结果确认
+//                }
+//            } else if (result[1] == 05) {
+//                if (result[2] == 01) { // 车型参数更新确认
+//                    Message message = mHandler.obtainMessage();
+//                    message.what = MSG_PARAMS_UPDATE_SUCESS;
+//                    mHandler.sendMessage(message);
+//                }
+//            } else if (result[1] == 06) {
+//                if (result[2] == 01) { // 固件升级确认
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_BEGIN_TO_UPDATE;
+//                    bundle.putInt("status", content[0]);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                } else if (result[2] == 02) { // 升级包刷写反馈
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    message.what = MSG_UPDATE_FOR_ONE_UNIT;
+//                    bundle.putInt("index", content[0]);
+//                    bundle.putInt("status", content[1]);
+//                    message.setData(bundle);
+//                    mHandler.sendMessage(message);
+//                }
+//            }
         }
     }
 
@@ -732,11 +846,11 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            OBDVersionInfo version = new OBDVersionInfo();
-                            version.setCar_no(bundle.getString("car_no"));
-                            version.setSn(bundle.getString("sn"));
-                            version.setVersion(bundle.getString("version"));
-                            notifyBleCallBackListener(OBDEvent.OBD_GET_VERSION, version);
+//                            OBDVersionInfo version = new OBDVersionInfo();
+//                            version.setCar_no(bundle.getString("car_no"));
+//                            version.setSn(bundle.getString("sn"));
+//                            version.setVersion(bundle.getString("version"));
+//                            notifyBleCallBackListener(OBDEvent.OBD_GET_VERSION, version);
                         }
                     });
                     break;
@@ -812,7 +926,102 @@ public class BlueManager {
                         }
                     });
                     break;
-
+                case MSG_UNREGISTERED: //未注册
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.UNREGISTERED, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_AUTHORIZATION: //未授权或者授权过期
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.AUTHORIZATION, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_AUTHORIZATION_SUCCESS:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.AUTHORIZATION_SUCCESS, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_AUTHORIZATION_FAIL:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.AUTHORIZATION_FAIL, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_NO_PARAM: // 无车型参数
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.NO_PARAM, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_PARAM_UPDATE_SUCCESS:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.PARAM_UPDATE_SUCESS, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_PARAM_UPDATE_FAIL:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.PARAM_UPDATE_FAIL, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_CURRENT_MISMATCHING: // 当前胎压不匹配
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.CURRENT_MISMATCHING, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_BEFORE_MISMATCHING: // 之前是否胎压匹配过
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.BEFORE_MISMATCHING, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_UN_ADJUST: // 未完成校准
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.UN_ADJUST, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_UN_LEGALITY: //BoxId 不合法
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.UN_LEGALITY, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_NORMAL: // 胎压盒子可以正常使用
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.NORMAL, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
             }
         }
     }

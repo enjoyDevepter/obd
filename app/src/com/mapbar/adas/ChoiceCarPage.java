@@ -47,6 +47,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     private TextView next;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
     private CarAdapter carAdapter;
     private CarBrandExpandableListAdapter carBrandExpandableListAdapter;
     private List<CarInfo> carInfos;
@@ -57,6 +59,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
         super.onResume();
         title.setText("选择车型");
         next.setOnClickListener(this);
+        reportV.setOnClickListener(this);
         back.setOnClickListener(this);
         getCar();
     }
@@ -230,6 +233,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 break;
             case R.id.next:
                 activate();
+                break;
+            case R.id.report:
                 break;
         }
     }

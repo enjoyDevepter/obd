@@ -14,10 +14,12 @@ import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 @PageSetting(contentViewId = R.layout.protocol_check_fail_layout, toHistory = false)
-public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackListener {
+public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.back)
     private View back;
 
@@ -25,6 +27,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
+        reportV.setOnClickListener(this);
         title.setText("匹配结果");
         showProgress();
         BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
@@ -80,6 +83,14 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             }
             page.setDate(bundle);
             PageManager.go(page);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.report:
+                break;
         }
     }
 }
