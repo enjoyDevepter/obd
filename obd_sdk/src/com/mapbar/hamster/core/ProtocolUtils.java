@@ -146,6 +146,75 @@ public class ProtocolUtils {
         return result;
     }
 
+
+    /**
+     * 怠速
+     *
+     * @return
+     */
+    public static byte[] idling() {
+        Log.d("Protocol idling ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x89;
+        result[2] = 01;
+        result[3] = 1;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 开始行驶
+     *
+     * @return
+     */
+    public static byte[] run() {
+        Log.d("Protocol run ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x89;
+        result[2] = 01;
+        result[3] = 2;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 开始采集
+     *
+     * @return
+     */
+    public static byte[] startCollect() {
+        Log.d("Protocol startCollect ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x89;
+        result[2] = 01;
+        result[3] = 03;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 停止采集
+     *
+     * @return
+     */
+    public static byte[] stopCollect() {
+        Log.d("Protocol stopCollect ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x89;
+        result[2] = 01;
+        result[3] = 00;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
     /**
      * 心跳包
      *

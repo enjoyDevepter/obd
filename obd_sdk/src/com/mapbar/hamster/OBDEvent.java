@@ -115,4 +115,9 @@ public class OBDEvent {
      * 胎压盒子正常
      */
     public static final int NORMAL = 170; // 胎压盒子可以正常使用
+
+    /**
+     * 采集数据
+     */
+    public static final int COLLECT_DATA = 180; // 采集数据
 }

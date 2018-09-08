@@ -1,8 +1,12 @@
 package com.mapbar.adas;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,14 +23,38 @@ import com.google.zxing.client.android.CaptureActivity;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.core.HexUtils;
 import com.miyuan.obd.R;
 
-public class MainActivity extends AppCompatActivity implements BleCallBackListener {
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class MainActivity extends AppCompatActivity implements BleCallBackListener, LocationListener {
 
     private static MainActivity INSTANCE = null;
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;
+
+    private LocationManager locationManager;
+
+    private double currentSpeed;
+
+    private Map<Integer, List<String>> collecData = new HashMap<>();
+    private List<String> list20 = new ArrayList();
+    private volatile boolean hasNotify20;
+    private List<String> list2060 = new ArrayList();
+    private volatile boolean hasNotify2060;
+    private List<String> list60 = new ArrayList();
+    private volatile boolean hasNotify60;
+    private long lastLocationTime;
+    private volatile boolean startTrun;
+    private volatile float stratTrunBearing;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -115,7 +143,17 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         setColor(this, Color.parseColor("#FF35BDB2"));
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
+
+        collecData.put(20, list20);
+        collecData.put(2060, list2060);
+        collecData.put(60, list60);
+
         BlueManager.getInstance().init(this);
+
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -133,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         super.onDestroy();
         BlueManager.getInstance().disconnect();
         MainActivity.INSTANCE = null;
+        EventBus.getDefault().unregister(this);
         BlueManager.getInstance().removeCallBackListener(this);
     }
 
@@ -153,6 +192,20 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .addTask(new UpdateTask());
         TaskManager.getInstance().next();
 
+    }
+
+    @Subscriber(tag = EventBusTags.START_COLLECT)
+    private void startCollect(int type) {
+        switch (type) {
+            case 1:
+                locationManager.removeUpdates(this);
+                break;
+        }
+    }
+
+    @Subscriber(tag = EventBusTags.COLLECT_TURN_START_EVENT)
+    private void startTrun(int type) {
+        this.startTrun = true;
     }
 
     @Override
@@ -207,6 +260,64 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
                 PageManager.go(new ConnectPage());
                 break;
+            case OBDEvent.COLLECT_DATA:
+                byte[] onePackage = (byte[]) data;
+                if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
+                    byte[] speed = new byte[]{(byte) currentSpeed};
+                    byte[] pack = new byte[speed.length + onePackage.length];
+                    System.arraycopy(speed, 0, pack, 0, speed.length);
+                    System.arraycopy(onePackage, 0, pack, speed.length, onePackage.length);
+                    if (currentSpeed < 20) {
+                        list20.add(HexUtils.byte2HexStr(pack));
+                        if (list20.size() >= 60 && !hasNotify20) {
+                            hasNotify20 = true;
+                            EventBus.getDefault().post(0, EventBusTags.COLLECT_DIRECT_EVENT);
+                        }
+                    } else if (currentSpeed >= 20 || currentSpeed <= 60) {
+                        list2060.add(HexUtils.byte2HexStr(pack));
+                        if (!hasNotify2060) {
+                            hasNotify2060 = true;
+                            EventBus.getDefault().post(1, EventBusTags.COLLECT_DIRECT_EVENT);
+                        }
+                    } else {
+                        list60.add(HexUtils.byte2HexStr(pack));
+                        if (list60.size() >= 60 && !hasNotify60) {
+                            hasNotify60 = true;
+                            EventBus.getDefault().post(2, EventBusTags.COLLECT_DIRECT_EVENT);
+                        }
+                    }
+                }
+                break;
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if ("gps".equals(location.getProvider())) {
+            lastLocationTime = System.currentTimeMillis();
+            currentSpeed = (int) (location.getSpeed() * 3.6);
+            if (startTrun && stratTrunBearing == 0) {
+                stratTrunBearing = location.getBearing();
+            } else if (startTrun && stratTrunBearing != 0) {
+                if (location.getBearing() - stratTrunBearing > 40) {
+                    EventBus.getDefault().post(0, EventBusTags.COLLECT_TURN_FINISHED_EVENT);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

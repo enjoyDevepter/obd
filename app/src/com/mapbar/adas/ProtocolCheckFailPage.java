@@ -15,6 +15,8 @@ import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
+import org.simple.eventbus.EventBus;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -197,9 +199,10 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 if (times >= 2) {
                     if (!obdStatusInfo.isCurrentMatching()) {
                         if (obdStatusInfo.isBerforeMatching()) {
-                            authFail("请不用换车!");
+                            authFail("请不要换车!");
                         } else {
-                            authFail("去采集吧!");
+                            EventBus.getDefault().post(0, EventBusTags.START_COLLECT);
+                            PageManager.go(new CollectGuide());
                         }
                     }
                 } else {
