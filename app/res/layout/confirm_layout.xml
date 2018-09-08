@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dailog_bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+
+    <include layout="@layout/layout_tittle" />
+
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:text="请您检查并确认当前四个轮胎胎压是正常的，而后再点击“校准”按钮。否则会漏报或误报!"
+        android:textColor="#FFFF0000"
+        android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp"
+        android:text="当您完成校准之后，胎压盒子会记录当前胎压并认为它是正常的。当胎压再次发生变化时，盒子就会报警！"
+        android:textColor="#ff3D424C"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/save"
+        android:layout_width="300dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/countdown_btn_bg"
+        android:gravity="center"
+        android:text="校准"
+        android:textColor="#ff3D424C"
+        android:textSize="16sp" />
+
+</LinearLayout>

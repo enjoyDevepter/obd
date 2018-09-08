@@ -194,10 +194,8 @@ public class BlueManager {
     }
 
     void notifyBleCallBackListener(int event, Object data) {
-        if (callBackListeners != null && callBackListeners.size() > 0) {
-            for (int i = callBackListeners.size() - 1; i > 0; i--) {
-                callBackListeners.get(i).onEvent(event, data);
-            }
+        for (BleCallBackListener callBackListener : callBackListeners) {
+            callBackListener.onEvent(event, data);
         }
     }
 
@@ -587,6 +585,8 @@ public class BlueManager {
                     obdStatusInfo.setbVersion(new String(Arrays.copyOfRange(content, 43, 55)));
                     obdStatusInfo.setpVersion(new String(Arrays.copyOfRange(content, 55, 67)));
                     obdStatusInfo.setSensitive((content[11] & 0xff));
+                    obdStatusInfo.setCurrentMatching(content[7] == 01);
+                    obdStatusInfo.setBerforeMatching(content[8] == 01);
 //                    Message message = mHandler.obtainMessage();
 //                    Bundle bundle = new Bundle();
 //                    bundle.putSerializable("obd_status_info", obdStatusInfo);
@@ -658,16 +658,6 @@ public class BlueManager {
 
                     // 判断当前胎压是否匹配
                     if (content[7] == 00) { // 当前胎压不匹配
-                        // 判断之前胎压是否匹配
-                        if (content[8] == 01) { // 之前胎压不匹配
-                            Message message = mHandler.obtainMessage();
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("obd_status_info", obdStatusInfo);
-                            message.setData(bundle);
-                            message.what = MSG_BEFORE_MATCHING;
-                            mHandler.sendMessage(message);
-                            return;
-                        }
                         Message message = mHandler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("obd_status_info", obdStatusInfo);
@@ -676,6 +666,16 @@ public class BlueManager {
                         mHandler.sendMessage(message);
                         return;
                     }
+
+//                    // 判断之前胎压是否匹配
+//                    if (content[8] == 01) { // 之前胎压匹配
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_BEFORE_MATCHING;
+//                        mHandler.sendMessage(message);
+//                    }
 
                     // 判断是否完成校准
                     if (content[9] == 00) { // 校准状态
@@ -687,7 +687,7 @@ public class BlueManager {
                         mHandler.sendMessage(message);
                         return;
                     }
-                    if (content[9] == 00) { // 校准中状态
+                    if (content[9] == 01) { // 校准中状态
                         Message message = mHandler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("obd_status_info", obdStatusInfo);
@@ -696,7 +696,7 @@ public class BlueManager {
                         mHandler.sendMessage(message);
                     }
 
-                    if (content[9] == 00) { // 校准完成
+                    if (content[9] == 02) { // 校准完成
                         Message message = mHandler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("obd_status_info", obdStatusInfo);

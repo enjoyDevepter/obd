@@ -12,6 +12,8 @@ public class OBDStatusInfo implements Serializable {
     private String pVersion;
     private String bVersion;
     private int sensitive;
+    private boolean berforeMatching;
+    private boolean currentMatching;
 
     public String getSn() {
         return sn;
@@ -53,6 +55,22 @@ public class OBDStatusInfo implements Serializable {
         this.sensitive = sensitive;
     }
 
+    public boolean isBerforeMatching() {
+        return berforeMatching;
+    }
+
+    public void setBerforeMatching(boolean berforeMatching) {
+        this.berforeMatching = berforeMatching;
+    }
+
+    public boolean isCurrentMatching() {
+        return currentMatching;
+    }
+
+    public void setCurrentMatching(boolean currentMatching) {
+        this.currentMatching = currentMatching;
+    }
+
     @Override
     public String toString() {
         return "OBDStatusInfo{" +
@@ -61,6 +79,8 @@ public class OBDStatusInfo implements Serializable {
                 ", pVersion='" + pVersion + '\'' +
                 ", bVersion='" + bVersion + '\'' +
                 ", sensitive=" + sensitive +
+                ", berforeMatching=" + berforeMatching +
+                ", currentMatching=" + currentMatching +
                 '}';
     }
 }

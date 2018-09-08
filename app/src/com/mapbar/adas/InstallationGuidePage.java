@@ -26,6 +26,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
         title.setText("安装引导");
         confirmV.setOnClickListener(this);
         back.setOnClickListener(this);
+        reportV.setVisibility(View.GONE);
 
     }
 

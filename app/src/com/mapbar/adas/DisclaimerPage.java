@@ -20,11 +20,14 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
     private View agree;
     @ViewInject(R.id.disagree)
     private View disagree;
+    @ViewInject(R.id.report)
+    private View reportV;
 
     @Override
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
+        reportV.setVisibility(View.GONE);
         title.setText("免责声明");
         agree.setOnClickListener(this);
         disagree.setOnClickListener(this);

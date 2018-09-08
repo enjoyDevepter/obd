@@ -24,9 +24,9 @@ public class FireConfirmPage extends AppBasePage implements View.OnClickListener
     public void onResume() {
         super.onResume();
         title.setText("确认车辆已打火");
+        reportV.setVisibility(View.GONE);
         confirmV.setOnClickListener(this);
-        back.setOnClickListener(this);
-
+        back.setVisibility(View.GONE);
     }
 
     @Override

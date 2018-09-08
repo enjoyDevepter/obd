@@ -6,13 +6,17 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.utils.CustomDialog;
+import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.OBDStatusInfo;
-import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 @PageSetting(contentViewId = R.layout.protocol_check_fail_layout, toHistory = false)
 public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
@@ -23,6 +27,15 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     private View reportV;
     @ViewInject(R.id.back)
     private View back;
+    private CustomDialog dialog;
+
+    private volatile boolean showConfirm;
+    private volatile int times = 1;
+    private int time = 15;
+    private Timer timer;
+    private TimerTask timerTask;
+    private TextView save;
+    private volatile OBDStatusInfo obdStatusInfo;
 
     @Override
     public void onResume() {
@@ -41,12 +54,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        BlueManager.getInstance().removeCallBackListener(this);
-    }
-
-    @Override
     public boolean onBackPressed() {
         return true;
     }
@@ -55,11 +62,28 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.CURRENT_MISMATCHING:
+                obdStatusInfo = (OBDStatusInfo) data;
+                if (!showConfirm) {
+                    showConfirm();
+                }
                 BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
                 break;
             case OBDEvent.UN_ADJUST:
+                if (null != dialog) {
+                    dialog.dismiss();
+                }
+                obdStatusInfo = (OBDStatusInfo) data;
+                PageManager.go(new ConfirmPage());
+                break;
+            case OBDEvent.UN_LEGALITY:
+                authFail("请从正规渠道购买!");
                 break;
             case OBDEvent.NORMAL:
+                if (null != dialog) {
+                    dialog.dismiss();
+                }
+                dismissProgress();
+                obdStatusInfo = (OBDStatusInfo) data;
                 MainPage mainPage = new MainPage();
                 Bundle mainBundle = new Bundle();
                 mainBundle.putSerializable("obdStatusInfo", (OBDStatusInfo) data);
@@ -69,31 +93,96 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         }
     }
 
-    /**
-     * 检查协议
-     */
-    private void protocolCheck(byte[] result) {
-
-        byte[] bytes = HexUtils.getBooleanArray(result[19]);
-        if (bytes[0] == 1) {
-            // 车型不支持
-            BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
-        } else {
-            dismissProgress();
-            // 支持
-            ProtocolCheckSuccessPage page = new ProtocolCheckSuccessPage();
-            Bundle bundle = new Bundle();
-            if (getDate() != null) {
-                if (getDate().containsKey("showStudy")) {
-                    bundle.putBoolean("showStudy", (boolean) getDate().get("showStudy"));
-                }
-                if (getDate().containsKey("sn")) {
-                    bundle.putString("sn", String.valueOf(getDate().getString("sn")));
-                }
-            }
-            page.setDate(bundle);
-            PageManager.go(page);
+    private void showConfirm() {
+        if (dialog != null && dialog.isVisible()) {
+            time = 10;
+            initTimer();
+            timer.schedule(timerTask, 1000, 1000);
+            return;
         }
+        showConfirm = true;
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        save = (TextView) view.findViewById(R.id.save);
+                        save.setSelected(false);
+                        time = 15;
+                        initTimer();
+                        timer.schedule(timerTask, 1000, 1000);
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_match)
+                .setDimAmount(0.5f)
+                .setCancelOutside(false)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+    }
+
+    private void initTimer() {
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (time <= 0 && timer != null) {
+                            timer.cancel();
+                            timer = null;
+                            timerTask.cancel();
+                            timerTask = null;
+                            save.setText("确认，我已打火!");
+                            save.setSelected(true);
+                            save.setOnClickListener(ProtocolCheckFailPage.this);
+                            save.setBackgroundResource(R.drawable.btn_bg);
+                        } else {
+                            save.setText("确认，我已打火!(" + time + "s)");
+                        }
+                        time--;
+                    }
+                });
+            }
+        };
+
+        timer = new Timer();
+    }
+
+    /**
+     * 授权失败
+     *
+     * @param reason
+     */
+    private void authFail(final String reason) {
+        GlobalUtil.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dismissProgress();
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.confirm))).setText("确认");
+                                ((TextView) (view.findViewById(R.id.info))).setText(reason);
+                                ((TextView) (view.findViewById(R.id.title))).setText("授权失败");
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        // 退出应用
+                                        PageManager.finishActivity(MainActivity.getInstance());
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.dailog_common_warm)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
+            }
+        });
     }
 
     @Override
@@ -101,6 +190,39 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         switch (v.getId()) {
             case R.id.report:
                 break;
+            case R.id.save:
+                if (null != dialog) {
+                    dialog.dismiss();
+                }
+                if (times >= 2) {
+                    if (!obdStatusInfo.isCurrentMatching()) {
+                        if (obdStatusInfo.isBerforeMatching()) {
+                            authFail("请不用换车!");
+                        } else {
+                            authFail("去采集吧!");
+                        }
+                    }
+                } else {
+                    times++;
+                    showConfirm();
+                }
+                break;
         }
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        BlueManager.getInstance().removeCallBackListener(this);
+
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+        if (timerTask != null) {
+            timerTask.cancel();
+            timerTask = null;
+        }
+    }
+
 }

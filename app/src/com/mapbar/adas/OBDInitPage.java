@@ -24,9 +24,9 @@ public class OBDInitPage extends AppBasePage implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         title.setText("初始化盒子");
+        back.setVisibility(View.GONE);
+        reportV.setVisibility(View.GONE);
         confirmTV.setOnClickListener(this);
-        reportV.setOnClickListener(this);
-        back.setOnClickListener(this);
     }
 
     @Override
@@ -47,8 +47,6 @@ public class OBDInitPage extends AppBasePage implements View.OnClickListener {
                 bundle.putString("boxId", getDate().getString("boxId"));
                 page.setDate(bundle);
                 PageManager.go(page);
-                break;
-            case R.id.report:
                 break;
         }
     }

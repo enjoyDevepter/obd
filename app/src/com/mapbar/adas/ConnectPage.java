@@ -68,6 +68,8 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
                 retry.setVisibility(View.INVISIBLE);
                 BlueManager.getInstance().startScan();
                 break;
+            case R.id.report:
+                break;
 
         }
     }

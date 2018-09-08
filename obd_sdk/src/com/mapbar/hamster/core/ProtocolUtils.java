@@ -134,6 +134,35 @@ public class ProtocolUtils {
         return result;
     }
 
+    public static byte[] stopGetTirePressureStatusUpdateSucess() {
+        Log.d("Protocol stopGetTirePressureStatusUpdateSucess ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_08;
+        result[2] = 03;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 心跳包
+     *
+     * @return
+     */
+    public static byte[] sentHeart() {
+        Log.d("Protocol sentHeart ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = 0x3E;
+        result[2] = 00;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
     public static byte[] setSensitive(int sensitive) {
         Log.d("Protocol setSensitive ===");
         byte[] result = new byte[6];

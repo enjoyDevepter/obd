@@ -35,7 +35,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@PageSetting(contentViewId = R.layout.obd_auth_layout)
+@PageSetting(contentViewId = R.layout.obd_auth_layout, toHistory = false)
 public class OBDAuthPage extends AppBasePage implements BleCallBackListener, LocationListener, View.OnClickListener {
 
     @ViewInject(R.id.title_text)
@@ -49,7 +49,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
 
     private LocationManager locationManager;
 
-    private String sn;
     private volatile boolean needNotifyParamsSuccess;
     private volatile boolean needNotifyVerifiedSuccess;
 
@@ -133,7 +132,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 getLisense(((OBDStatusInfo) data).getSn());
                 break;
             case OBDEvent.AUTHORIZATION_SUCCESS:
-                authSuccess();
+                authSuccess((OBDStatusInfo) data);
                 break;
             case OBDEvent.AUTHORIZATION_FAIL:
                 authFail("授权失败!请联系客服!");
@@ -146,15 +145,18 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             case OBDEvent.PARAM_UPDATE_FAIL:
                 break;
             case OBDEvent.CURRENT_MISMATCHING:
+                dismissProgress();
                 PageManager.go(new ProtocolCheckFailPage());
                 break;
-            case OBDEvent.BEFORE_MATCHING: // 之前匹配过，换车
-                authFail("请不用换车!");
+            case OBDEvent.UN_ADJUST:
+                dismissProgress();
+                PageManager.go(new ConfirmPage());
                 break;
             case OBDEvent.UN_LEGALITY:
                 authFail("请从正规渠道购买!");
                 break;
             case OBDEvent.NORMAL:
+                dismissProgress();
                 MainPage mainPage = new MainPage();
                 Bundle mainBundle = new Bundle();
                 mainBundle.putSerializable("obdStatusInfo", (OBDStatusInfo) data);
@@ -286,7 +288,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     /**
      * 激活成功
      */
-    private void authSuccess() {
+    private void authSuccess(final OBDStatusInfo obdStatusInfo) {
 
         if (!needNotifyVerifiedSuccess) {
             return;
@@ -294,7 +296,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn);
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -326,7 +328,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     public void onClick(View v) {
                                         dialog.dismiss();
                                         showProgress();
-                                        authSuccess();
+                                        authSuccess(obdStatusInfo);
                                     }
                                 });
                             }
@@ -348,7 +350,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     if ("000".equals(result.optString("status"))) {
                         // 协议匹配检查（通过获取胎压信息）
                         needNotifyVerifiedSuccess = false;
-                        BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
                     } else {
                         Log.d("activate failure" + result.optString("message"));
                     }
@@ -395,17 +396,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                dismissProgress();
                 Log.d("notifyUpdateSuccess success " + responese);
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         needNotifyParamsSuccess = false;
-                        OBDAuthPage authPage = new OBDAuthPage();
-                        Bundle bundle = new Bundle();
-                        bundle.putBoolean("showStudy", true);
-                        authPage.setDate(bundle);
-                        PageManager.go(authPage);
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
