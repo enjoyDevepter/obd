@@ -207,23 +207,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
                 PageManager.go(new ConnectPage());
                 break;
-            case OBDEvent.UNREGISTERED: //未注册
-                break;
-            case OBDEvent.AUTHORIZATION: //未授权或者授权过期
-                // 获取授权码
-                break;
-            case OBDEvent.NO_PARAM: // 无车型参数
-                break;
-            case OBDEvent.CURRENT_MISMATCHING: // 当前胎压不匹配
-                break;
-            case OBDEvent.BEFORE_MISMATCHING: // 之前是否胎压匹配过
-                break;
-            case OBDEvent.UN_ADJUST: // 未完成校准
-                break;
-            case OBDEvent.UN_LEGALITY:  // BoxId 不合法
-                break;
-            case OBDEvent.NORMAL: // 胎压盒子可以正常使用
-                break;
         }
     }
 }

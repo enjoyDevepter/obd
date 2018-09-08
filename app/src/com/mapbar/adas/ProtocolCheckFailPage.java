@@ -9,6 +9,7 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
@@ -30,7 +31,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         reportV.setOnClickListener(this);
         title.setText("匹配结果");
         showProgress();
-        BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
+        BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
     }
 
     @Override
@@ -53,8 +54,17 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
-                protocolCheck((byte[]) data);
+            case OBDEvent.CURRENT_MISMATCHING:
+                BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
+                break;
+            case OBDEvent.UN_ADJUST:
+                break;
+            case OBDEvent.NORMAL:
+                MainPage mainPage = new MainPage();
+                Bundle mainBundle = new Bundle();
+                mainBundle.putSerializable("obdStatusInfo", (OBDStatusInfo) data);
+                mainPage.setDate(mainBundle);
+                PageManager.go(mainPage);
                 break;
         }
     }

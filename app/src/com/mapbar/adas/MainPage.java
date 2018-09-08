@@ -31,7 +31,7 @@ import com.mapbar.adas.view.SensitiveView;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
-import com.mapbar.hamster.Update;
+import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
@@ -44,7 +44,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -55,8 +54,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.mapbar.adas.preferences.SettingPreferencesConfig.STUDYSTATUS;
-import static com.mapbar.adas.view.SensitiveView.Type.HIGHT;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.ADJUST_START;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.ADJUST_SUCCESS;
 import static com.mapbar.adas.view.SensitiveView.Type.LOW;
 import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
 
@@ -65,7 +64,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private static final int UNIT = 1024;
     CustomDialog dialog = null;
     CustomDialog updateDialog = null;
-    private String sn;
     private SensitiveView.Type type = SensitiveView.Type.MEDIUM;
     @ViewInject(R.id.back)
     private View back;
@@ -106,7 +104,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private Timer timer;
     private TimerTask timerTask;
     private TextView save;
+    private OBDStatusInfo obdStatusInfo;
 
+    private volatile boolean needNotifyParamsSuccess;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -164,14 +164,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
         getUserInfo();
 
-        if (getDate() != null) {
-            if (getDate().getBoolean("showStudy")) {
-                showStudy();
-                return;
-            }
-        }
+//        if (getDate() != null) {
+//            if (getDate().getBoolean("showStudy")) {
+//                showStudy();
+//                return;
+//            }
+//        }
+
+        obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
+        checkOBDVersion(obdStatusInfo);
         // 获取OBD版本信息，请求服务器是否有更新
-        BlueManager.getInstance().send(ProtocolUtils.getVersion());
+//        BlueManager.getInstance().send(ProtocolUtils.getVersion());
         Log.d("onResumeonResumeonResume  ");
     }
 
@@ -221,11 +224,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 if (null != dialog) {
                     dialog.dismiss();
                 }
-                if (getDate() != null) {
-                    if (getDate().getBoolean("showStudy")) {
-                        getDate().putBoolean("showStudy", false);
-                    }
-                }
+//                if (getDate() != null) {
+//                    if (getDate().getBoolean("showStudy")) {
+//                        getDate().putBoolean("showStudy", false);
+//                    }
+//                }
                 BlueManager.getInstance().send(ProtocolUtils.study());
                 break;
             case R.id.report:
@@ -402,27 +405,27 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case OBDEvent.OBD_UPDATE_FINISH_UNIT:
-                Update update = (Update) data;
-                if (update.getStatus() == 0) {
-                    // 重新传递
-                    updateForOneUnit(update.getIndex());
-                } else if (update.getStatus() == 1) {
-                    // 继续
-                    updateForOneUnit(update.getIndex() + 1);
-                } else if (update.getStatus() == 2) {
-                    File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                    // 升级完成，通知服务器
-                    notifyUpdateSuccess(obdVersion);
-                    if (null != progressBar && null != updateDialog) {
-                        updateDialog.dismiss();
-                        updateDialog = null;
-                        progressBar = null;
-                    }
-                    showStudy();
-                }
+//                Update update = (Update) data;
+//                if (update.getStatus() == 0) {
+//                    // 重新传递
+//                    updateForOneUnit(update.getIndex());
+//                } else if (update.getStatus() == 1) {
+//                    // 继续
+//                    updateForOneUnit(update.getIndex() + 1);
+//                } else if (update.getStatus() == 2) {
+//                    File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
+//                    if (file.exists()) {
+//                        file.delete();
+//                    }
+//                    // 升级完成，通知服务器
+//                    notifyUpdateSuccess(obdVersion);
+//                    if (null != progressBar && null != updateDialog) {
+//                        updateDialog.dismiss();
+//                        updateDialog = null;
+//                        progressBar = null;
+//                    }
+//                    showStudy();
+//                }
                 break;
             case OBDEvent.OBD_GET_VERSION:
 //                OBDVersionInfo version = (OBDVersionInfo) data;
@@ -430,15 +433,15 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 //                checkOBDVersion(version);
                 break;
             case OBDEvent.OBD_UPDATE_PARAMS_SUCCESS:
-                // 判断是否需要升级固件
-                if (null != obdVersion) {
-                    if (obdVersion.getUpdateState() == 1) {
-                        downloadUpdate(obdVersion);
-                    } else {
-                        notifyUpdateSuccess(obdVersion);
-                        showStudy();
-                    }
-                }
+//                // 判断是否需要升级固件
+//                if (null != obdVersion) {
+//                    if (obdVersion.getUpdateState() == 1) {
+//                        downloadUpdate(obdVersion);
+//                    } else {
+//                        notifyUpdateSuccess(obdVersion);
+//                        showStudy();
+//                    }
+//                }
                 break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
@@ -472,6 +475,27 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     showStudy();
                 }
                 break;
+            case OBDEvent.PARAM_UPDATE_SUCCESS:
+                if (needNotifyParamsSuccess) {
+                    notifyUpdateSuccess((OBDStatusInfo) data);
+                    showStudy();
+                }
+                break;
+            case OBDEvent.PARAM_UPDATE_FAIL:
+                break;
+            case OBDEvent.ADJUSTING:
+                if (ADJUST_START.get()) {
+                    ADJUST_START.set(false);
+                    AlarmManager.getInstance().play(R.raw.begin);
+                }
+                mHandler.sendEmptyMessage(0);
+                break;
+            case OBDEvent.ADJUST_SUCCESS:
+                if (ADJUST_SUCCESS.get()) {
+                    ADJUST_SUCCESS.set(false);
+                    AlarmManager.getInstance().play(R.raw.finish);
+                }
+                break;
         }
     }
 
@@ -481,135 +505,118 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
      * @param status
      */
     private void parseStatus(byte[] status, boolean update, boolean checkVersion) {
-        if (null != status && status.length == 77) {
+        if (null != status && status.length > 2) {
 
-            byte[] snBytes = new byte[19];
+            byte[] bytes = HexUtils.getBooleanArray(status[2]);
+//            if (bytes[0] == 1) {
+//                Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
+//            } else {
+            // 左前，右前，左后，右后
+            if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
+                if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
+                    return;
+                }
+                if (bytes[7] == 1) {
+                    leftTop.setBackgroundResource(R.drawable.high_bg);
+                    highAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
+                    rightButtom.setBackgroundResource(R.drawable.low_bg);
+                    lowAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
+                } else if (bytes[6] == 1) {
+                    rightTop.setBackgroundResource(R.drawable.high_bg);
+                    highAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
+                    leftButtom.setBackgroundResource(R.drawable.low_bg);
+                    lowAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
+                } else if (bytes[5] == 1) {
+                    leftButtom.setBackgroundResource(R.drawable.high_bg);
+                    highAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
+                    rightTop.setBackgroundResource(R.drawable.low_bg);
+                    lowAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
+                } else if (bytes[4] == 1) {
+                    rightButtom.setBackgroundResource(R.drawable.high_bg);
+                    highAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
+                    leftTop.setBackgroundResource(R.drawable.low_bg);
+                    lowAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
+                }
+                if (highAnimationDrawable != null && !highAnimationDrawable.isRunning()) {
+                    highAnimationDrawable.start();
+                }
 
-            sn = new String(Arrays.copyOfRange(status, 0, snBytes.length));
+                if (lowAnimationDrawable != null && !lowAnimationDrawable.isRunning()) {
+                    lowAnimationDrawable.start();
+                }
 
-            byte[] bytes = HexUtils.getBooleanArray(status[snBytes.length]);
-            if (bytes[0] == 1) {
-                Toast.makeText(getContext(), "车型不支持", Toast.LENGTH_LONG).show();
             } else {
-                // 左前，右前，左后，右后
-                if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
-                    if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
-                        return;
-                    }
-                    if (bytes[7] == 1) {
-                        leftTop.setBackgroundResource(R.drawable.high_bg);
-                        highAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
-                        rightButtom.setBackgroundResource(R.drawable.low_bg);
-                        lowAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
-                    } else if (bytes[6] == 1) {
-                        rightTop.setBackgroundResource(R.drawable.high_bg);
-                        highAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
-                        leftButtom.setBackgroundResource(R.drawable.low_bg);
-                        lowAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
-                    } else if (bytes[5] == 1) {
-                        leftButtom.setBackgroundResource(R.drawable.high_bg);
-                        highAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
-                        rightTop.setBackgroundResource(R.drawable.low_bg);
-                        lowAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
-                    } else if (bytes[4] == 1) {
-                        rightButtom.setBackgroundResource(R.drawable.high_bg);
-                        highAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
-                        leftTop.setBackgroundResource(R.drawable.low_bg);
-                        lowAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
-                    }
-                    if (highAnimationDrawable != null && !highAnimationDrawable.isRunning()) {
-                        highAnimationDrawable.start();
-                    }
-
-                    if (lowAnimationDrawable != null && !lowAnimationDrawable.isRunning()) {
-                        lowAnimationDrawable.start();
-                    }
-
-                    AlarmManager.getInstance().play(R.raw.warm);
-
-                    // 上传胎压信息
-                    byte[] tire = new byte[status.length - snBytes.length];
-                    System.arraycopy(status, snBytes.length, tire, 0, tire.length);
-                    updateTireInfo(tire);
-
-                    if (update) { // 避免首次检测OBD时胎压异常，导致重复上传。
-                        update = false;
-                    }
-                } else {
-                    if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
-                        highAnimationDrawable.stop();
-                        highAnimationDrawable = null;
-                    }
-                    if (lowAnimationDrawable != null && lowAnimationDrawable.isRunning()) {
-                        lowAnimationDrawable.stop();
-                        lowAnimationDrawable = null;
-                    }
-                    leftTop.setBackgroundResource(R.drawable.t_nromal);
-                    leftButtom.setBackgroundResource(R.drawable.t_nromal);
-                    rightTop.setBackgroundResource(R.drawable.t_nromal);
-                    rightButtom.setBackgroundResource(R.drawable.t_nromal);
+                if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
+                    highAnimationDrawable.stop();
+                    highAnimationDrawable = null;
                 }
-
-                if (update) {
-                    // 上传胎压信息
-                    byte[] tire = new byte[status.length - snBytes.length];
-                    System.arraycopy(status, snBytes.length, tire, 0, tire.length);
-                    updateTireInfo(tire);
+                if (lowAnimationDrawable != null && lowAnimationDrawable.isRunning()) {
+                    lowAnimationDrawable.stop();
+                    lowAnimationDrawable = null;
                 }
+                leftTop.setBackgroundResource(R.drawable.t_nromal);
+                leftButtom.setBackgroundResource(R.drawable.t_nromal);
+                rightTop.setBackgroundResource(R.drawable.t_nromal);
+                rightButtom.setBackgroundResource(R.drawable.t_nromal);
             }
 
-            switch (status[snBytes.length + 1]) {
-                case 1:
-                    type = LOW;
-                    break;
-                case 2:
-                    type = SensitiveView.Type.MEDIUM;
-                    break;
-                case 3:
-                    type = HIGHT;
-                    break;
+            if (status[status.length - 1] == 1) {
+                // 上传胎压信息
+                updateTireInfo(status);
             }
-            // 验证是否已经学习完成,并播报语音
-            String studyStutus = HexUtils.formatHexString(Arrays.copyOfRange(status, snBytes.length + 2, snBytes.length + 2 + 24));
-            if (GlobalUtil.isEmpty(STUDYSTATUS.get())) {
-                STUDYSTATUS.set(studyStutus);
-            } else {
-                if (!studyStutus.equals(STUDYSTATUS.get())) {
-                    STUDYSTATUS.set(studyStutus);
-                    AlarmManager.getInstance().play(R.raw.finish);
-                }
-            }
-
-            if (bytes[1] == 1) {
-                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                        .setViewListener(new CustomDialog.ViewListener() {
-                            @Override
-                            public void bindView(View view) {
-                                ((TextView) (view.findViewById(R.id.confirm))).setText("确定");
-                                ((TextView) (view.findViewById(R.id.info))).setText("应用升级未完成，请确认网络链接正常!");
-                                ((TextView) (view.findViewById(R.id.title))).setText("升级中断");
-                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        // 获取OBD版本信息，请求服务器是否有更新
-                                        BlueManager.getInstance().send(ProtocolUtils.getVersion());
-                                    }
-                                });
-                            }
-                        })
-                        .setLayoutRes(R.layout.dailog_common_warm)
-                        .setCancelOutside(false)
-                        .setDimAmount(0.5f)
-                        .isCenter(true)
-                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                        .show();
-            } else {
-                if (checkVersion) {
-                    // 获取OBD版本信息，请求服务器是否有更新
-                    BlueManager.getInstance().send(ProtocolUtils.getVersion());
-                }
-            }
+//            }
+//            switch (status[snBytes.length + 1]) {
+//                case 1:
+//                    type = LOW;
+//                    break;
+//                case 2:
+//                    type = SensitiveView.Type.MEDIUM;
+//                    break;
+//                case 3:
+//                    type = HIGHT;
+//                    break;
+//            }
+//            // 验证是否已经学习完成,并播报语音
+//            String studyStutus = HexUtils.formatHexString(Arrays.copyOfRange(status, snBytes.length + 2, snBytes.length + 2 + 24));
+//            if (GlobalUtil.isEmpty(STUDYSTATUS.get())) {
+//                STUDYSTATUS.set(studyStutus);
+//            } else {
+//                if (!studyStutus.equals(STUDYSTATUS.get())) {
+//                    STUDYSTATUS.set(studyStutus);
+//                    AlarmManager.getInstance().play(R.raw.finish);
+//                }
+//            }
+//
+//            if (bytes[1] == 1) {
+//                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+//                        .setViewListener(new CustomDialog.ViewListener() {
+//                            @Override
+//                            public void bindView(View view) {
+//                                ((TextView) (view.findViewById(R.id.confirm))).setText("确定");
+//                                ((TextView) (view.findViewById(R.id.info))).setText("应用升级未完成，请确认网络链接正常!");
+//                                ((TextView) (view.findViewById(R.id.title))).setText("升级中断");
+//                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View v) {
+//                                        dialog.dismiss();
+//                                        // 获取OBD版本信息，请求服务器是否有更新
+//                                        BlueManager.getInstance().send(ProtocolUtils.getVersion());
+//                                    }
+//                                });
+//                            }
+//                        })
+//                        .setLayoutRes(R.layout.dailog_common_warm)
+//                        .setCancelOutside(false)
+//                        .setDimAmount(0.5f)
+//                        .isCenter(true)
+//                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+//                        .show();
+//            } else {
+//                if (checkVersion) {
+//                    // 获取OBD版本信息，请求服务器是否有更新
+//                    BlueManager.getInstance().send(ProtocolUtils.getVersion());
+//                }
+//            }
 
         } else {
             Log.d(" status error " + status.length);
@@ -624,54 +631,38 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
      */
     private void updateTireInfo(byte[] tire) {
 
-        if (null != tire && tire.length == 58) {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                byte[] content = new byte[8];
-                jsonObject.put("serialNumber", sn);
-                jsonObject.put("s_status", HexUtils.formatHexString(new byte[]{tire[0]}));
-                jsonObject.put("s_level", HexUtils.formatHexString(new byte[]{tire[1]}));
-                System.arraycopy(tire, 2, content, 0, content.length);
-                jsonObject.put("study1", new String(content));
-                System.arraycopy(tire, 10, content, 0, content.length);
-                jsonObject.put("study2", new String(content));
-                System.arraycopy(tire, 18, content, 0, content.length);
-                jsonObject.put("study3", new String(content));
-                System.arraycopy(tire, 26, content, 0, content.length);
-                jsonObject.put("alarm1", new String(content));
-                System.arraycopy(tire, 34, content, 0, content.length);
-                jsonObject.put("alarm2", new String(content));
-                System.arraycopy(tire, 42, content, 0, content.length);
-                jsonObject.put("alarm3", new String(content));
-                System.arraycopy(tire, 50, content, 0, content.length);
-                jsonObject.put("alarm4", new String(content));
-            } catch (JSONException e) {
-                e.printStackTrace();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("status", HexUtils.formatHexString(tire));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("update_tire input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_TIRE)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("update_tire failure " + e.getMessage());
+
             }
 
-            Log.d("update_tire input " + jsonObject.toString());
-
-            RequestBody requestBody = new FormBody.Builder()
-                    .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-            Request request = new Request.Builder()
-                    .url(URLUtils.UPDATE_TIRE)
-                    .post(requestBody)
-                    .addHeader("content-type", "application/json;charset:utf-8")
-                    .build();
-            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("update_tire failure " + e.getMessage());
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String responese = response.body().string();
-                    Log.d("update_tire success " + responese);
-                }
-            });
-        }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                BlueManager.getInstance().send(ProtocolUtils.tirePressureStatusUpdateSucess());
+                Log.d("update_tire success " + responese);
+            }
+        });
 
     }
 
@@ -681,7 +672,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private void getUserInfo() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", getDate().get("sn"));
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -720,13 +711,13 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         });
     }
 
-    private void checkOBDVersion(/*OBDVersionInfo version*/) {
+    private void checkOBDVersion(final OBDStatusInfo obdStatusInfo) {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn);
-//            jsonObject.put("bVersion", version.getVersion());
-//            jsonObject.put("pVersion", version.getCar_no());
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
+            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -763,13 +754,19 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 //                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                                     break;
                                 case 1: // 版本参数都更新
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
+                                    needNotifyParamsSuccess = true;
+                                    ADJUST_START.set(true);
+                                    ADJUST_SUCCESS.set(true);
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
                                     break;
                                 case 2: // 只有版本更新
                                     downloadUpdate(obdVersion);
                                     break;
                                 case 3: // 只有参数更新
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(sn, obdVersion.getParams()));
+                                    needNotifyParamsSuccess = true;
+                                    ADJUST_START.set(true);
+                                    ADJUST_SUCCESS.set(true);
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
                                     break;
                             }
                         } else {
@@ -807,13 +804,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     /**
      * 通知服务器固件升级完成
      */
-    private void notifyUpdateSuccess(OBDVersion obdVersion) {
+    private void notifyUpdateSuccess(OBDStatusInfo obdStatusInfo) {
+
+        if (!needNotifyParamsSuccess) {
+            return;
+        }
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn);
-            jsonObject.put("bVersion", obdVersion.getbVersion());
-            jsonObject.put("pVersion", obdVersion.getpVersion());
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
+            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -841,12 +842,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(GlobalUtil.getContext(), "升级成功", Toast.LENGTH_LONG).show();
-                            }
-                        });
+//                        GlobalUtil.getHandler().post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(GlobalUtil.getContext(), "升级成功", Toast.LENGTH_LONG).show();
+//                            }
+//                        });
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
@@ -936,10 +937,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             mainHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    BlueManager.getInstance().send(ProtocolUtils.getTirePressureStatus());
+                    BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
                     WorkerHandler.this.sendEmptyMessage(0);
                 }
-            }, 5000);
+            }, 3000);
         }
     }
 }

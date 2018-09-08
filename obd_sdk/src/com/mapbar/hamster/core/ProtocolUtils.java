@@ -15,6 +15,7 @@ public class ProtocolUtils {
     private static final int PROTOCAL_COMMON_03 = 0x83;
     private static final int PROTOCAL_COMMON_05 = 0x85;
     private static final int PROTOCAL_COMMON_06 = 0x86;
+    private static final int PROTOCAL_COMMON_08 = 0x88;
 
     public static byte[] getOBDStatus(long time) {
         Log.d("Protocol getOBDStatus ==");
@@ -57,11 +58,11 @@ public class ProtocolUtils {
     }
 
     /**
-     * 获取OBD盒子版本
+     * 检查是否匹配
      *
      * @return
      */
-    public static byte[] getVersion() {
+    public static byte[] checkMatchingStatus() {
         Log.d("Protocol getVersion ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
@@ -104,6 +105,30 @@ public class ProtocolUtils {
         result[1] = (byte) PROTOCAL_COMMON_02;
         result[2] = 03;
         result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    public static byte[] getNewTirePressureStatus() {
+        Log.d("Protocol getNewTirePressureStatus ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_08;
+        result[2] = 03;
+        result[3] = 1;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    public static byte[] tirePressureStatusUpdateSucess() {
+        Log.d("Protocol getNewTirePressureStatus ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_08;
+        result[2] = 03;
+        result[3] = (byte) 0xFF;
         result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
         result[5] = PROTOCOL_HEAD_TAIL;
         return result;

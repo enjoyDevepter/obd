@@ -56,8 +56,10 @@ public class BlueManager {
     private static final int MSG_PARAM_UPDATE_SUCCESS = 51; // 车型参数更新成功
     private static final int MSG_PARAM_UPDATE_FAIL = 53; // 车型参数更新失败
     private static final int MSG_CURRENT_MISMATCHING = 60; // 当前胎压不匹配
-    private static final int MSG_BEFORE_MISMATCHING = 70; // 之前是否胎压匹配过
+    private static final int MSG_BEFORE_MATCHING = 70; // 之前胎压匹配过
     private static final int MSG_UN_ADJUST = 80; // 未完成校准
+    private static final int MSG_ADJUSTING = 81; // 校准中
+    private static final int MSG_ADJUST_SUCCESS = 83; // 校准完成
     private static final int MSG_UN_LEGALITY = 90; // BoxId 不合法
     private static final int MSG_NORMAL = 100; // 胎压盒子可以正常使用
 
@@ -553,15 +555,17 @@ public class BlueManager {
     }
 
     /**
-     * @param result
+     * @param res
      */
-    private void validateAndNotify(byte[] result) {
+    private synchronized void validateAndNotify(byte[] res) {
         byte[] msg = instructList.pollLast();
         canGo = true;
         if (msg != null && queue.size() == 0) {
             queue.add(msg);
         }
 
+        byte[] result = new byte[res.length];
+        System.arraycopy(res, 0, result, 0, res.length);
 
         int cr = result[0];
         for (int i = 1; i < result.length - 1; i++) {
@@ -571,79 +575,142 @@ public class BlueManager {
             result = null;
         } else {
             byte[] content = new byte[result.length - 1];
-            System.arraycopy(result, 0, content, 0, content.length);
+            System.arraycopy(result, 0, content, 0, content.length); // 去掉校验码
             Log.d("content  " + HexUtils.formatHexString(content));
-            if (result[0] == 00) {
-                if (result[1] == 00) { // 通用错误
+            if (content[0] == 00) {
+                if (content[1] == 00) { // 通用错误
 
-                } else if (result[1] == 01) { // 获取终端状态
+                } else if (content[1] == 01) { // 获取终端状态
                     OBDStatusInfo obdStatusInfo = new OBDStatusInfo();
                     obdStatusInfo.setBoxId(HexUtils.formatHexString(Arrays.copyOfRange(content, 12, 24)));
                     obdStatusInfo.setSn(new String(Arrays.copyOfRange(content, 24, 43)));
                     obdStatusInfo.setbVersion(new String(Arrays.copyOfRange(content, 43, 55)));
                     obdStatusInfo.setpVersion(new String(Arrays.copyOfRange(content, 55, 67)));
                     obdStatusInfo.setSensitive((content[11] & 0xff));
-                    Message message = mHandler.obtainMessage();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("obd_status_info", obdStatusInfo);
-                    message.setData(bundle);
+//                    Message message = mHandler.obtainMessage();
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                    message.setData(bundle);
                     // 判断是否注册
-                    if (result[2] == 00) { // 未注册
+                    if (content[4] == 00) { // 未注册
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_UNREGISTERED;
                         mHandler.sendMessage(message);
                         return;
                     }
                     // 判断是否授权
-                    if ((result[3] & 15) == 0) { // 未授权或者授权过期
+                    if ((content[5] & 15) == 0) { // 未授权或者授权过期或者授权失败
+                        if ((content[5] >> 4) != 0) { // 授权成功
+                            Message message = mHandler.obtainMessage();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+                            message.setData(bundle);
+                            message.what = MSG_AUTHORIZATION_FAIL;
+                            mHandler.sendMessage(message);
+                            return;
+                        }
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_AUTHORIZATION;
                         mHandler.sendMessage(message);
                         return;
-                    }
-
-                    if ((result[3] >> 4) == 0) { // 授权成功
+                    } else {
+                        // 授权成功
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_AUTHORIZATION_SUCCESS;
                         mHandler.sendMessage(message);
-                    } else {
-                        message.what = MSG_AUTHORIZATION_FAIL;
-                        mHandler.sendMessage(message);
-                        return;
                     }
 
                     // 判断是否存在车型参数
-                    if ((result[4] & 15) == 00) { // 未车型参数
+                    if ((content[6] & 15) == 00) { // 未车型参数或者车型参数更新失败
+                        if ((content[6] >> 4) != 00) { // 车型参数失败
+                            Message message = mHandler.obtainMessage();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+                            message.setData(bundle);
+                            message.what = MSG_PARAM_UPDATE_FAIL;
+                            mHandler.sendMessage(message);
+                            return;
+                        }
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_NO_PARAM;
                         mHandler.sendMessage(message);
                         return;
-                    }
-                    // 判断车型参数是否更新成功
-                    if ((result[4] >> 4) == 00) { // 车型参数更新成功
-                        message.what = MSG_PARAM_UPDATE_SUCCESS;
-                        mHandler.sendMessage(message);
                     } else {
-                        message.what = MSG_PARAM_UPDATE_FAIL;
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
+                        message.what = MSG_PARAM_UPDATE_SUCCESS;
                         mHandler.sendMessage(message);
                     }
 
                     // 判断当前胎压是否匹配
-                    if (result[5] == 00) { // 当前胎压不匹配
+                    if (content[7] == 00) { // 当前胎压不匹配
+                        // 判断之前胎压是否匹配
+                        if (content[8] == 01) { // 之前胎压不匹配
+                            Message message = mHandler.obtainMessage();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+                            message.setData(bundle);
+                            message.what = MSG_BEFORE_MATCHING;
+                            mHandler.sendMessage(message);
+                            return;
+                        }
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_CURRENT_MISMATCHING;
                         mHandler.sendMessage(message);
                         return;
                     }
-                    // 判断之前胎压是否匹配
-                    if (result[6] == 00) { // 之前胎压不匹配
-                        message.what = MSG_BEFORE_MISMATCHING;
-                        mHandler.sendMessage(message);
-                        return;
-                    }
+
                     // 判断是否完成校准
-                    if (result[7] == 00) { // 校准状态
+                    if (content[9] == 00) { // 校准状态
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_UN_ADJUST;
                         mHandler.sendMessage(message);
                         return;
                     }
+                    if (content[9] == 00) { // 校准中状态
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
+                        message.what = MSG_ADJUSTING;
+                        mHandler.sendMessage(message);
+                    }
+
+                    if (content[9] == 00) { // 校准完成
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
+                        message.what = MSG_ADJUST_SUCCESS;
+                        mHandler.sendMessage(message);
+                    }
+
                     // 判断BoxId是否合法
-                    if (result[8] == 00) { // boxId是否合法
+                    if (content[10] == 00) { // boxId是否合法
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
                         message.what = MSG_UN_LEGALITY;
                         mHandler.sendMessage(message);
                         return;
@@ -652,7 +719,7 @@ public class BlueManager {
                     Message normalMessage = mHandler.obtainMessage();
                     Bundle normalBundle = new Bundle();
                     normalBundle.putSerializable("obd_status_info", obdStatusInfo);
-                    normalMessage.setData(bundle);
+                    normalMessage.setData(normalBundle);
                     normalMessage.what = MSG_NORMAL;
                     mHandler.sendMessage(normalMessage);
 
@@ -666,6 +733,15 @@ public class BlueManager {
 //                        mHandler.sendMessage(message);
 //                        return;
 //                    }
+                }
+            } else if (content[0] == 8) {
+                if (content[1] == 3) { // 胎压状态
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_TIRE_PRESSURE_STATUS;
+                    bundle.putByteArray("status", content);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 }
             }
 //                if (result[1] == 00) { // 通用错误
@@ -815,25 +891,6 @@ public class BlueManager {
                         }
                     });
                     break;
-                case MSG_VERIFY:
-                    mMainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            String date = bundle.getString("value");
-                            switch (bundle.getInt("status")) {
-                                case 0: // 首次使用
-                                    notifyBleCallBackListener(OBDEvent.OBD_FIRST_USE, date);
-                                    break;
-                                case 1: // 设置授权正常
-                                    notifyBleCallBackListener(OBDEvent.OBD_NORMAL, bundle.getByteArray("value"));
-                                    break;
-                                case 2: // 设备授权过期
-                                    notifyBleCallBackListener(OBDEvent.OBD_EXPIRE, date);
-                                    break;
-                            }
-                        }
-                    });
-                    break;
                 case MSG_AUTH_RESULT:
                     mMainHandler.post(new Runnable() {
                         @Override
@@ -930,6 +987,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.UNREGISTERED");
                             notifyBleCallBackListener(OBDEvent.UNREGISTERED, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -938,6 +996,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.AUTHORIZATION");
                             notifyBleCallBackListener(OBDEvent.AUTHORIZATION, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -946,6 +1005,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.AUTHORIZATION_SUCCESS");
                             notifyBleCallBackListener(OBDEvent.AUTHORIZATION_SUCCESS, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -954,6 +1014,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.AUTHORIZATION_FAIL");
                             notifyBleCallBackListener(OBDEvent.AUTHORIZATION_FAIL, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -962,6 +1023,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.NO_PARAM");
                             notifyBleCallBackListener(OBDEvent.NO_PARAM, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -970,7 +1032,8 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.PARAM_UPDATE_SUCESS, bundle.getSerializable("obd_status_info"));
+                            Log.d("OBDEvent.PARAM_UPDATE_SUCCESS");
+                            notifyBleCallBackListener(OBDEvent.PARAM_UPDATE_SUCCESS, bundle.getSerializable("obd_status_info"));
                         }
                     });
                     break;
@@ -978,6 +1041,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.PARAM_UPDATE_FAIL");
                             notifyBleCallBackListener(OBDEvent.PARAM_UPDATE_FAIL, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -986,15 +1050,17 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.CURRENT_MISMATCHING");
                             notifyBleCallBackListener(OBDEvent.CURRENT_MISMATCHING, bundle.getSerializable("obd_status_info"));
                         }
                     });
                     break;
-                case MSG_BEFORE_MISMATCHING: // 之前是否胎压匹配过
+                case MSG_BEFORE_MATCHING: // 之前胎压匹配过
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.BEFORE_MISMATCHING, bundle.getSerializable("obd_status_info"));
+                            Log.d("OBDEvent.BEFORE_MISMATCHING");
+                            notifyBleCallBackListener(OBDEvent.BEFORE_MATCHING, bundle.getSerializable("obd_status_info"));
                         }
                     });
                     break;
@@ -1002,7 +1068,26 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.UN_ADJUST");
                             notifyBleCallBackListener(OBDEvent.UN_ADJUST, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_ADJUSTING:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.ADJUSTING");
+                            notifyBleCallBackListener(OBDEvent.ADJUSTING, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
+                case MSG_ADJUST_SUCCESS:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.ADJUST_SUCCESS");
+                            notifyBleCallBackListener(OBDEvent.ADJUST_SUCCESS, bundle.getSerializable("obd_status_info"));
                         }
                     });
                     break;
@@ -1010,6 +1095,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.UN_LEGALITY");
                             notifyBleCallBackListener(OBDEvent.UN_LEGALITY, bundle.getSerializable("obd_status_info"));
                         }
                     });
@@ -1018,6 +1104,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d("OBDEvent.NORMAL");
                             notifyBleCallBackListener(OBDEvent.NORMAL, bundle.getSerializable("obd_status_info"));
                         }
                     });

@@ -34,18 +34,6 @@ public class OBDEvent {
      */
     public static final int OBD_DISCONNECTED = 6;
     /**
-     * OBD首次使用
-     */
-    public static final int OBD_FIRST_USE = 7;
-    /**
-     * OBD正常使用
-     */
-    public static final int OBD_NORMAL = 8;
-    /**
-     * OBD过期
-     */
-    public static final int OBD_EXPIRE = 9;
-    /**
      * 开始升级
      */
     public static final int OBD_BEGIN_UPDATE = 10;
@@ -103,7 +91,7 @@ public class OBDEvent {
      * 无车型参数
      */
     public static final int NO_PARAM = 120; // 无车型参数
-    public static final int PARAM_UPDATE_SUCESS = 121; // 无车型参数
+    public static final int PARAM_UPDATE_SUCCESS = 121; // 无车型参数
     public static final int PARAM_UPDATE_FAIL = 122; // 无车型参数
     /**
      * 当前胎压不匹配
@@ -112,11 +100,13 @@ public class OBDEvent {
     /**
      * 之前胎压匹配成功过
      */
-    public static final int BEFORE_MISMATCHING = 140; // 之前是否胎压匹配过
+    public static final int BEFORE_MATCHING = 140; // 之前胎压匹配过
     /**
      * 未校准
      */
     public static final int UN_ADJUST = 150; // 未完成校准
+    public static final int ADJUSTING = 151; // 校准中
+    public static final int ADJUST_SUCCESS = 152; // 校准完成
     /**
      * BoxId不合法，盗版
      */

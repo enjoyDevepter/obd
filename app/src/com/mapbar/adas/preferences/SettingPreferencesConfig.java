@@ -25,4 +25,8 @@ public class SettingPreferencesConfig {
 
     public static final StringPreferences STUDYSTATUS = new StringPreferences(SHARED_PREFERENCES_INIT, "study_status", "");
 
+    public static final BooleanPreferences ADJUST_START = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_start", true);
+
+    public static final BooleanPreferences ADJUST_SUCCESS = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_success", true);
+
 }

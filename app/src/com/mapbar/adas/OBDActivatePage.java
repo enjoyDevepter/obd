@@ -45,6 +45,9 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
     private View reportV;
     private CustomDialog dialog;
 
+    private volatile boolean needNotifyParamsSuccess;
+    private volatile boolean needNotifyVerifiedSuccess;
+
     @Override
     public void onResume() {
         super.onResume();
@@ -128,6 +131,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                         String code = result.optString("rightStr");
                         SettingPreferencesConfig.CAR.set(carName);
                         SettingPreferencesConfig.PHONE.set(String.valueOf(getDate().get("phone")));
+                        needNotifyVerifiedSuccess = true;
                         BlueManager.getInstance().send(ProtocolUtils.auth(getDate().getString("sn"), code));
                     }
                 } catch (JSONException e) {
@@ -141,23 +145,69 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.AUTHORIZATION_SUCCESS:
-                OBDStatusInfo obdStatusInfo = (OBDStatusInfo) data;
-                activateSuccess(obdStatusInfo);
+                activateSuccess((OBDStatusInfo) data);
                 break;
             case OBDEvent.AUTHORIZATION_FAIL:
+                authFail("授权失败!请联系客服!");
                 break;
             case OBDEvent.NO_PARAM: // 无车型参数
-                OBDStatusInfo obdStatus = (OBDStatusInfo) data;
-                checkOBDVersion(obdStatus);
+                checkOBDVersion((OBDStatusInfo) data);
+                break;
+            case OBDEvent.PARAM_UPDATE_SUCCESS:
+                notifyUpdateSuccess((OBDStatusInfo) data);
+                break;
+            case OBDEvent.PARAM_UPDATE_FAIL:
+                authFail("参数更新失败!请联系客服!");
                 break;
         }
     }
 
 
     /**
+     * 授权失败
+     *
+     * @param reason
+     */
+    private void authFail(final String reason) {
+        GlobalUtil.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dismissProgress();
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.confirm))).setText("确认");
+                                ((TextView) (view.findViewById(R.id.info))).setText(reason);
+                                ((TextView) (view.findViewById(R.id.title))).setText("授权失败");
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        // 退出应用
+                                        PageManager.finishActivity(MainActivity.getInstance());
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.dailog_common_warm)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
+            }
+        });
+    }
+
+    /**
      * 通知服务器固件升级完成
      */
     private void notifyUpdateSuccess(OBDStatusInfo obdStatusInfo) {
+
+        if (!needNotifyParamsSuccess) {
+            return;
+        }
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -192,6 +242,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
+                        needNotifyParamsSuccess = false;
                         OBDAuthPage authPage = new OBDAuthPage();
                         Bundle bundle = new Bundle();
                         bundle.putBoolean("showStudy", true);
@@ -252,6 +303,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                                 case 1:
                                 case 2:
                                 case 3: // 只有参数更新
+                                    needNotifyParamsSuccess = true;
                                     BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
                                     break;
                             }
@@ -268,6 +320,9 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
      * 激活成功
      */
     private void activateSuccess(final OBDStatusInfo obdStatusInfo) {
+        if (!needNotifyVerifiedSuccess) {
+            return;
+        }
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -318,6 +373,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener 
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
+                        needNotifyVerifiedSuccess = false;
                     } else {
                         Log.d("activate failure");
                     }
