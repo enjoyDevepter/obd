@@ -27,6 +27,7 @@ import com.mapbar.adas.utils.AlarmManager;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.adas.view.NumberSeekBar;
 import com.mapbar.adas.view.SensitiveView;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
@@ -151,6 +152,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     };
 
     private Timer heartTimer;
+    private NumberSeekBar sensitiveView;
 
     @Override
     public void onResume() {
@@ -183,7 +185,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             }
         }, 1000 * 30, 1000 * 60);
     }
-
 
     @Override
     public void onStart() {
@@ -282,20 +283,19 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
-                        final SensitiveView sensitiveView = (SensitiveView) view.findViewById(R.id.sensitive);
+                        sensitiveView = (NumberSeekBar) view.findViewById(R.id.sensitive);
+                        sensitiveView.setCurProgress(obdStatusInfo.getSensitive());
                         view.findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                SensitiveView.Type type = sensitiveView.getType();
                                 BlueManager.getInstance().send(ProtocolUtils.setSensitive(type == LOW ? 01 : type == MEDIUM ? 02 : 03));
                                 dialog.dismiss();
                             }
                         });
-                        sensitiveView.setType(type);
-                        sensitiveView.setOnItemChoiceListener(new SensitiveView.OnItemChoiceListener() {
+                        sensitiveView.setOnProgressChangeListener(new NumberSeekBar.OnProgressChangeListener() {
                             @Override
-                            public void onChoice(SensitiveView.Type t) {
-                                type = t;
+                            public void onProgress(int progress) {
+                                BlueManager.getInstance().send(ProtocolUtils.setSensitive(progress));
                             }
                         });
                     }
@@ -500,6 +500,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 if (ADJUST_SUCCESS.get()) {
                     ADJUST_SUCCESS.set(false);
                     AlarmManager.getInstance().play(R.raw.finish);
+                }
+                break;
+            case OBDEvent.NORMAL:
+                obdStatusInfo = (OBDStatusInfo) data;
+                if (null != sensitiveView) {
+                    sensitiveView.setCurProgress(obdStatusInfo.getSensitive());
                 }
                 break;
         }
@@ -759,9 +765,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             switch (obdVersion.getUpdateState()) {
                                 case 0:
                                     BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
-                                    // 定时获取胎压状态
-//                                    mHandler.sendEmptyMessage(0);
-//                            BlueManager.getInstance().write(ProtocolUtils.getStudyProgess());
                                     break;
                                 case 1: // 版本参数都更新
                                     needNotifyParamsSuccess = true;
@@ -853,12 +856,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         needNotifyParamsSuccess = false;
-//                        GlobalUtil.getHandler().post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Toast.makeText(GlobalUtil.getContext(), "升级成功", Toast.LENGTH_LONG).show();
-//                            }
-//                        });
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override

@@ -12,4 +12,18 @@
     <dimen name="sensitive_divider">20dp</dimen>
     <dimen name="letter_size">14sp</dimen>
     <dimen name="loading">60dp</dimen>
+
+    <dimen name="textSize30">15sp</dimen>
+    <dimen name="textSize36">18sp</dimen>
+    <dimen name="textSize48">24sp</dimen>
+    <dimen name="textSize18">9sp</dimen>
+    <dimen name="padding_10">5dp</dimen>
+    <dimen name="padding_38">19dp</dimen>
+    <dimen name="padding_20">10dp</dimen>
+    <dimen name="speed_size">9sp</dimen>
+    <dimen name="size_40">20dp</dimen>
+    <dimen name="size_22">11dp</dimen>
+    <dimen name="size_456">228dp</dimen>
+    <dimen name="size_14">7dp</dimen>
+
 </resources>

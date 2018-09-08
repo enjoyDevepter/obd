@@ -34,7 +34,7 @@ public class CollectTurnFinish extends AppBasePage implements View.OnClickListen
 
     }
 
-    @Subscriber(tag = EventBusTags.COLLECT_TURN_finished_EVENT)
+    @Subscriber(tag = EventBusTags.COLLECT_TURN_FINISHED_EVENT)
     private void updateCollectTurnStauts(int type) {
         BlueManager.getInstance().send(ProtocolUtils.stopCollect());
         PageManager.go(new CollectFinish());
@@ -56,7 +56,7 @@ public class CollectTurnFinish extends AppBasePage implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                EventBus.getDefault().post(0, EventBusTags.COLLECT_TURN_finished_EVENT);
+                EventBus.getDefault().post(0, EventBusTags.COLLECT_TURN_START_EVENT);
                 break;
         }
     }

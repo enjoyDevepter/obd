@@ -232,6 +232,7 @@ public class ProtocolUtils {
         return result;
     }
 
+
     public static byte[] setSensitive(int sensitive) {
         Log.d("Protocol setSensitive ===");
         byte[] result = new byte[6];

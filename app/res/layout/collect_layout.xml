@@ -26,12 +26,27 @@
             android:textColor="#FFFF0000"
             android:textSize="18sp" />
 
-        <View
-            android:id="@+id/speed20"
-            android:layout_width="30dp"
-            android:layout_height="20dp"
-            android:background="@drawable/reset"
-            android:visibility="invisible" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/img_loading_20"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_loading" />
+
+            <View
+                android:id="@+id/speed20"
+                android:layout_width="30dp"
+                android:layout_height="20dp"
+                android:background="@drawable/reset"
+                android:visibility="invisible" />
+
+        </FrameLayout>
+
 
     </LinearLayout>
 
@@ -80,13 +95,27 @@
             android:textColor="#FFFF0000"
             android:textSize="18sp" />
 
-        <View
-            android:id="@+id/speed60"
-            android:layout_width="30dp"
-            android:layout_height="20dp"
-            android:background="@drawable/reset"
-            android:visibility="invisible" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
+            <ImageView
+                android:id="@+id/img_loading_60"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_loading"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/speed60"
+                android:layout_width="30dp"
+                android:layout_height="20dp"
+                android:background="@drawable/reset"
+                android:visibility="invisible" />
+
+        </FrameLayout>
     </LinearLayout>
 
 </LinearLayout>

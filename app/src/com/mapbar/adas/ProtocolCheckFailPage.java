@@ -29,6 +29,8 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     private View reportV;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.confirm)
+    private TextView confirmV;
     private CustomDialog dialog;
 
     private volatile boolean showConfirm;
@@ -36,7 +38,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     private int time = 15;
     private Timer timer;
     private TimerTask timerTask;
-    private TextView save;
     private volatile OBDStatusInfo obdStatusInfo;
 
     @Override
@@ -44,8 +45,8 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         super.onResume();
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
+        confirmV.setSelected(false);
         title.setText("匹配结果");
-        showProgress();
         BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
     }
 
@@ -66,14 +67,15 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             case OBDEvent.CURRENT_MISMATCHING:
                 obdStatusInfo = (OBDStatusInfo) data;
                 if (!showConfirm) {
-                    showConfirm();
+                    showConfirm = true;
+                    time = 15;
+                    initTimer();
+                    timer.schedule(timerTask, 3000, 1000);
                 }
                 BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
                 break;
             case OBDEvent.UN_ADJUST:
-                if (null != dialog) {
-                    dialog.dismiss();
-                }
+                dismissProgress();
                 obdStatusInfo = (OBDStatusInfo) data;
                 PageManager.go(new ConfirmPage());
                 break;
@@ -81,9 +83,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 authFail("请从正规渠道购买!");
                 break;
             case OBDEvent.NORMAL:
-                if (null != dialog) {
-                    dialog.dismiss();
-                }
                 dismissProgress();
                 obdStatusInfo = (OBDStatusInfo) data;
                 MainPage mainPage = new MainPage();
@@ -95,33 +94,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         }
     }
 
-    private void showConfirm() {
-        if (dialog != null && dialog.isVisible()) {
-            time = 10;
-            initTimer();
-            timer.schedule(timerTask, 1000, 1000);
-            return;
-        }
-        showConfirm = true;
-        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                .setViewListener(new CustomDialog.ViewListener() {
-                    @Override
-                    public void bindView(View view) {
-                        save = (TextView) view.findViewById(R.id.save);
-                        save.setSelected(false);
-                        time = 15;
-                        initTimer();
-                        timer.schedule(timerTask, 1000, 1000);
-                    }
-                })
-                .setLayoutRes(R.layout.dailog_match)
-                .setDimAmount(0.5f)
-                .setCancelOutside(false)
-                .isCenter(true)
-                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                .show();
-    }
-
     private void initTimer() {
         timerTask = new TimerTask() {
             @Override
@@ -130,16 +102,16 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     @Override
                     public void run() {
                         if (time <= 0 && timer != null) {
+                            showProgress();
                             timer.cancel();
                             timer = null;
                             timerTask.cancel();
                             timerTask = null;
-                            save.setText("确认，我已打火!");
-                            save.setSelected(true);
-                            save.setOnClickListener(ProtocolCheckFailPage.this);
-                            save.setBackgroundResource(R.drawable.btn_bg);
+                            confirmV.setText("确认，我已打火!");
+                            confirmV.setSelected(true);
+                            confirmV.setOnClickListener(ProtocolCheckFailPage.this);
                         } else {
-                            save.setText("确认，我已打火!(" + time + "s)");
+                            confirmV.setText("确认，我已打火!(" + time + "s)");
                         }
                         time--;
                     }
@@ -192,10 +164,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         switch (v.getId()) {
             case R.id.report:
                 break;
-            case R.id.save:
-                if (null != dialog) {
-                    dialog.dismiss();
-                }
+            case R.id.confirm:
                 if (times >= 2) {
                     if (!obdStatusInfo.isCurrentMatching()) {
                         if (obdStatusInfo.isBerforeMatching()) {
@@ -207,7 +176,12 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     }
                 } else {
                     times++;
-                    showConfirm();
+                    confirmV.setOnClickListener(null);
+                    confirmV.setSelected(false);
+                    showProgress();
+                    time = 15;
+                    initTimer();
+                    timer.schedule(timerTask, 1000, 1000);
                 }
                 break;
         }

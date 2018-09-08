@@ -1,6 +1,10 @@
 package com.mapbar.adas;
 
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
@@ -22,16 +26,24 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
     private View back;
     @ViewInject(R.id.speed20)
     private View speed20;
+    @ViewInject(R.id.img_loading_20)
+    private ImageView iamge20;
     @ViewInject(R.id.speed20To60)
     private View speed20To60V;
     @ViewInject(R.id.speed60)
     private View speed60V;
+    @ViewInject(R.id.img_loading_60)
+    private ImageView iamge60;
+    private Animation operatingAnim;
 
     @Override
     public void onResume() {
         super.onResume();
         title.setText("直线行驶");
         back.setOnClickListener(this);
+        operatingAnim = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+        iamge20.startAnimation(operatingAnim);
+        operatingAnim.setInterpolator(new LinearInterpolator());
         BlueManager.getInstance().send(ProtocolUtils.run());
     }
 
@@ -39,15 +51,21 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
     private void updateCollectDirectStauts(int type) {
         switch (type) {
             case 0:
+                iamge20.clearAnimation();
+                iamge20.setVisibility(View.INVISIBLE);
                 speed20.setVisibility(View.VISIBLE);
+                iamge60.setVisibility(View.VISIBLE);
+                iamge60.startAnimation(operatingAnim);
                 break;
             case 1:
                 speed20To60V.setVisibility(View.VISIBLE);
                 break;
             case 2:
+                iamge60.setVisibility(View.INVISIBLE);
                 speed60V.setVisibility(View.VISIBLE);
                 break;
             case 3:
+                iamge60.clearAnimation();
                 PageManager.go(new CollectTurnFinish());
                 break;
         }

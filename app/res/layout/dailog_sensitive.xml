@@ -31,7 +31,8 @@
         android:textColor="#ff3D424C"
         android:textSize="12sp" />
 
-    <com.mapbar.adas.view.SensitiveView
+
+    <com.mapbar.adas.widget.NumberSeekBar
         android:id="@+id/sensitive"
         android:layout_width="match_parent"
         android:layout_height="70dp"
@@ -39,6 +40,15 @@
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:layout_marginTop="15dp" />
+
+    <!--<com.mapbar.adas.view.SensitiveView
+        android:id="@+id/sensitive"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="15dp" />-->
 
     <TextView
         android:id="@+id/save"

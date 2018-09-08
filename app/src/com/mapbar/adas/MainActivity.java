@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -24,15 +25,23 @@ import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.core.HexUtils;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements BleCallBackListener, LocationListener {
 
@@ -55,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private long lastLocationTime;
     private volatile boolean startTrun;
     private volatile float stratTrunBearing;
+    private Timer heartTimer;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -173,6 +183,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         MainActivity.INSTANCE = null;
         EventBus.getDefault().unregister(this);
         BlueManager.getInstance().removeCallBackListener(this);
+        if (null != heartTimer) {
+            heartTimer.cancel();
+            heartTimer = null;
+        }
     }
 
     public boolean isFirst() {
@@ -197,6 +211,15 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Subscriber(tag = EventBusTags.START_COLLECT)
     private void startCollect(int type) {
         switch (type) {
+            case 0:
+                heartTimer = new Timer();
+                heartTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        BlueManager.getInstance().send(ProtocolUtils.sentHeart());
+                    }
+                }, 1000, 60 * 1000);
+                break;
             case 1:
                 locationManager.removeUpdates(this);
                 break;
@@ -301,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             } else if (startTrun && stratTrunBearing != 0) {
                 if (location.getBearing() - stratTrunBearing > 40) {
                     EventBus.getDefault().post(0, EventBusTags.COLLECT_TURN_FINISHED_EVENT);
+                    new Thread(new FileRunnable("Normal2050")).start();
                 }
             }
         }
@@ -319,5 +343,51 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    private class FileRunnable implements Runnable {
+
+        private String fileName;
+
+        public FileRunnable(String fileName) {
+            this.fileName = fileName;
+        }
+
+        @Override
+        public void run() {
+            try {
+                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "obd_collect" + File.separator);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File file = new File(dir, fileName);
+                try {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+                    for (String str : list20) {
+                        bw.write(str);
+                        bw.newLine();
+                        bw.flush();
+                    }
+                    for (String str : list2060) {
+                        bw.write(str);
+                        bw.newLine();
+                        bw.flush();
+                    }
+                    for (String str : list60) {
+                        bw.write(str);
+                        bw.newLine();
+                        bw.flush();
+                    }
+                    bw.close();
+                    fos.close();
+                    // 上传
+                } catch (FileNotFoundException e) {
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
