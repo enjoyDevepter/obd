@@ -7,8 +7,8 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
 
-@PageSetting(contentViewId = R.layout.collect_one_layout, toHistory = false)
-public class CollectOnePage extends AppBasePage implements View.OnClickListener {
+@PageSetting(contentViewId = R.layout.collect_two_layout, toHistory = false)
+public class CollectTwoPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
@@ -25,7 +25,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         confirmV.setOnClickListener(this);
-        title.setText("磨合方法");
+        title.setText("磨合方法(图示)");
     }
 
     @Override
@@ -38,7 +38,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                PageManager.go(new CollectTwoPage());
+                PageManager.go(new CollectPage());
                 break;
         }
     }

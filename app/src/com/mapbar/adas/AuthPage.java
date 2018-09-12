@@ -28,7 +28,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@PageSetting(contentViewId = R.layout.auth_layout)
+@PageSetting(contentViewId = R.layout.auth_layout, toHistory = false)
 public class AuthPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
@@ -56,7 +56,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         super.onResume();
         title.setText("输入授权码");
         next.setOnClickListener(this);
-        back.setOnClickListener(this);
+        back.setVisibility(View.GONE);
         scanV.setOnClickListener(this);
         reportV.setOnClickListener(this);
 
@@ -134,18 +134,24 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("sn_check failure " + e.getMessage());
-                dismissProgress();
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
+                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
                                     public void bindView(View view) {
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
+                                                showProgress();
+                                                confirm.setEnabled(false);
                                                 check();
                                             }
                                         });

@@ -14,25 +14,43 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
         android:gravity="center_horizontal"
-        android:text="胎压匹配检测失败！\n\n胎压匹配检测必须在车辆打火状态下进行！"
-        android:textColor="#ffff0000"
+        android:text="未检测到车辆数据！"
+        android:textColor="#ff000000"
         android:textSize="20sp" />
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp"
-        android:text="可能的原因：\n1、车辆未打火，请您打火后点击重试按钮！\n\n2、您选择的车型与车辆实际车型不符！请您联系经销商或厂家客服！"
-        android:textColor="#FF000000"
-        android:textSize="15sp" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/reason_one"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:text="可能存在以下原因：\n1、车辆未打火，请您打火！打火检测到数据后页面会自动跳转！\n\n2、您更换了车辆。\n一个盒子只能支持一辆车！"
+            android:textColor="#ff000000"
+            android:textSize="20sp"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/reason_two"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:text="请您再次确认车辆已打火！\n\n请您务必确认已打火后再点击确认按钮!"
+            android:textColor="#ff000000"
+            android:textSize="20sp" />
+    </FrameLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-
 
     <TextView
         android:id="@+id/confirm"

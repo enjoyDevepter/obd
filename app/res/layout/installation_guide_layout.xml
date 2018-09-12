@@ -13,8 +13,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="即将开始...:\n\n 1、请不要离开车辆，否则蓝牙会断卡！\n\n 2、请打开网络，确保网络连接正常！"
-        android:textColor="#ffff0000"
+        android:text="即将开始...\n\n1、请不要离开车辆，否则蓝牙会断卡！\n2、请打开网络，确保网络连接正常！"
+        android:textColor="#FF35a59c"
         android:textSize="20sp" />
 
 

@@ -43,7 +43,6 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
         super.onStop();
     }
 
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -53,7 +52,7 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
                     PageManager.go(new OBDAuthPage());
                 } else {
                     BlueManager.getInstance().stopScan(false);
-                    PageManager.go(new OBDeviceCheckPage());
+                    PageManager.go(new ConnectPage());
                 }
                 break;
             case R.id.disagree:

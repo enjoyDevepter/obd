@@ -8,12 +8,24 @@
     <include layout="@layout/layout_tittle" />
 
     <TextView
+        android:id="@+id/success"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="40dp"
-        android:text="初级校准已完成，当您行驶10小时后，开启APP，按照APP提示进行精确校准！"
+        android:layout_marginTop="30dp"
+        android:text="恭喜您！\n磨合成功！\n胎压盒子可以正常使用了!\n\n当轮胎亏气时，胎压盒子会发出连续蜂鸣声！此时您需要停车并用APP连接盒子，点击校准后方可停止蜂鸣！如果继续亏气，仍然会再次蜂鸣！"
+        android:textColor="#FF000000"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/fail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:text="磨合成功失败！\n\n抱歉，磨合失败！\n请您点击确定按钮，我们会在第一时间寻找同款车型并在24-48小时内完成相关开发工作！\n\n开发完成后我们会电话通知您！届时您只需要重新联网升级即可！"
         android:textColor="#FF000000"
         android:textSize="20sp" />
 

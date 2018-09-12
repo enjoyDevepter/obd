@@ -15,7 +15,7 @@
         android:layout_marginTop="30dp"
         android:gravity="center_horizontal"
         android:text="请您务必不要关闭当前APP，不要做任何操作！\n\n正在激活胎压盒子。。。"
-        android:textColor="#ffff0000"
+        android:textColor="#ff000000"
         android:textSize="20sp" />
 
 </LinearLayout>

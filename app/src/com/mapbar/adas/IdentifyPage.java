@@ -49,6 +49,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
         title.setText("输入验证码");
         next.setOnClickListener(this);
         back.setOnClickListener(this);
+        reportV.setOnClickListener(this);
         if (getDate() != null) {
             phone.setText(getDate().getString("phone"));
         }
@@ -62,6 +63,8 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 break;
             case R.id.next:
                 check();
+                break;
+            case R.id.report:
                 break;
         }
     }
@@ -98,10 +101,16 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
                                     public void bindView(View view) {
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
+                                                showProgress();
+                                                confirm.setEnabled(false);
                                                 check();
                                             }
                                         });

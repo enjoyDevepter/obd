@@ -13,8 +13,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="请您准备好以下工具:\n\n 1、手机（注册收取验证码）\n\n 2、包装盒(获取注册码)"
-        android:textColor="#ffff0000"
+        android:text="请您准备好以下工具:\n\n1、手机(注册收取验证码)\n2、包装盒(获取注册码)"
+        android:textColor="#ff000000"
         android:textSize="20sp" />
 
 

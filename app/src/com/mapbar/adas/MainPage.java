@@ -4,17 +4,14 @@ import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -761,31 +758,31 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 GlobalUtil.getHandler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if ("000".equals(obdVersion.getStatus())) {
-                            switch (obdVersion.getUpdateState()) {
-                                case 0:
-                                    BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
-                                    break;
-                                case 1: // 版本参数都更新
-                                    needNotifyParamsSuccess = true;
-                                    ADJUST_START.set(true);
-                                    ADJUST_SUCCESS.set(true);
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
-                                    break;
-                                case 2: // 只有版本更新
-                                    downloadUpdate(obdVersion);
-                                    break;
-                                case 3: // 只有参数更新
-                                    needNotifyParamsSuccess = true;
-                                    ADJUST_START.set(true);
-                                    ADJUST_SUCCESS.set(true);
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
-                                    break;
-                            }
-                        } else {
-
-                            Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
-                        }
+//                        if ("000".equals(obdVersion.getStatus())) {
+//                            switch (obdVersion.getUpdateState()) {
+//                                case 0:
+//                                    BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
+//                                    break;
+//                                case 1: // 版本参数都更新
+//                                    needNotifyParamsSuccess = true;
+//                                    ADJUST_START.set(true);
+//                                    ADJUST_SUCCESS.set(true);
+//                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
+//                                    break;
+//                                case 2: // 只有版本更新
+//                                    downloadUpdate(obdVersion);
+//                                    break;
+//                                case 3: // 只有参数更新
+//                                    needNotifyParamsSuccess = true;
+//                                    ADJUST_START.set(true);
+//                                    ADJUST_SUCCESS.set(true);
+//                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
+//                                    break;
+//                            }
+//                        } else {
+//
+//                            Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
+//                        }
                     }
                 }, 1500);
             }
@@ -872,35 +869,35 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     }
 
     private void downloadUpdate(OBDVersion obdVersion) {
-        //创建下载任务
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(obdVersion.getUrl()));
-        request.setAllowedOverRoaming(false);//漫游网络是否可以下载
-
-        //设置文件类型，可以在下载结束后自动打开该文件
-        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-        String mimeString = mimeTypeMap.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(obdVersion.getUrl()));
-        request.setMimeType(mimeString);
-
-        //在通知栏中显示，默认就是显示的
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-        request.setVisibleInDownloadsUi(true);
-
-        //sdcard的目录下的download文件夹，必须设置
-        File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
-        if (file.exists()) {
-            file.delete();
-        }
-        request.setDestinationInExternalPublicDir("/download/", "update.bin");
-
-        //将下载请求加入下载队列
-        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        //加入下载队列后会给该任务返回一个long型的id，
-        //通过该id可以取消任务，重启任务等等，看上面源码中框起来的方法
-        mTaskId = downloadManager.enqueue(request);
-
-        //注册广播接收者，监听下载状态
-        getContext().registerReceiver(receiver,
-                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+//        //创建下载任务
+//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(obdVersion.getUrl()));
+//        request.setAllowedOverRoaming(false);//漫游网络是否可以下载
+//
+//        //设置文件类型，可以在下载结束后自动打开该文件
+//        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+//        String mimeString = mimeTypeMap.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(obdVersion.getUrl()));
+//        request.setMimeType(mimeString);
+//
+//        //在通知栏中显示，默认就是显示的
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+//        request.setVisibleInDownloadsUi(true);
+//
+//        //sdcard的目录下的download文件夹，必须设置
+//        File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
+//        if (file.exists()) {
+//            file.delete();
+//        }
+//        request.setDestinationInExternalPublicDir("/download/", "update.bin");
+//
+//        //将下载请求加入下载队列
+//        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+//        //加入下载队列后会给该任务返回一个long型的id，
+//        //通过该id可以取消任务，重启任务等等，看上面源码中框起来的方法
+//        mTaskId = downloadManager.enqueue(request);
+//
+//        //注册广播接收者，监听下载状态
+//        getContext().registerReceiver(receiver,
+//                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     private void updateForOneUnit(int index) {

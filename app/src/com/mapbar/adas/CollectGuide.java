@@ -22,7 +22,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("初级校准");
+        title.setText("车辆磨合");
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         confirmV.setOnClickListener(this);

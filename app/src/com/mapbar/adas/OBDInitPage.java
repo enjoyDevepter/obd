@@ -8,7 +8,7 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
 
-@PageSetting(contentViewId = R.layout.obd_init_layout)
+@PageSetting(contentViewId = R.layout.obd_init_layout, toHistory = false)
 public class OBDInitPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
@@ -23,7 +23,7 @@ public class OBDInitPage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("初始化盒子");
+        title.setText("安装引导");
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         confirmTV.setOnClickListener(this);

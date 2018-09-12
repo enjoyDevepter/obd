@@ -8,7 +8,7 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
 
-@PageSetting(contentViewId = R.layout.fire_confirm_layout)
+@PageSetting(contentViewId = R.layout.fire_confirm_layout, toHistory = false)
 public class FireConfirmPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
@@ -23,7 +23,7 @@ public class FireConfirmPage extends AppBasePage implements View.OnClickListener
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("确认车辆已打火");
+        title.setText("安装引导");
         reportV.setVisibility(View.GONE);
         confirmV.setOnClickListener(this);
         back.setVisibility(View.GONE);

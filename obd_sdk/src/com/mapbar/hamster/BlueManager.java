@@ -659,6 +659,16 @@ public class BlueManager {
 
                     // 判断当前胎压是否匹配
                     if (content[7] == 00) { // 当前胎压不匹配
+                        // 优先判断之前胎压是否匹配
+                        if (content[8] == 01) { // 之前胎压匹配
+                            Message message = mHandler.obtainMessage();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+                            message.setData(bundle);
+                            message.what = MSG_BEFORE_MATCHING;
+                            mHandler.sendMessage(message);
+                            return;
+                        }
                         Message message = mHandler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("obd_status_info", obdStatusInfo);
@@ -667,16 +677,6 @@ public class BlueManager {
                         mHandler.sendMessage(message);
                         return;
                     }
-
-//                    // 判断之前胎压是否匹配
-//                    if (content[8] == 01) { // 之前胎压匹配
-//                        Message message = mHandler.obtainMessage();
-//                        Bundle bundle = new Bundle();
-//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-//                        message.setData(bundle);
-//                        message.what = MSG_BEFORE_MATCHING;
-//                        mHandler.sendMessage(message);
-//                    }
 
                     // 判断是否完成校准
                     if (content[9] == 00) { // 校准状态
@@ -706,16 +706,16 @@ public class BlueManager {
                         mHandler.sendMessage(message);
                     }
 
-                    // 判断BoxId是否合法
-                    if (content[10] == 00) { // boxId是否合法
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_UN_LEGALITY;
-                        mHandler.sendMessage(message);
-                        return;
-                    }
+//                    // 判断BoxId是否合法
+//                    if (content[10] == 00) { // boxId是否合法
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_UN_LEGALITY;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
 
                     Message normalMessage = mHandler.obtainMessage();
                     Bundle normalBundle = new Bundle();

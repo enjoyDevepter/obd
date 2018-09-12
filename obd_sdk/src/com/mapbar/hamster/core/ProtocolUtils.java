@@ -323,5 +323,24 @@ public class ProtocolUtils {
         return result;
     }
 
+
+    /**
+     * 清除参数
+     *
+     * @return
+     */
+    public static byte[] cleanParams() {
+        Log.d("Protocol idling ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x85;
+        result[2] = 02;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
 }
 

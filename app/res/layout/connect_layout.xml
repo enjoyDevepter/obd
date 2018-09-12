@@ -13,8 +13,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="请确认已完成以下操作:\n\n 1、已将盒子插入汽车的OBD插口 \n 2、已打开手机蓝牙(或车载导航、后视镜蓝牙)"
-        android:textColor="#ffff0000"
+        android:text="请您确认:\n\n1、已将盒子插入车辆OBD插口上\n2、已打开手机蓝牙"
+        android:textColor="#FF000000"
         android:textSize="20sp" />
 
 
@@ -45,7 +45,7 @@
         android:layout_marginTop="30dp"
         android:background="@drawable/btn_bg"
         android:gravity="center"
-        android:text="重 试"
+        android:text="重试连接"
         android:textColor="#ffffffff"
         android:textSize="18sp"
         android:visibility="invisible" />

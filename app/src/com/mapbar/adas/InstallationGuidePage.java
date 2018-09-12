@@ -8,7 +8,7 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
 
-@PageSetting(contentViewId = R.layout.installation_guide_layout)
+@PageSetting(contentViewId = R.layout.installation_guide_layout, toHistory = false)
 public class InstallationGuidePage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
@@ -27,6 +27,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
         confirmV.setOnClickListener(this);
         back.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
+        back.setVisibility(View.GONE);
 
     }
 

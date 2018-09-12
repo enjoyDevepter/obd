@@ -113,10 +113,16 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
                                     public void bindView(View view) {
-                                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
+                                                showProgress();
+                                                confirm.setEnabled(false);
                                                 getMSN();
                                             }
                                         });
@@ -128,7 +134,6 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                                 .isCenter(true)
                                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
                                 .show();
-
                     }
                 });
             }

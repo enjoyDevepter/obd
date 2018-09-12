@@ -44,6 +44,10 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
+    @ViewInject(R.id.status)
+    private TextView statusTV;
+    @ViewInject(R.id.close)
+    private View closeV;
     private volatile boolean verified;
     private CustomDialog dialog;
 
@@ -55,8 +59,9 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("授权检查");
+        title.setText("获取盒子状态");
         reportV.setOnClickListener(this);
+        closeV.setOnClickListener(this);
         back.setVisibility(View.GONE);
         verify();
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
@@ -103,6 +108,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     @Override
     public void onStop() {
         super.onStop();
+        dismissProgress();
         verified = false;
         BlueManager.getInstance().removeCallBackListener(this);
     }
@@ -146,14 +152,23 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 break;
             case OBDEvent.CURRENT_MISMATCHING:
                 dismissProgress();
-                PageManager.go(new ProtocolCheckFailPage());
+                ProtocolCheckFailPage checkFailPage = new ProtocolCheckFailPage();
+                Bundle checkFailPageBundle = new Bundle();
+                checkFailPageBundle.putBoolean("before_matching", false);
+                checkFailPage.setDate(checkFailPageBundle);
+                PageManager.go(checkFailPage);
+                break;
+            case OBDEvent.BEFORE_MATCHING:
+                dismissProgress();
+                ProtocolCheckFailPage protocolCheckFailPage = new ProtocolCheckFailPage();
+                Bundle protocolCheckFailPageBundle = new Bundle();
+                protocolCheckFailPageBundle.putBoolean("before_matching", true);
+                protocolCheckFailPage.setDate(protocolCheckFailPageBundle);
+                PageManager.go(protocolCheckFailPage);
                 break;
             case OBDEvent.UN_ADJUST:
                 dismissProgress();
-                PageManager.go(new ConfirmPage());
-                break;
-            case OBDEvent.UN_LEGALITY:
-                authFail("请从正规渠道购买!");
+                PageManager.go(new CollectGuide());
                 break;
             case OBDEvent.NORMAL:
                 dismissProgress();
@@ -202,15 +217,14 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
                                     public void bindView(View view) {
-                                        ((TextView) (view.findViewById(R.id.confirm))).setText("授权");
-                                        ((TextView) (view.findViewById(R.id.info))).setText("OBD盒子已过期,请开启网络重新授权!");
-                                        ((TextView) (view.findViewById(R.id.title))).setText("盒子过期");
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
                                         final View confirm = view.findViewById(R.id.confirm);
                                         confirm.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                // 获取授权码
                                                 showProgress();
                                                 confirm.setEnabled(false);
                                                 getLisense(sn);
@@ -239,7 +253,14 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                         String code = result.optString("rightStr");
                         BlueManager.getInstance().send(ProtocolUtils.auth(sn, code));
                     } else {
-                        authFail(result.optString("message"));
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                closeV.setVisibility(View.VISIBLE);
+                                dismissProgress();
+                                statusTV.setText("您的盒子可能为盗版盒子,\n请联系商家或厂家客服\nwww.obdbox.cn");
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     Log.d("getLisense failure " + e.getMessage());
@@ -315,30 +336,37 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("activate failure " + e.getMessage());
-                dismissProgress();
-                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                        .setViewListener(new CustomDialog.ViewListener() {
-                            @Override
-                            public void bindView(View view) {
-                                ((TextView) (view.findViewById(R.id.confirm))).setText("重试");
-                                ((TextView) (view.findViewById(R.id.info))).setText("网络异常,请检查网络状态后重试!");
-                                ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
-                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissProgress();
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        showProgress();
-                                        authSuccess(obdStatusInfo);
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                showProgress();
+                                                confirm.setEnabled(false);
+                                                authSuccess(obdStatusInfo);
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                        })
-                        .setLayoutRes(R.layout.dailog_common_warm)
-                        .setCancelOutside(false)
-                        .setDimAmount(0.5f)
-                        .isCenter(true)
-                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                        .show();
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+                    }
+                });
             }
 
             @Override
@@ -448,7 +476,9 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
-
+                break;
+            case R.id.close:
+                PageManager.finishActivity(MainActivity.getInstance());
                 break;
         }
     }
@@ -485,23 +515,36 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 String responese = response.body().string();
                 Log.d("checkOBDVersion success " + responese);
                 final OBDVersion obdVersion = JSON.parseObject(responese, OBDVersion.class);
-                GlobalUtil.getHandler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if ("000".equals(obdVersion.getStatus())) {
-                            switch (obdVersion.getUpdateState()) {
-                                case 1:
-                                case 2:
-                                case 3: // 只有参数更新
+                if ("000".equals(obdVersion.getStatus())) {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (obdVersion.getpUpdateState()) {
+                                case 0:  // 无参数更新
+                                    break;
+                                case 1: // 有更新
                                     needNotifyParamsSuccess = true;
                                     BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
                                     break;
+                                case 2: // 临时车型，需要采集
+                                    PageManager.go(new CollectGuide());
+                                    break;
+                                case 3: // 临时车型，参数已采集
+                                    dismissProgress();
+                                    closeV.setVisibility(View.VISIBLE);
+                                    statusTV.setText("您的胎压盒子还在进一步校准中，\n请耐心等待，整个校准过程大概需要十几分钟,\n如果遇到长时间没有校准完成，您可以联系我们的客服!");
+                                    break;
                             }
-                        } else {
+                        }
+                    });
+                } else {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
                             Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
                         }
-                    }
-                }, 1500);
+                    });
+                }
             }
         });
     }
