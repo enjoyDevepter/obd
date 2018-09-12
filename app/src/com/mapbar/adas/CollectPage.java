@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
+    private boolean matching;
 
     @Override
     public void onResume() {
@@ -28,11 +30,25 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
         back.setVisibility(View.GONE);
         BlueManager.getInstance().send(ProtocolUtils.run());
         showProgress();
+        matching = getDate().getBoolean("matching");
+        if (matching) {
+            GlobalUtil.getHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    BlueManager.getInstance().send(ProtocolUtils.study());
+                }
+            }, 3000);
+        }
     }
 
-    @Subscriber(tag = EventBusTags.COLLECT_DIRECT_EVENT)
-    private void updateCollectDirectStauts(int type) {
+    @Subscriber(tag = EventBusTags.COLLECT_FINISHED)
+    private void updateCollectStauts(int type) {
         dismissProgress();
+        CollectFinish collectFinish = new CollectFinish();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("success", matching);
+        collectFinish.setDate(bundle);
+        PageManager.go(collectFinish);
     }
 
     @Override

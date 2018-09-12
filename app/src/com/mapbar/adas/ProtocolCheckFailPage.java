@@ -91,7 +91,11 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.NO_PARAM: // 删除参数逻辑
-                PageManager.go(new CollectGuide());
+                CollectGuide collectGuide = new CollectGuide();
+                Bundle collectBundle = new Bundle();
+                collectBundle.putBoolean("matching", false);
+                collectGuide.setDate(collectBundle);
+                PageManager.go(collectGuide);
                 break;
             case OBDEvent.CURRENT_MISMATCHING:
                 obdStatusInfo = (OBDStatusInfo) data;
@@ -108,7 +112,11 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 break;
             case OBDEvent.UN_ADJUST:
                 obdStatusInfo = (OBDStatusInfo) data;
-                PageManager.go(new CollectGuide());
+                CollectGuide guide = new CollectGuide();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("matching", true);
+                guide.setDate(bundle);
+                PageManager.go(guide);
                 break;
             case OBDEvent.NORMAL:
                 obdStatusInfo = (OBDStatusInfo) data;

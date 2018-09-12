@@ -5,8 +5,6 @@ package com.mapbar.adas;
  */
 
 public interface EventBusTags {
-    String COLLECT_DIRECT_EVENT = "collect_direct";
-    String COLLECT_TURN_FINISHED_EVENT = "collect_turn_finished";
-    String COLLECT_TURN_START_EVENT = "collect_turn_finished";
     String START_COLLECT = "start_collect";
+    String COLLECT_FINISHED = "collect_finished";
 }

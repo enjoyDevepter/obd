@@ -121,6 +121,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", sn.toString());
+            jsonObject.put("boxId", getDate().getString("boxId"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

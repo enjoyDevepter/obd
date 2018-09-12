@@ -1,11 +1,14 @@
 package com.mapbar.adas;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
+
+import org.simple.eventbus.EventBus;
 
 @PageSetting(contentViewId = R.layout.collect_two_layout, toHistory = false)
 public class CollectTwoPage extends AppBasePage implements View.OnClickListener {
@@ -38,7 +41,12 @@ public class CollectTwoPage extends AppBasePage implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                PageManager.go(new CollectPage());
+                EventBus.getDefault().post(getDate().getBoolean("matching"), EventBusTags.START_COLLECT);
+                CollectPage collectPage = new CollectPage();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("matching", getDate().getBoolean("matching"));
+                collectPage.setDate(bundle);
+                PageManager.go(collectPage);
                 break;
         }
     }

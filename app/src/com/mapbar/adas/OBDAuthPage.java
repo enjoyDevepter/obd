@@ -168,7 +168,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 break;
             case OBDEvent.UN_ADJUST:
                 dismissProgress();
-                PageManager.go(new CollectGuide());
+                CollectGuide collectGuide = new CollectGuide();
+                Bundle collectBundle = new Bundle();
+                collectBundle.putBoolean("matching", true);
+                collectGuide.setDate(collectBundle);
+                PageManager.go(collectGuide);
                 break;
             case OBDEvent.NORMAL:
                 dismissProgress();
@@ -527,7 +531,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
                                     break;
                                 case 2: // 临时车型，需要采集
-                                    PageManager.go(new CollectGuide());
+                                    CollectGuide collectGuide = new CollectGuide();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putBoolean("matching", false);
+                                    collectGuide.setDate(bundle);
+                                    PageManager.go(collectGuide);
                                     break;
                                 case 3: // 临时车型，参数已采集
                                     dismissProgress();

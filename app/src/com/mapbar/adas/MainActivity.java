@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
+import com.mapbar.adas.utils.AlarmManager;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
@@ -52,19 +53,21 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
     private LocationManager locationManager;
 
-    private double currentSpeed;
+    private int currentSpeed;
 
     private Map<Integer, List<String>> collecData = new HashMap<>();
     private List<String> list20 = new ArrayList();
-    private volatile boolean hasNotify20;
     private List<String> list2060 = new ArrayList();
-    private volatile boolean hasNotify2060;
     private List<String> list60 = new ArrayList();
-    private volatile boolean hasNotify60;
     private long lastLocationTime;
-    private volatile boolean startTrun;
+    private long firstLocationTime;
     private volatile float stratTrunBearing;
     private Timer heartTimer;
+    private volatile double maxSpeed = 0;
+    private boolean mathing;
+    private volatile boolean adjust_success;
+    private boolean notify;
+    private boolean startCollect;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -154,9 +157,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
         setColor(this, Color.parseColor("#FF35BDB2"));
 
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
-
         collecData.put(20, list20);
         collecData.put(2060, list2060);
         collecData.put(60, list60);
@@ -209,26 +209,26 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
     @Subscriber(tag = EventBusTags.START_COLLECT)
-    private void startCollect(int type) {
-        switch (type) {
-            case 0:
-                heartTimer = new Timer();
-                heartTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        BlueManager.getInstance().send(ProtocolUtils.sentHeart());
-                    }
-                }, 1000, 60 * 1000);
-                break;
-            case 1:
-                locationManager.removeUpdates(this);
-                break;
-        }
+    private void startCollect(boolean mathing) {
+        this.mathing = mathing;
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
+        heartTimer = new Timer();
+        heartTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                BlueManager.getInstance().send(ProtocolUtils.sentHeart());
+            }
+        }, 1000, 60 * 1000);
     }
 
-    @Subscriber(tag = EventBusTags.COLLECT_TURN_START_EVENT)
-    private void startTrun(int type) {
-        this.startTrun = true;
+    private void stopCollecct() {
+        if (null != heartTimer) {
+            heartTimer.cancel();
+            heartTimer = null;
+        }
+        BlueManager.getInstance().send(ProtocolUtils.stopCollect());
+        locationManager.removeUpdates(this);
     }
 
     @Override
@@ -283,6 +283,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
                 PageManager.go(new ConnectPage());
                 break;
+            case OBDEvent.ADJUST_SUCCESS:
+                adjust_success = true;
+                break;
             case OBDEvent.COLLECT_DATA:
                 byte[] onePackage = (byte[]) data;
                 if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
@@ -292,22 +295,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     System.arraycopy(onePackage, 0, pack, speed.length, onePackage.length);
                     if (currentSpeed < 20) {
                         list20.add(HexUtils.byte2HexStr(pack));
-                        if (list20.size() >= 60 && !hasNotify20) {
-                            hasNotify20 = true;
-                            EventBus.getDefault().post(0, EventBusTags.COLLECT_DIRECT_EVENT);
-                        }
                     } else if (currentSpeed >= 20 || currentSpeed <= 60) {
                         list2060.add(HexUtils.byte2HexStr(pack));
-                        if (!hasNotify2060) {
-                            hasNotify2060 = true;
-                            EventBus.getDefault().post(1, EventBusTags.COLLECT_DIRECT_EVENT);
-                        }
                     } else {
                         list60.add(HexUtils.byte2HexStr(pack));
-                        if (list60.size() >= 60 && !hasNotify60) {
-                            hasNotify60 = true;
-                            EventBus.getDefault().post(2, EventBusTags.COLLECT_DIRECT_EVENT);
-                        }
                     }
                 }
                 break;
@@ -317,17 +308,65 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     public void onLocationChanged(Location location) {
         if ("gps".equals(location.getProvider())) {
-            lastLocationTime = System.currentTimeMillis();
+            if (firstLocationTime == 0) {
+                firstLocationTime = System.currentTimeMillis();
+            }
+            lastLocationTime = location.getTime();
             currentSpeed = (int) (location.getSpeed() * 3.6);
-            if (startTrun && stratTrunBearing == 0) {
+            maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
+            if (!startCollect && currentSpeed > 20) {
+                startCollect = true;
+                BlueManager.getInstance().send(ProtocolUtils.startCollect());
+            }
+            if (stratTrunBearing == 0) {
                 stratTrunBearing = location.getBearing();
-            } else if (startTrun && stratTrunBearing != 0) {
-                if (location.getBearing() - stratTrunBearing > 40) {
-                    EventBus.getDefault().post(0, EventBusTags.COLLECT_TURN_FINISHED_EVENT);
-                    new Thread(new FileRunnable("Normal2050")).start();
+            } else if (stratTrunBearing != 0) {
+                if (!mathing) {
+                    if (location.getBearing() - stratTrunBearing >= 150) {
+                        stopCollect();
+                    } else {
+                        if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) { // 1分钟内未完成操作播报一次
+                            // 提示请完成掉头操作
+                            AlarmManager.getInstance().play(R.raw.trun);
+                            firstLocationTime = System.currentTimeMillis();
+                        }
+                    }
+                } else {
+                    if (!adjust_success) { // 未校准完成
+                        if (location.getBearing() - stratTrunBearing >= 150 && maxSpeed >= 55) {
+                            stopCollect();
+                        } else {
+                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) { // 1分钟内未完成操作播报一次
+                                if (location.getBearing() - stratTrunBearing < 150) {
+                                    // 提示请完成掉头操作
+                                    AlarmManager.getInstance().play(R.raw.trun);
+                                    firstLocationTime = System.currentTimeMillis();
+                                    return;
+                                }
+                                if (maxSpeed < 55) {
+                                    // 提示请完成加速
+                                    AlarmManager.getInstance().play(R.raw.speed);
+                                    firstLocationTime = System.currentTimeMillis();
+                                    return;
+                                }
+                            }
+                        }
+                    } else {
+                        // 校准完成
+                        if (!notify) { // 未通知
+                            notify = true;
+                            stopCollect();
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private void stopCollect() {
+        stopCollecct();
+        EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
+        new Thread(new FileRunnable("Normal2050")).start();
     }
 
     @Override

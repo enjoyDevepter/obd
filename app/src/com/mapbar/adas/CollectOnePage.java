@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -38,7 +39,11 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                PageManager.go(new CollectTwoPage());
+                CollectTwoPage collectTwoPage = new CollectTwoPage();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("matching", getDate().getBoolean("matching"));
+                collectTwoPage.setDate(bundle);
+                PageManager.go(collectTwoPage);
                 break;
         }
     }
