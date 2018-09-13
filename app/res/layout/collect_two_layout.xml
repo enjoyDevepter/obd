@@ -14,7 +14,6 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:gravity="center_horizontal"
         android:text="如下图所示，先掉头，再直线行驶至磨合完成(完成后会有语音提示)"
         android:textColor="#ff000000"
         android:textSize="20sp" />

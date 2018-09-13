@@ -52,6 +52,12 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
     }
 
     @Override
+    public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
+        return true;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);

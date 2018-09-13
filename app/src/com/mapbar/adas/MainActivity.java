@@ -22,13 +22,17 @@ import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.mapbar.adas.utils.AlarmManager;
+import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
+import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
 
@@ -36,6 +40,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +49,16 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class MainActivity extends AppCompatActivity implements BleCallBackListener, LocationListener {
 
     private static MainActivity INSTANCE = null;
@@ -51,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private ViewGroup rootViewGroup;
     private View splashView;
 
+    private boolean uploadSuccess;
     private LocationManager locationManager;
 
     private int currentSpeed;
@@ -288,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 break;
             case OBDEvent.COLLECT_DATA:
                 byte[] onePackage = (byte[]) data;
-                if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
+//                if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
                     byte[] speed = new byte[]{(byte) currentSpeed};
                     byte[] pack = new byte[speed.length + onePackage.length];
                     System.arraycopy(speed, 0, pack, 0, speed.length);
@@ -300,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     } else {
                         list60.add(HexUtils.byte2HexStr(pack));
                     }
-                }
+//                }
                 break;
         }
     }
@@ -311,19 +327,25 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             if (firstLocationTime == 0) {
                 firstLocationTime = System.currentTimeMillis();
             }
-            lastLocationTime = location.getTime();
+            lastLocationTime = System.currentTimeMillis();
             currentSpeed = (int) (location.getSpeed() * 3.6);
             maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
             if (!startCollect && currentSpeed > 20) {
                 startCollect = true;
+                if (stratTrunBearing == 0) {
+                    stratTrunBearing = location.getBearing();
+                }
+                Log.d("stratTrunBearing " + stratTrunBearing);
                 BlueManager.getInstance().send(ProtocolUtils.startCollect());
             }
-            if (stratTrunBearing == 0) {
-                stratTrunBearing = location.getBearing();
-            } else if (stratTrunBearing != 0) {
+            Log.d("location.getBearing() " + location.getBearing());
+            if (stratTrunBearing != 0 && startCollect) {
                 if (!mathing) {
-                    if (location.getBearing() - stratTrunBearing >= 150) {
-                        stopCollect();
+                    if (Math.abs(location.getBearing() - stratTrunBearing) >= 150 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                        if (!uploadSuccess) {
+                            uploadSuccess = true;
+                            stopCollect();
+                        }
                     } else {
                         if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) { // 1分钟内未完成操作播报一次
                             // 提示请完成掉头操作
@@ -333,11 +355,14 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     }
                 } else {
                     if (!adjust_success) { // 未校准完成
-                        if (location.getBearing() - stratTrunBearing >= 150 && maxSpeed >= 55) {
-                            stopCollect();
+                        if (Math.abs(location.getBearing() - stratTrunBearing) >= 150 && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                            if (!uploadSuccess) {
+                                uploadSuccess = true;
+                                stopCollect();
+                            }
                         } else {
                             if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) { // 1分钟内未完成操作播报一次
-                                if (location.getBearing() - stratTrunBearing < 150) {
+                                if (Math.abs(location.getBearing() - stratTrunBearing) < 150) {
                                     // 提示请完成掉头操作
                                     AlarmManager.getInstance().play(R.raw.trun);
                                     firstLocationTime = System.currentTimeMillis();
@@ -355,7 +380,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         // 校准完成
                         if (!notify) { // 未通知
                             notify = true;
-                            stopCollect();
+                            if (!uploadSuccess) {
+                                uploadSuccess = true;
+                                stopCollect();
+                            }
                         }
                     }
                 }
@@ -382,6 +410,53 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    private void uploadCollectData(String filePath) {
+        FormBody paramsBody = new FormBody.Builder()
+                .add("serialNumber", "L4K8-ZCJ8-RGKY-M5BD")
+                .add("type", "2")
+                .build();
+
+        MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
+        RequestBody fileBody = RequestBody.create(type, new File(filePath));
+
+        RequestBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.ALTERNATIVE)
+                //一样的效果
+                .addPart(Headers.of(
+                        "Content-Disposition",
+                        "form-data; name=\"params\"")
+                        , paramsBody)
+                .addPart(Headers.of(
+                        "Content-Disposition",
+                        "form-data; name=\"file\"; filename=\"plans.xml\"")
+                        , fileBody).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_ERROR_FILE)
+                .post(multipartBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("uploadCollectData onFailure " + e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("uploadCollectData success " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                } catch (JSONException e) {
+                    Log.d("uploadCollectData failure " + e.getMessage());
+                }
+            }
+        });
     }
 
     private class FileRunnable implements Runnable {
@@ -422,6 +497,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     bw.close();
                     fos.close();
                     // 上传
+                    uploadCollectData(file.getPath());
                 } catch (FileNotFoundException e) {
                 }
             } catch (Exception e) {
@@ -429,4 +505,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             }
         }
     }
+
+
 }

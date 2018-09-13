@@ -50,7 +50,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
 
     private volatile boolean showConfirm;
     private volatile int times = 1;
-    private int time = 15;
+    private int time = 3;
     private Timer timer;
     private TimerTask timerTask;
     private volatile OBDStatusInfo obdStatusInfo;
@@ -84,6 +84,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
 
     @Override
     public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
         return true;
     }
 
@@ -91,6 +92,11 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.NO_PARAM: // 删除参数逻辑
+                dismissProgress();
+                if (null != timer) {
+                    timer.cancel();
+                    timer = null;
+                }
                 CollectGuide collectGuide = new CollectGuide();
                 Bundle collectBundle = new Bundle();
                 collectBundle.putBoolean("matching", false);
@@ -101,7 +107,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 obdStatusInfo = (OBDStatusInfo) data;
                 if (!showConfirm) {
                     showConfirm = true;
-                    time = 15;
+                    time = 3;
                     initTimer();
                     timer.schedule(timerTask, 3000, 1000);
                 }
@@ -196,6 +202,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
             case R.id.confirm:
                 if (times >= 2) {
@@ -204,7 +211,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     times++;
                     confirmV.setOnClickListener(null);
                     confirmV.setSelected(false);
-                    time = 15;
+                    time = 3;
                     initTimer();
                     timer.schedule(timerTask, 3000, 1000);
                 }
@@ -232,7 +239,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
         showProgress();
         Request request = new Request.Builder()
-                .url(URLUtils.GET_LISENSE)
+                .url(URLUtils.CLEAR_PARAM)
                 .post(requestBody)
                 .addHeader("content-type", "application/json;charset:utf-8")
                 .build();
@@ -279,13 +286,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                dismissProgress();
-                                BlueManager.getInstance().send(ProtocolUtils.cleanParams());
-                            }
-                        });
+                        BlueManager.getInstance().send(ProtocolUtils.cleanParams());
                     }
                 } catch (JSONException e) {
                     Log.d("cleanParams failure " + e.getMessage());

@@ -123,7 +123,8 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
+                final String responese = response.body().string();
+
                 Log.d("activate success " + responese);
                 try {
                     final JSONObject result = new JSONObject(responese);
@@ -249,18 +250,24 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
+                final String responese = response.body().string();
                 Log.d("activate success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        PageManager.clearHistoryAndGo(new OBDAuthPage());
-                    } else {
-                        Log.d("activate failure");
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dismissProgress();
+                        try {
+                            final JSONObject result = new JSONObject(responese);
+                            if ("000".equals(result.optString("status"))) {
+                                PageManager.clearHistoryAndGo(new OBDAuthPage());
+                            } else {
+                                Log.d("activate failure");
+                            }
+                        } catch (JSONException e) {
+                            Log.d("activate failure " + e.getMessage());
+                        }
                     }
-                } catch (JSONException e) {
-                    Log.d("activate failure " + e.getMessage());
-                }
+                });
             }
         });
     }
@@ -269,6 +276,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
         }
     }

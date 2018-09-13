@@ -744,7 +744,7 @@ public class BlueManager {
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
-            } else if (content[0] == 89) {
+            } else if (content[0] == 9) {
                 if (content[1] == 01) { // 采集数据
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
@@ -1123,7 +1123,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("OBDEvent.NORMAL");
+                            Log.d("OBDEvent.COLLECT_DATA");
                             notifyBleCallBackListener(OBDEvent.COLLECT_DATA, bundle.getByteArray("status"));
                         }
                     });

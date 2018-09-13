@@ -13,6 +13,8 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -98,6 +100,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
                 break;
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
         }
     }

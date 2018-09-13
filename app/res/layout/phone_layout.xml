@@ -17,6 +17,7 @@
         android:hint="请输入手机号码"
         android:inputType="number"
         android:paddingLeft="10dp"
+        android:text="15910894990"
         android:textSize="17sp" />
 
     <TextView

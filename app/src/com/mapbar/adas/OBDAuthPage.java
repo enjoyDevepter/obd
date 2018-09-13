@@ -480,6 +480,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
             case R.id.close:
                 PageManager.finishActivity(MainActivity.getInstance());

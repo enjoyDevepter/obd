@@ -9,6 +9,7 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -69,6 +70,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
                 BlueManager.getInstance().startScan();
                 break;
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
 
         }

@@ -236,6 +236,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 BlueManager.getInstance().send(ProtocolUtils.study());
                 break;
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
         }
     }

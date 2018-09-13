@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 @PageSetting(contentViewId = R.layout.confirm_car_layout)
@@ -47,6 +49,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
                 PageManager.back();
                 break;
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
             case R.id.next:
                 OBDActivatePage page = new OBDActivatePage();

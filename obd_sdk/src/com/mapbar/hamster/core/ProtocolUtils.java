@@ -63,7 +63,7 @@ public class ProtocolUtils {
      * @return
      */
     public static byte[] checkMatchingStatus() {
-        Log.d("Protocol getVersion ===");
+        Log.d("Protocol checkMatchingStatus ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_01;
@@ -224,7 +224,7 @@ public class ProtocolUtils {
         Log.d("Protocol sentHeart ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
-        result[1] = 0x3E;
+        result[1] = 62;
         result[2] = 00;
         result[3] = 0;
         result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
@@ -323,14 +323,24 @@ public class ProtocolUtils {
         return result;
     }
 
-
+    public static byte[] reset() {
+        Log.d("Protocol reset ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x86;
+        result[2] = 17;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
     /**
      * 清除参数
      *
      * @return
      */
     public static byte[] cleanParams() {
-        Log.d("Protocol idling ===");
+        Log.d("Protocol cleanParams ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x85;

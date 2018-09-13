@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by guomin on 2018/6/3.
  */
 
-public class CarInfo implements Comparable<CarInfo> {
+public class CarBrand implements Comparable<CarBrand> {
 
     private String letter;
     private String name;
@@ -18,7 +18,6 @@ public class CarInfo implements Comparable<CarInfo> {
     private String sortLetters;         // sort
     private String id;
     private boolean choice;
-
 
 
     public String getLetter() {
@@ -77,14 +76,6 @@ public class CarInfo implements Comparable<CarInfo> {
         this.choice = choice;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Override
     public String toString() {
         return "CarInfo{" +
@@ -94,13 +85,11 @@ public class CarInfo implements Comparable<CarInfo> {
                 ", rawName='" + rawName + '\'' +
                 ", pinyinName='" + pinyinName + '\'' +
                 ", sortLetters='" + sortLetters + '\'' +
-                ", id='" + id + '\'' +
-                ", choice=" + choice +
                 '}';
     }
 
     @Override
-    public int compareTo(@NonNull CarInfo another) {
+    public int compareTo(@NonNull CarBrand another) {
         if (sortLetters.startsWith("#")) {
             return 1;
         } else if (another.getSortLetters().startsWith("#")) {

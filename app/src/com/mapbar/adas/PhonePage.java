@@ -11,6 +11,8 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -67,9 +69,17 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                getMSN();
+                IdentifyPage page = new IdentifyPage();
+                Bundle bundle = new Bundle();
+                bundle.putString("boxId", getDate().getString("boxId"));
+                bundle.putString("sn", getDate().getString("sn"));
+                bundle.putString("phone", content.getText().toString());
+                page.setDate(bundle);
+                PageManager.go(page);
+//                getMSN();
                 break;
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
         }
     }
@@ -141,7 +151,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                Log.d(responese);
+                Log.d("get MSN " + responese);
                 try {
                     dismissProgress();
                     final JSONObject result = new JSONObject(responese);

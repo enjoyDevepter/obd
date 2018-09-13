@@ -16,19 +16,22 @@ import com.mapbar.adas.utils.CarHelper;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
-import com.mapbar.adas.view.IndexSideBar;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.core.ProtocolUtils;
+import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.choice_car_layout)
@@ -36,11 +39,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.brand)
     ListView listView;
-    @ViewInject(R.id.index_letter)
-    IndexSideBar indexSideBar;
     @ViewInject(R.id.expandablelistView)
     ExpandableListView expandableListView;
-    String carName = "";
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.next)
@@ -53,6 +53,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     private CarBrandExpandableListAdapter carBrandExpandableListAdapter;
     private List<CarInfo> carInfos;
     private CustomDialog dialog;
+    private String carId;
+    private String carName = "";
 
     @Override
     public void onResume() {
@@ -61,7 +63,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
         next.setOnClickListener(this);
         reportV.setOnClickListener(this);
         back.setOnClickListener(this);
-        getCar();
+        getCarBrands();
     }
 
     @Override
@@ -69,9 +71,19 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
         super.onStop();
     }
 
-    private void getCar() {
-        showProgress();
-        final Request request = new Request.Builder().url(URLUtils.GET_CAR_BRAND).build();
+    private void getCarBrands() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", "");
+            jsonObject.put("type", "1");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("getCarBrands input " + jsonObject.toString());
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        final Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.GET_CAR_BRAND).post(requestBody).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -79,7 +91,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -94,7 +105,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                                                 dialog.dismiss();
                                                 showProgress();
                                                 confirm.setEnabled(false);
-                                                getCar();
+                                                getCarBrands();
                                             }
                                         });
                                     }
@@ -111,9 +122,9 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(final Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                dismissProgress();
+                Log.d("getCarBrands success " + responese);
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
@@ -121,7 +132,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                show(carInfos);
+                                showBrands(carInfos);
+                                getCarModelForBrands(carInfos.get(0).getId());
                             }
                         });
                     } else {
@@ -140,60 +152,89 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
     }
 
-    private void show(List<CarInfo> result) {
 
-        final List<CarInfo> carInfos = CarHelper.setupContactInfoList(result);
-
-        // 设置侧边栏中的字母索引
-        List<String> mLetterIndexList = CarHelper.setupLetterIndexList(carInfos);
-        indexSideBar.setLetterIndexList(mLetterIndexList, false);
-
-        // 设置联系人列表的信息
-        carInfos.get(0).setChoice(true);
-        carAdapter = new CarAdapter(getContext(), carInfos);
-        listView.setAdapter(carAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void getCarModelForBrands(final String id) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", id);
+            jsonObject.put("type", "2");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("getCarModelForBrands input " + jsonObject.toString());
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        final Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.GET_CAR_BRAND).post(requestBody).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ArrayList<CarModel> models = carInfos.get(position).getModels();
-
-                for (CarModel model : models) {
-                    for (CarStyle carStyle : model.getStyles()) {
-                        carStyle.setChoice(false);
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Log.d("getCarModelForBrands failure " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                showProgress();
+                                                getCarModelForBrands(id);
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
                     }
-                }
+                });
 
-                for (int i = 0; i < carInfos.size(); i++) {
-                    if (i != position) {
-                        carInfos.get(i).setChoice(false);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("getCarModelForBrands success " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        carInfos = JSON.parseArray(result.optString("brands"), CarInfo.class);
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                showModle(carInfos);
+                            }
+                        });
                     } else {
-                        carInfos.get(i).setChoice(!carInfos.get(i).isChoice());
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
-                carAdapter.notifyDataSetChanged();
-                carBrandExpandableListAdapter.setCarModels(models);
-                carBrandExpandableListAdapter.notifyDataSetChanged();
             }
         });
 
-        // 设置侧边栏的触摸事件监听
-        indexSideBar.setOnTouchLetterListener(new IndexSideBar.OnTouchLetterListener() {
-            @Override
-            public void onTouchingLetterListener(String letter) {
-                int position = carAdapter.getPositionForSection(letter.charAt(0));
-                if (position != -1) {
-                    listView.setSelection(position);     // jump to the specified position
-                }
-            }
+    }
 
-            @Override
-            public void onTouchedLetterListener() {
-            }
-        });
-
-        carBrandExpandableListAdapter = new CarBrandExpandableListAdapter(carInfos.get(0).getModels());
+    private void showModle(List<CarInfo> result) {
+        carBrandExpandableListAdapter = new CarBrandExpandableListAdapter(result.get(0).getModels());
         expandableListView.setAdapter(carBrandExpandableListAdapter);
         expandableListView.setDivider(new ColorDrawable(0xfff8f9fa));
         expandableListView.setChildDivider(new ColorDrawable(0xfff));
@@ -225,8 +266,38 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                         style.setChoice(false);
                     }
                 }
+                carId = carStyle.getId();
+                carName = carModel.getName() + " " + carStyle.getName();
                 carBrandExpandableListAdapter.notifyDataSetChanged();
                 return true;
+            }
+        });
+    }
+
+    private void showBrands(List<CarInfo> result) {
+
+        final List<CarInfo> carInfos = CarHelper.setupContactInfoList(result);
+
+        // 设置联系人列表的信息
+        carInfos.get(0).setChoice(true);
+        carAdapter = new CarAdapter(getContext(), carInfos);
+        listView.setAdapter(carAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getCarModelForBrands(carInfos.get(position).getId());
+                for (int i = 0; i < carInfos.size(); i++) {
+                    if (i != position) {
+                        carInfos.get(i).setChoice(false);
+                    } else {
+                        carInfos.get(i).setChoice(!carInfos.get(i).isChoice());
+                    }
+                }
+                carId = "";
+                carName = "";
+
+                carAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -241,6 +312,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 activate();
                 break;
             case R.id.report:
+                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
         }
     }
@@ -248,21 +320,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     private void activate() {
         if (null == carInfos) {
             return;
-        }
-
-        String carId = "";
-
-        for (CarInfo carInfo : carInfos) {
-            if (carInfo.isChoice()) {
-                for (CarModel carModel : carInfo.getModels()) {
-                    for (CarStyle carStyle : carModel.getStyles()) {
-                        if (carStyle.isChoice()) {
-                            carId = carStyle.getId();
-                            carName = carModel.getName() + "  " + carStyle.getName();
-                        }
-                    }
-                }
-            }
         }
 
         if (GlobalUtil.isEmpty(carId)) {
