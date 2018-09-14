@@ -1,6 +1,7 @@
 package com.mapbar.hamster;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by guomin on 2018/3/7.
@@ -14,6 +15,15 @@ public class OBDStatusInfo implements Serializable {
     private int sensitive;
     private boolean berforeMatching;
     private boolean currentMatching;
+    private byte[] orginal;
+
+    public byte[] getOrginal() {
+        return orginal;
+    }
+
+    public void setOrginal(byte[] orginal) {
+        this.orginal = orginal;
+    }
 
     public String getSn() {
         return sn;
@@ -81,6 +91,7 @@ public class OBDStatusInfo implements Serializable {
                 ", sensitive=" + sensitive +
                 ", berforeMatching=" + berforeMatching +
                 ", currentMatching=" + currentMatching +
+                ", orginal=" + Arrays.toString(orginal) +
                 '}';
     }
 }

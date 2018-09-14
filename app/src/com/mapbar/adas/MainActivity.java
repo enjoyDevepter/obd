@@ -26,6 +26,7 @@ import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
@@ -65,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;
-
     private boolean uploadSuccess;
     private LocationManager locationManager;
 
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private volatile boolean adjust_success;
     private boolean notify;
     private boolean startCollect;
+    private OBDStatusInfo obdStatusInfo;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -299,26 +300,75 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
                 PageManager.go(new ConnectPage());
                 break;
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+            case OBDEvent.STATUS_UPDATA:
+                obdStatusInfo = (OBDStatusInfo) data;
+                updateStatusInfo(obdStatusInfo);
+                break;
             case OBDEvent.ADJUST_SUCCESS:
                 adjust_success = true;
                 break;
             case OBDEvent.COLLECT_DATA:
                 byte[] onePackage = (byte[]) data;
-//                if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
-                    byte[] speed = new byte[]{(byte) currentSpeed};
-                    byte[] pack = new byte[speed.length + onePackage.length];
-                    System.arraycopy(speed, 0, pack, 0, speed.length);
-                    System.arraycopy(onePackage, 0, pack, speed.length, onePackage.length);
-                    if (currentSpeed < 20) {
-                        list20.add(HexUtils.byte2HexStr(pack));
-                    } else if (currentSpeed >= 20 || currentSpeed <= 60) {
-                        list2060.add(HexUtils.byte2HexStr(pack));
-                    } else {
-                        list60.add(HexUtils.byte2HexStr(pack));
-                    }
-//                }
+                if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
+                    return;
+                }
+                byte[] speed = new byte[]{(byte) currentSpeed};
+                byte[] pack = new byte[speed.length + onePackage.length];
+                System.arraycopy(speed, 0, pack, 0, speed.length);
+                System.arraycopy(onePackage, 0, pack, speed.length, onePackage.length);
+                if (currentSpeed < 20) {
+                    list20.add(HexUtils.byte2HexStr(pack));
+                } else if (currentSpeed >= 20 || currentSpeed <= 60) {
+                    list2060.add(HexUtils.byte2HexStr(pack));
+                } else {
+                    list60.add(HexUtils.byte2HexStr(pack));
+                }
                 break;
         }
+    }
+
+    /**
+     * 上传状态信息
+     *
+     * @param obdStatusInfo
+     */
+    private void updateStatusInfo(OBDStatusInfo obdStatusInfo) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bState", HexUtils.formatHexString(obdStatusInfo.getOrginal()));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("update_tire input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_TIRE)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("update_tire failure " + e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("update_tire success " + responese);
+            }
+        });
+
     }
 
     @Override
@@ -341,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             Log.d("location.getBearing() " + location.getBearing());
             if (stratTrunBearing != 0 && startCollect) {
                 if (!mathing) {
-                    if (Math.abs(location.getBearing() - stratTrunBearing) >= 150 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                    if (Math.abs(location.getBearing() - stratTrunBearing) >= 150 && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                         if (!uploadSuccess) {
                             uploadSuccess = true;
                             stopCollect();
@@ -351,6 +401,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                             // 提示请完成掉头操作
                             AlarmManager.getInstance().play(R.raw.trun);
                             firstLocationTime = System.currentTimeMillis();
+                        }
+                        if (maxSpeed < 55) {
+                            // 提示请完成加速
+                            AlarmManager.getInstance().play(R.raw.speed);
+                            firstLocationTime = System.currentTimeMillis();
+                            return;
                         }
                     }
                 } else {
@@ -414,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
     private void uploadCollectData(String filePath) {
         FormBody paramsBody = new FormBody.Builder()
-                .add("serialNumber", "L4K8-ZCJ8-RGKY-M5BD")
+                .add("serialNumber", obdStatusInfo.getSn())
                 .add("type", "2")
                 .build();
 
@@ -430,13 +486,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         , paramsBody)
                 .addPart(Headers.of(
                         "Content-Disposition",
-                        "form-data; name=\"file\"; filename=\"plans.xml\"")
+                        "form-data; name=\"file\"; filename=\"Normal2050\"")
                         , fileBody).build();
 
         Request request = new Request.Builder()
                 .url(URLUtils.UPDATE_ERROR_FILE)
                 .post(multipartBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
                 .build();
 
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {

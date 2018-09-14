@@ -80,6 +80,8 @@ public class OBDEvent {
      * 未注册
      */
     public static final int UNREGISTERED = 100; //未注册
+
+    public static final int STATUS_UPDATA = 101; // 状态上传
     /**
      * 未授权或者授权过期
      */

@@ -576,61 +576,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 rightTop.setBackgroundResource(R.drawable.t_nromal);
                 rightButtom.setBackgroundResource(R.drawable.t_nromal);
             }
-
-//            }
-//            switch (status[snBytes.length + 1]) {
-//                case 1:
-//                    type = LOW;
-//                    break;
-//                case 2:
-//                    type = SensitiveView.Type.MEDIUM;
-//                    break;
-//                case 3:
-//                    type = HIGHT;
-//                    break;
-//            }
-//            // 验证是否已经学习完成,并播报语音
-//            String studyStutus = HexUtils.formatHexString(Arrays.copyOfRange(status, snBytes.length + 2, snBytes.length + 2 + 24));
-//            if (GlobalUtil.isEmpty(STUDYSTATUS.get())) {
-//                STUDYSTATUS.set(studyStutus);
-//            } else {
-//                if (!studyStutus.equals(STUDYSTATUS.get())) {
-//                    STUDYSTATUS.set(studyStutus);
-//                    AlarmManager.getInstance().play(R.raw.finish);
-//                }
-//            }
-//
-//            if (bytes[1] == 1) {
-//                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-//                        .setViewListener(new CustomDialog.ViewListener() {
-//                            @Override
-//                            public void bindView(View view) {
-//                                ((TextView) (view.findViewById(R.id.confirm))).setText("确定");
-//                                ((TextView) (view.findViewById(R.id.info))).setText("应用升级未完成，请确认网络链接正常!");
-//                                ((TextView) (view.findViewById(R.id.title))).setText("升级中断");
-//                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(View v) {
-//                                        dialog.dismiss();
-//                                        // 获取OBD版本信息，请求服务器是否有更新
-//                                        BlueManager.getInstance().send(ProtocolUtils.getVersion());
-//                                    }
-//                                });
-//                            }
-//                        })
-//                        .setLayoutRes(R.layout.dailog_common_warm)
-//                        .setCancelOutside(false)
-//                        .setDimAmount(0.5f)
-//                        .isCenter(true)
-//                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-//                        .show();
-//            } else {
-//                if (checkVersion) {
-//                    // 获取OBD版本信息，请求服务器是否有更新
-//                    BlueManager.getInstance().send(ProtocolUtils.getVersion());
-//                }
-//            }
-
         } else {
             Log.d(" status error " + status.length);
         }
@@ -647,7 +592,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", obdStatusInfo.getSn());
-            jsonObject.put("status", HexUtils.formatHexString(tire));
+            jsonObject.put("pState", HexUtils.formatHexString(tire));
         } catch (JSONException e) {
             e.printStackTrace();
         }

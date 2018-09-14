@@ -48,6 +48,7 @@ public class BlueManager {
 
 
     private static final int MSG_ERROR = 20; // 错误
+    private static final int MSG_STATUS_UPDATA = 21; // 状态信息上传
     private static final int MSG_UNREGISTERED = 30; //未注册
     private static final int MSG_AUTHORIZATION = 40; //未授权或者授权过期
     private static final int MSG_AUTHORIZATION_SUCCESS = 41; //授权成功
@@ -588,6 +589,15 @@ public class BlueManager {
                     obdStatusInfo.setSensitive((content[11] & 0xff));
                     obdStatusInfo.setCurrentMatching(content[7] == 01);
                     obdStatusInfo.setBerforeMatching(content[8] == 01);
+
+                    if (content[content.length - 1] == 1) {
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
+                        message.what = MSG_STATUS_UPDATA;
+                        mHandler.sendMessage(message);
+                    }
 //                    Message message = mHandler.obtainMessage();
 //                    Bundle bundle = new Bundle();
 //                    bundle.putSerializable("obd_status_info", obdStatusInfo);
@@ -990,6 +1000,15 @@ public class BlueManager {
                         @Override
                         public void run() {
                             notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
+                        }
+                    });
+                    break;
+                case MSG_STATUS_UPDATA:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.STATUS_UPDATA");
+                            notifyBleCallBackListener(OBDEvent.STATUS_UPDATA, bundle.getSerializable("obd_status_info"));
                         }
                     });
                     break;
