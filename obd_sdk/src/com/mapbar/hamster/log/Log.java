@@ -1,5 +1,7 @@
 package com.mapbar.hamster.log;
 
+import android.os.Environment;
+
 import timber.log.Timber;
 
 /**
@@ -12,7 +14,7 @@ public class Log {
 
     static {
         Timber.plant(new Timber.DebugTree());
-//        Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + "/obd"));
+        Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + "/obd"));
     }
 
     public static void d(String message) {

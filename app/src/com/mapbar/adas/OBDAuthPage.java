@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,11 +27,14 @@ import com.miyuan.obd.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -38,6 +42,7 @@ import okhttp3.Response;
 @PageSetting(contentViewId = R.layout.obd_auth_layout, toHistory = false)
 public class OBDAuthPage extends AppBasePage implements BleCallBackListener, LocationListener, View.OnClickListener {
 
+    OBDStatusInfo obdStatusInfo;
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.back)
@@ -50,9 +55,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     private View closeV;
     private volatile boolean verified;
     private CustomDialog dialog;
-
     private LocationManager locationManager;
-
     private volatile boolean needNotifyParamsSuccess;
     private volatile boolean needNotifyVerifiedSuccess;
 
@@ -125,7 +128,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             case OBDEvent.UNREGISTERED://未注册
                 dismissProgress();
 //                // 激活
-                OBDStatusInfo obdStatusInfo = (OBDStatusInfo) data;
+                obdStatusInfo = (OBDStatusInfo) data;
                 Log.d("obdStatusInfo  " + obdStatusInfo);
                 OBDInitPage obdInitPage = new OBDInitPage();
                 Bundle bundle = new Bundle();
@@ -134,19 +137,23 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 PageManager.go(obdInitPage);
                 break;
             case OBDEvent.AUTHORIZATION: //未授权或者授权过期
+                obdStatusInfo = (OBDStatusInfo) data;
                 // 获取授权码
-                getLisense(((OBDStatusInfo) data).getSn());
+                getLisense();
                 break;
             case OBDEvent.AUTHORIZATION_SUCCESS:
-                authSuccess((OBDStatusInfo) data);
+                obdStatusInfo = (OBDStatusInfo) data;
+                authSuccess();
                 break;
             case OBDEvent.AUTHORIZATION_FAIL:
                 authFail("授权失败!请联系客服!");
             case OBDEvent.NO_PARAM: // 无参数
-                checkOBDVersion((OBDStatusInfo) data);
+                obdStatusInfo = (OBDStatusInfo) data;
+                checkOBDVersion();
                 break;
             case OBDEvent.PARAM_UPDATE_SUCCESS:
-                notifyUpdateSuccess((OBDStatusInfo) data);
+                obdStatusInfo = (OBDStatusInfo) data;
+                notifyUpdateSuccess();
                 break;
             case OBDEvent.PARAM_UPDATE_FAIL:
                 break;
@@ -171,6 +178,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 CollectGuide collectGuide = new CollectGuide();
                 Bundle collectBundle = new Bundle();
                 collectBundle.putBoolean("matching", true);
+                collectBundle.putString("sn", obdStatusInfo.getSn());
                 collectGuide.setDate(collectBundle);
                 PageManager.go(collectGuide);
                 break;
@@ -188,14 +196,12 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
 
     /**
      * 获取授权码
-     *
-     * @param sn
      */
-    private void getLisense(final String sn) {
+    private void getLisense() {
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn);
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -231,7 +237,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                                 dialog.dismiss();
                                                 showProgress();
                                                 confirm.setEnabled(false);
-                                                getLisense(sn);
+                                                getLisense();
                                             }
                                         });
                                     }
@@ -255,7 +261,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     if ("000".equals(result.optString("status"))) {
                         needNotifyVerifiedSuccess = true;
                         String code = result.optString("rightStr");
-                        BlueManager.getInstance().send(ProtocolUtils.auth(sn, code));
+                        BlueManager.getInstance().send(ProtocolUtils.auth(obdStatusInfo.getSn(), code));
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
@@ -313,7 +319,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     /**
      * 激活成功
      */
-    private void authSuccess(final OBDStatusInfo obdStatusInfo) {
+    private void authSuccess() {
 
         if (!needNotifyVerifiedSuccess) {
             return;
@@ -358,7 +364,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                                 dialog.dismiss();
                                                 showProgress();
                                                 confirm.setEnabled(false);
-                                                authSuccess(obdStatusInfo);
+                                                authSuccess();
                                             }
                                         });
                                     }
@@ -395,7 +401,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     /**
      * 通知服务器固件升级完成
      */
-    private void notifyUpdateSuccess(OBDStatusInfo obdStatusInfo) {
+    private void notifyUpdateSuccess() {
         if (!needNotifyParamsSuccess) {
             return;
         }
@@ -480,7 +486,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
-                BlueManager.getInstance().send(ProtocolUtils.reset());
+                uploadLog();
                 break;
             case R.id.close:
                 PageManager.finishActivity(MainActivity.getInstance());
@@ -488,7 +494,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         }
     }
 
-    private void checkOBDVersion(final OBDStatusInfo obdStatusInfo) {
+    private void checkOBDVersion() {
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -535,6 +541,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     CollectGuide collectGuide = new CollectGuide();
                                     Bundle bundle = new Bundle();
                                     bundle.putBoolean("matching", false);
+                                    bundle.putString("sn", obdStatusInfo.getSn());
                                     collectGuide.setDate(bundle);
                                     PageManager.go(collectGuide);
                                     break;
@@ -557,4 +564,48 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             }
         });
     }
+
+
+    private void uploadLog() {
+        Log.d("OBDAuthPage uploadLog ");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File[] logs = dir.listFiles();
+
+        if (null != logs && logs.length > 0) {
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
+                    .addPart(MultipartBody.Part.createFormData("type", "1"));
+            for (File file : logs) {
+                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            }
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_ERROR_FILE)
+                    .post(builder.build())
+                    .build();
+
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("OBDAuthPage uploadLog onFailure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("OBDAuthPage uploadLog success " + responese);
+                    try {
+                        final JSONObject result = new JSONObject(responese);
+                        if ("000".equals(result.optString("status"))) {
+                            for (File delete : logs) {
+                                delete.delete();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.d("OBDAuthPage uploadLog failure " + e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
 }

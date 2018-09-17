@@ -13,7 +13,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="请您检测并确保胎压正常，且四个轮胎胎压相同!"
+        android:text="请您按提示，进行深度校准。\n首次使用必须深度校准，否则会误报或者漏报!\n\n第一步：请停车拉手刹！\n（自动挡挂P档、并拉手刹；手动挡挂空挡、并拉手刹）\n\n第二步：请将车辆打火！\n请将车辆打火！！"
         android:textColor="#FF000000"
         android:textSize="20sp" />
 
@@ -29,7 +29,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/buttom_bg"
         android:gravity="center"
-        android:text="确认四个轮胎胎压相同"
+        android:text="确认已拉手刹、并打火"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
 

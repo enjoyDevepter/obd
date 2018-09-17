@@ -2,6 +2,7 @@ package com.mapbar.adas;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
@@ -16,20 +17,21 @@ import com.mapbar.adas.utils.CarHelper;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
-import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -312,8 +314,50 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 activate();
                 break;
             case R.id.report:
-                BlueManager.getInstance().send(ProtocolUtils.reset());
+                uploadLog();
                 break;
+        }
+    }
+
+    private void uploadLog() {
+        Log.d("ChoiceCarPage uploadLog ");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File[] logs = dir.listFiles();
+
+        if (null != logs && logs.length > 0) {
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", getDate().getString("sn")))
+                    .addPart(MultipartBody.Part.createFormData("type", "1"));
+            for (File file : logs) {
+                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            }
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_ERROR_FILE)
+                    .post(builder.build())
+                    .build();
+
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("ChoiceCarPage uploadLog onFailure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("ChoiceCarPage uploadLog success " + responese);
+                    try {
+                        final JSONObject result = new JSONObject(responese);
+                        if ("000".equals(result.optString("status"))) {
+                            for (File delete : logs) {
+                                delete.delete();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.d("ChoiceCarPage uploadLog failure " + e.getMessage());
+                    }
+                }
+            });
         }
     }
 

@@ -13,7 +13,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="即将开始...\n\n1、请不要离开车辆，否则蓝牙会断卡！\n2、请打开网络，确保网络连接正常！"
+        android:text="第一步：请停车拉手刹!（自动挡挂P档、并拉手刹；手动挡挂空挡、并拉手刹）\n\第二步：请将车辆打火！\n请将车辆打火！！\n\n请确认完成操作后再点击确认按钮！"
         android:textColor="#FF35a59c"
         android:textSize="20sp" />
 
@@ -30,7 +30,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/buttom_bg"
         android:gravity="center"
-        android:text="我知道了"
+        android:text="确认已拉手刹、并打火"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
 

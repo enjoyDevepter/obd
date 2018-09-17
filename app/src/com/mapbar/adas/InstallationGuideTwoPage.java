@@ -6,36 +6,33 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-@PageSetting(contentViewId = R.layout.collect_guide_layout)
-public class CollectGuide extends AppBasePage implements View.OnClickListener {
+@PageSetting(contentViewId = R.layout.installation_guide_two_layout)
+public class InstallationGuideTwoPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
+    @ViewInject(R.id.confirm)
+    private TextView confirmV;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
-    @ViewInject(R.id.confirm)
-    private TextView confirmV;
     private Timer timer;
     private TimerTask timerTask;
-    private int time = 10;
+    private int time = 15;
+
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("深度校准准备");
-        back.setVisibility(View.GONE);
-        confirmV.setOnClickListener(this);
-        reportV.setOnClickListener(this);
+        title.setText("安装引导一");
+        back.setOnClickListener(this);
         confirmV.setSelected(false);
-        back.setVisibility(View.GONE);
+        reportV.setVisibility(View.GONE);
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -47,11 +44,11 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                             timer = null;
                             timerTask.cancel();
                             timerTask = null;
-                            confirmV.setText("确认已拉手刹、并打火");
+                            confirmV.setText("我已准备好了");
                             confirmV.setSelected(true);
-                            confirmV.setOnClickListener(CollectGuide.this);
+                            confirmV.setOnClickListener(InstallationGuideTwoPage.this);
                         } else {
-                            confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
+                            confirmV.setText("我已准备好了(" + time + "s)");
                         }
                         time--;
                     }
@@ -80,15 +77,17 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.back:
+                PageManager.back();
+                break;
             case R.id.confirm:
-                BlueManager.getInstance().send(ProtocolUtils.idling());
-                CollectOnePage collectOnePage = new CollectOnePage();
+                AuthPage authPage = new AuthPage();
                 Bundle bundle = new Bundle();
-                bundle.putBoolean("matching", getDate().getBoolean("matching"));
-                bundle.putString("sn", getDate().getString("sn"));
-                collectOnePage.setDate(bundle);
-                PageManager.go(collectOnePage);
+                bundle.putString("boxId", getDate().getString("boxId"));
+                authPage.setDate(bundle);
+                PageManager.go(authPage);
                 break;
         }
     }
+
 }

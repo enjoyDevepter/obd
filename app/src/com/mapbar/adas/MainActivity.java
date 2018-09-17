@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -71,13 +72,18 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
     private int currentSpeed;
 
+    /**
+     * 航向集合
+     */
+    private LinkedList<Float> bears = new LinkedList<>();
+
     private Map<Integer, List<String>> collecData = new HashMap<>();
     private List<String> list20 = new ArrayList();
     private List<String> list2060 = new ArrayList();
     private List<String> list60 = new ArrayList();
+    private List<String> locationList = new ArrayList<>();
     private long lastLocationTime;
     private long firstLocationTime;
-    private volatile float stratTrunBearing;
     private Timer heartTimer;
     private volatile double maxSpeed = 0;
     private boolean mathing;
@@ -85,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private boolean notify;
     private boolean startCollect;
     private OBDStatusInfo obdStatusInfo;
+    private StringBuilder sb = new StringBuilder();
+    private volatile boolean hasTrun = false;
+    private long startTime;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -191,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         }
         setFirst(false);
         BlueManager.getInstance().addBleCallBackListener(this);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
     }
 
     @Override
@@ -228,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Subscriber(tag = EventBusTags.START_COLLECT)
     private void startCollect(boolean mathing) {
         this.mathing = mathing;
+        startTime = System.currentTimeMillis();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
         heartTimer = new Timer();
@@ -240,12 +252,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
     private void stopCollecct() {
+        locationManager.removeUpdates(this);
         if (null != heartTimer) {
             heartTimer.cancel();
             heartTimer = null;
         }
         BlueManager.getInstance().send(ProtocolUtils.stopCollect());
-        locationManager.removeUpdates(this);
     }
 
     @Override
@@ -316,9 +328,11 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     return;
                 }
                 byte[] speed = new byte[]{(byte) currentSpeed};
-                byte[] pack = new byte[speed.length + onePackage.length];
+                byte[] time = HexUtils.longToByte(lastLocationTime);
+                byte[] pack = new byte[speed.length + time.length + onePackage.length];
                 System.arraycopy(speed, 0, pack, 0, speed.length);
-                System.arraycopy(onePackage, 0, pack, speed.length, onePackage.length);
+                System.arraycopy(time, 0, pack, speed.length, time.length);
+                System.arraycopy(onePackage, 0, pack, speed.length + time.length, onePackage.length);
                 if (currentSpeed < 20) {
                     list20.add(HexUtils.byte2HexStr(pack));
                 } else if (currentSpeed >= 20 || currentSpeed <= 60) {
@@ -337,6 +351,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
      */
     private void updateStatusInfo(OBDStatusInfo obdStatusInfo) {
 
+        if ("0000000000000000000".equals(obdStatusInfo.getSn())) {
+            return;
+        }
+
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", obdStatusInfo.getSn());
@@ -345,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             e.printStackTrace();
         }
 
-        Log.d("update_tire input " + jsonObject.toString());
+        Log.d("updateStatusInfo input " + jsonObject.toString());
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
@@ -358,14 +376,14 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d("update_tire failure " + e.getMessage());
+                Log.d("updateStatusInfo failure " + e.getMessage());
 
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                Log.d("update_tire success " + responese);
+                Log.d("updateStatusInfo success " + responese);
             }
         });
 
@@ -380,51 +398,77 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             lastLocationTime = System.currentTimeMillis();
             currentSpeed = (int) (location.getSpeed() * 3.6);
             maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
-            if (!startCollect && currentSpeed > 20) {
+            if (!startCollect && currentSpeed > 15) {
                 startCollect = true;
-                if (stratTrunBearing == 0) {
-                    stratTrunBearing = location.getBearing();
-                }
-                Log.d("stratTrunBearing " + stratTrunBearing);
                 BlueManager.getInstance().send(ProtocolUtils.startCollect());
             }
-            Log.d("location.getBearing() " + location.getBearing());
-            if (stratTrunBearing != 0 && startCollect) {
+            sb = new StringBuilder();
+            sb.append(location.getTime()).append("#")
+                    .append(location.getSpeed()).append("#")
+                    .append(currentSpeed).append("#")
+                    .append(location.getLongitude()).append("#")
+                    .append(location.getLatitude()).append("#");
+            locationList.add(sb.toString());
+            Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
+
+            if (!startCollect && System.currentTimeMillis() - startTime > 2 * 1000 * 60) {
+                AlarmManager.getInstance().play(R.raw.speed_20);
+                startTime = System.currentTimeMillis();
+            }
+
+            if (startCollect) {
+                if (currentSpeed > 15) {
+                    if (bears.size() > 20) {
+                        bears.peekFirst();
+                    }
+                    bears.addLast(location.getBearing());
+                }
+                if (!hasTrun) {
+                    if (hasTurn()) {
+                        hasTrun = true;
+                    }
+                }
+
                 if (!mathing) {
-                    if (Math.abs(location.getBearing() - stratTrunBearing) >= 150 && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                    if (hasTrun && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                         if (!uploadSuccess) {
                             uploadSuccess = true;
                             stopCollect();
                         }
                     } else {
-                        if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) { // 1分钟内未完成操作播报一次
-                            // 提示请完成掉头操作
-                            AlarmManager.getInstance().play(R.raw.trun);
-                            firstLocationTime = System.currentTimeMillis();
-                        }
-                        if (maxSpeed < 55) {
-                            // 提示请完成加速
-                            AlarmManager.getInstance().play(R.raw.speed);
-                            firstLocationTime = System.currentTimeMillis();
-                            return;
+                        if (!hasTrun) {
+                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
+                                // 提示请完成掉头操作
+                                AlarmManager.getInstance().play(R.raw.trun);
+                                firstLocationTime = System.currentTimeMillis();
+                                return;
+                            }
+                        } else {
+                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
+                                // 提示请完成加速
+                                AlarmManager.getInstance().play(R.raw.speed);
+                                firstLocationTime = System.currentTimeMillis();
+                                return;
+                            }
                         }
                     }
                 } else {
                     if (!adjust_success) { // 未校准完成
-                        if (Math.abs(location.getBearing() - stratTrunBearing) >= 150 && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                        if (hasTrun && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                             if (!uploadSuccess) {
                                 uploadSuccess = true;
                                 stopCollect();
                             }
                         } else {
-                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) { // 1分钟内未完成操作播报一次
-                                if (Math.abs(location.getBearing() - stratTrunBearing) < 150) {
+                            if (!hasTrun) {
+                                if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
                                     // 提示请完成掉头操作
                                     AlarmManager.getInstance().play(R.raw.trun);
                                     firstLocationTime = System.currentTimeMillis();
                                     return;
                                 }
-                                if (maxSpeed < 55) {
+                            } else {
+                                if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
                                     // 提示请完成加速
                                     AlarmManager.getInstance().play(R.raw.speed);
                                     firstLocationTime = System.currentTimeMillis();
@@ -436,10 +480,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         // 校准完成
                         if (!notify) { // 未通知
                             notify = true;
-                            if (!uploadSuccess) {
-                                uploadSuccess = true;
-                                stopCollect();
-                            }
+                            EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
                         }
                     }
                 }
@@ -451,6 +492,18 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         stopCollecct();
         EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
         new Thread(new FileRunnable("Normal2050")).start();
+        new Thread(new LocationRunnable("location")).start();
+    }
+
+    private boolean hasTurn() {
+        if (bears.size() > 2) {
+            float first = bears.getFirst();
+            float last = bears.getLast();
+            if (160 <= Math.abs(last - first) && Math.abs(last - first) <= 200) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -469,25 +522,71 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
     private void uploadCollectData(String filePath) {
-        FormBody paramsBody = new FormBody.Builder()
-                .add("serialNumber", obdStatusInfo.getSn())
-                .add("type", "2")
-                .build();
+        final File file = new File(filePath);
+
+        Log.d("uploadCollectData input ");
 
         MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
-        RequestBody fileBody = RequestBody.create(type, new File(filePath));
+        RequestBody fileBody = RequestBody.create(type, file);
 
         RequestBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.ALTERNATIVE)
                 //一样的效果
-                .addPart(Headers.of(
-                        "Content-Disposition",
-                        "form-data; name=\"params\"")
-                        , paramsBody)
+                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
+                .addPart(MultipartBody.Part.createFormData("type", "2"))
                 .addPart(Headers.of(
                         "Content-Disposition",
                         "form-data; name=\"file\"; filename=\"Normal2050\"")
                         , fileBody).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_ERROR_FILE)
+                .post(multipartBody)
+                .build();
+
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("uploadCollectData onFailure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("uploadCollectData success " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+//                        if (file.exists()) {
+//                            file.delete();
+//                        }
+                    }
+                } catch (JSONException e) {
+                    Log.d("uploadCollectData failure " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void uploadLocationData(String filePath) {
+
+        final File file = new File(filePath);
+
+        Log.d("uploadLocationData input ");
+
+        MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
+        RequestBody fileBody = RequestBody.create(type, file);
+
+        RequestBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.ALTERNATIVE)
+                //一样的效果
+                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
+                .addPart(MultipartBody.Part.createFormData("type", "3"))
+                .addPart(Headers.of(
+                        "Content-Disposition",
+                        "form-data; name=\"file\"; filename=\"location\"")
+                        , fileBody).build();
+
 
         Request request = new Request.Builder()
                 .url(URLUtils.UPDATE_ERROR_FILE)
@@ -507,6 +606,11 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Log.d("uploadCollectData success " + responese);
                 try {
                     final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+//                        if (file.exists()) {
+//                            file.delete();
+//                        }
+                    }
                 } catch (JSONException e) {
                     Log.d("uploadCollectData failure " + e.getMessage());
                 }
@@ -553,6 +657,43 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     fos.close();
                     // 上传
                     uploadCollectData(file.getPath());
+                } catch (FileNotFoundException e) {
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class LocationRunnable implements Runnable {
+
+        private String fileName;
+
+        public LocationRunnable(String fileName) {
+            this.fileName = fileName;
+        }
+
+        @Override
+        public void run() {
+            try {
+                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "obd_collect" + File.separator);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File file = new File(dir, fileName);
+                try {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+                    for (String str : locationList) {
+                        bw.write(str);
+                        bw.newLine();
+                        bw.flush();
+                    }
+                    bw.close();
+                    fos.close();
+                    // 上传
+                    uploadLocationData(file.getPath());
                 } catch (FileNotFoundException e) {
                 }
             } catch (Exception e) {

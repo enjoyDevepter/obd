@@ -8,27 +8,54 @@ import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.miyuan.obd.R;
 
-@PageSetting(contentViewId = R.layout.installation_guide_layout, toHistory = false)
+import java.util.Timer;
+import java.util.TimerTask;
+
+@PageSetting(contentViewId = R.layout.installation_guide_layout)
 public class InstallationGuidePage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
     private TextView title;
     @ViewInject(R.id.confirm)
-    private View confirmV;
+    private TextView confirmV;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
+    private Timer timer;
+    private TimerTask timerTask;
+    private int time = 10;
 
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("安装引导");
-        confirmV.setOnClickListener(this);
-        back.setOnClickListener(this);
+        title.setText("安装引导一");
         reportV.setVisibility(View.GONE);
+        confirmV.setSelected(false);
         back.setVisibility(View.GONE);
-
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (time <= 0 && timer != null) {
+                            timer.cancel();
+                            timer = null;
+                            timerTask.cancel();
+                            timerTask = null;
+                            confirmV.setText("确认已拉手刹、并打火");
+                            confirmV.setSelected(true);
+                            confirmV.setOnClickListener(InstallationGuidePage.this);
+                        } else {
+                            confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
+                        }
+                        time--;
+                    }
+                });
+            }
+        };
+        timer.schedule(timerTask, 1000, 1000);
     }
 
     @Override
@@ -38,6 +65,12 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
 
     @Override
     public void onStop() {
+        if (null != timerTask) {
+            timerTask.cancel();
+            timerTask = null;
+            timer.cancel();
+            timer = null;
+        }
         super.onStop();
     }
 
@@ -48,7 +81,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
                 PageManager.back();
                 break;
             case R.id.confirm:
-                AuthPage authPage = new AuthPage();
+                InstallationGuideTwoPage authPage = new InstallationGuideTwoPage();
                 Bundle bundle = new Bundle();
                 bundle.putString("boxId", getDate().getString("boxId"));
                 authPage.setDate(bundle);

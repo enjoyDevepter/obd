@@ -14,7 +14,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
-        android:text="接下来会分两步完成磨合\n请您前选择好路线之后，再点击按钮！\n\n第一步：缓慢掉头；\n第二步：缓慢提速至60km/h以上并保持直线行驶若干分钟，直至磨合完成!\n\n为了驾驶安全，驾驶过程中请不要看手机屏幕！\n\n磨合完成后APP会语音提示您!"
+        android:text="接下来会分三步完成校准，\n\n第一步：提速至20km/h;\n第二步：掉头；\n第三步:缓慢提速至60km/h以上并保持直线行驶若干分钟，直至校准完成！\n\n注意：请不要急加速或急减速！\n\n请在安全行驶的前提下操作！\n校准完成后APP会语音提示您！"
         android:textColor="#ff000000"
         android:textSize="20sp" />
 
@@ -32,7 +32,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/buttom_bg"
         android:gravity="center"
-        android:text="我知道了"
+        android:text="查看图示"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
 

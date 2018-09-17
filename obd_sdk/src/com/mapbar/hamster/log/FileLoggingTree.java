@@ -21,7 +21,7 @@ public class FileLoggingTree extends Timber.Tree {
 
     public FileLoggingTree(String filePath) {
         File dir = new File(filePath);
-        while (null != dir.listFiles() && dir.listFiles().length > 5) {
+        while (null != dir.listFiles() && dir.listFiles().length > 4) {
             File[] files = dir.listFiles();
             File deleteFile = files[0];
             for (int i = 1; i < files.length; i++) {

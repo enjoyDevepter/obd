@@ -13,8 +13,6 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
-import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -30,7 +28,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@PageSetting(contentViewId = R.layout.auth_layout, toHistory = false)
+@PageSetting(contentViewId = R.layout.auth_layout)
 public class AuthPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.title_text)
@@ -58,9 +56,9 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         super.onResume();
         title.setText("输入授权码");
         next.setOnClickListener(this);
-        back.setVisibility(View.GONE);
         scanV.setOnClickListener(this);
-        reportV.setOnClickListener(this);
+        back.setOnClickListener(this);
+        reportV.setVisibility(View.GONE);
 
         if (getDate() != null && null != getDate().get("sn")) {
             String sn = (String) getDate().get("sn");
@@ -98,9 +96,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             case R.id.scan:
                 Intent intent = new Intent(GlobalUtil.getMainActivity(), CaptureActivity.class);
                 GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
-                break;
-            case R.id.report:
-                BlueManager.getInstance().send(ProtocolUtils.reset());
                 break;
         }
     }

@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ import com.miyuan.obd.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +29,8 @@ import java.util.TimerTask;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -93,12 +97,14 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         switch (event) {
             case OBDEvent.NO_PARAM: // 删除参数逻辑
                 dismissProgress();
+                obdStatusInfo = (OBDStatusInfo) data;
                 if (null != timer) {
                     timer.cancel();
                     timer = null;
                 }
                 CollectGuide collectGuide = new CollectGuide();
                 Bundle collectBundle = new Bundle();
+                collectBundle.putString("sn", obdStatusInfo.getSn());
                 collectBundle.putBoolean("matching", false);
                 collectGuide.setDate(collectBundle);
                 PageManager.go(collectGuide);
@@ -121,6 +127,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 CollectGuide guide = new CollectGuide();
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("matching", true);
+                bundle.putString("sn", obdStatusInfo.getSn());
                 guide.setDate(bundle);
                 PageManager.go(guide);
                 break;
@@ -202,7 +209,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
-                BlueManager.getInstance().send(ProtocolUtils.reset());
+                uploadLog();
                 break;
             case R.id.confirm:
                 if (times >= 2) {
@@ -216,6 +223,48 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     timer.schedule(timerTask, 3000, 1000);
                 }
                 break;
+        }
+    }
+
+    private void uploadLog() {
+        Log.d("ProtocolCheckFailPage uploadLog ");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File[] logs = dir.listFiles();
+
+        if (null != logs && logs.length > 0) {
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
+                    .addPart(MultipartBody.Part.createFormData("type", "1"));
+            for (File file : logs) {
+                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            }
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_ERROR_FILE)
+                    .post(builder.build())
+                    .build();
+
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("ProtocolCheckFailPage uploadLog onFailure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("ProtocolCheckFailPage uploadLog success " + responese);
+                    try {
+                        final JSONObject result = new JSONObject(responese);
+                        if ("000".equals(result.optString("status"))) {
+                            for (File delete : logs) {
+                                delete.delete();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.d("ProtocolCheckFailPage uploadLog failure " + e.getMessage());
+                    }
+                }
+            });
         }
     }
 

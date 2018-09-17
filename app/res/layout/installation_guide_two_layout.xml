@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <include layout="@layout/layout_tittle" />
@@ -11,22 +10,18 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="10dp"
-        android:text="请您提前选择好路况，\n再点击准备好了按钮!"
-        android:textColor="#ff000000"
+        android:layout_marginTop="30dp"
+        android:text="第一步：请检查轮胎胎压一致（建议使用胎压计测量)\n\n第二步：请您准备好以下工具：\n\n1、手机（注册收取验证码）\n2、包装盒（获取授权码）"
+        android:textColor="#FF35a59c"
         android:textSize="20sp" />
 
 
     <View
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:background="@drawable/diaotou" />
-
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/confirm"
@@ -35,7 +30,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/buttom_bg"
         android:gravity="center"
-        android:text="下一步"
+        android:text="我已准备好了"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
 

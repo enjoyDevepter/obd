@@ -589,6 +589,7 @@ public class BlueManager {
                     obdStatusInfo.setSensitive((content[11] & 0xff));
                     obdStatusInfo.setCurrentMatching(content[7] == 01);
                     obdStatusInfo.setBerforeMatching(content[8] == 01);
+                    obdStatusInfo.setOrginal(content);
 
                     if (content[content.length - 1] == 1) {
                         Message message = mHandler.obtainMessage();
