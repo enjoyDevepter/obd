@@ -58,7 +58,6 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
             }
         };
         timer.schedule(timerTask, 1000, 1000);
-
     }
 
     @Override

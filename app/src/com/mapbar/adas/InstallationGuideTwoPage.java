@@ -29,7 +29,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("安装引导一");
+        title.setText("安装引导二");
         back.setOnClickListener(this);
         confirmV.setSelected(false);
         reportV.setVisibility(View.GONE);

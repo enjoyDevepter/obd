@@ -130,7 +130,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
 //                // 激活
                 obdStatusInfo = (OBDStatusInfo) data;
                 Log.d("obdStatusInfo  " + obdStatusInfo);
-                OBDInitPage obdInitPage = new OBDInitPage();
+                InstallationGuidePage obdInitPage = new InstallationGuidePage();
                 Bundle bundle = new Bundle();
                 bundle.putString("boxId", obdStatusInfo.getBoxId());
                 obdInitPage.setDate(bundle);

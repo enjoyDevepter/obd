@@ -433,6 +433,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     if (hasTrun && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                         if (!uploadSuccess) {
                             uploadSuccess = true;
+                            AlarmManager.getInstance().play(R.raw.fail);
                             stopCollect();
                         }
                     } else {
@@ -480,6 +481,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         // 校准完成
                         if (!notify) { // 未通知
                             notify = true;
+                            AlarmManager.getInstance().play(R.raw.success);
                             EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
                         }
                     }

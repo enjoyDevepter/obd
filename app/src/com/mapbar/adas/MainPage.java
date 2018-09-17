@@ -541,7 +541,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.ADJUST_SUCCESS:
                 if (ADJUST_SUCCESS.get()) {
                     ADJUST_SUCCESS.set(false);
-                    AlarmManager.getInstance().play(R.raw.finish);
+                    AlarmManager.getInstance().play(R.raw.success);
                 }
                 break;
             case OBDEvent.NORMAL:
