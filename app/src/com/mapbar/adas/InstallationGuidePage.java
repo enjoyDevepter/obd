@@ -22,7 +22,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
-    private Timer timer;
+    private Timer timer = new Timer();
     private TimerTask timerTask;
     private int time = 10;
 

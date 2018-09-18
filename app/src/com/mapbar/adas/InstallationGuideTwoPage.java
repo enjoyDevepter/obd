@@ -22,8 +22,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
-    private Timer timer;
-    private TimerTask timerTask;
+    private Timer timer = new Timer();
     private int time = 15;
 
     @Override
@@ -33,7 +32,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
         back.setOnClickListener(this);
         confirmV.setSelected(false);
         reportV.setVisibility(View.GONE);
-        timerTask = new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 GlobalUtil.getHandler().post(new Runnable() {
@@ -42,8 +41,6 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
                         if (time <= 0 && timer != null) {
                             timer.cancel();
                             timer = null;
-                            timerTask.cancel();
-                            timerTask = null;
                             confirmV.setText("我已准备好了");
                             confirmV.setSelected(true);
                             confirmV.setOnClickListener(InstallationGuideTwoPage.this);
@@ -54,8 +51,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
                     }
                 });
             }
-        };
-        timer.schedule(timerTask, 1000, 1000);
+        }, 1000, 1000);
     }
 
     @Override
@@ -65,9 +61,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
 
     @Override
     public void onStop() {
-        if (null != timerTask) {
-            timerTask.cancel();
-            timerTask = null;
+        if (null != timer) {
             timer.cancel();
             timer = null;
         }

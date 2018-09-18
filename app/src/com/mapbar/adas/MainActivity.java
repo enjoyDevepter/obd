@@ -411,7 +411,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             locationList.add(sb.toString());
             Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
 
-            if (!startCollect && System.currentTimeMillis() - startTime > 2 * 1000 * 60) {
+            if (!startCollect && startTime != 0 && System.currentTimeMillis() - startTime > 2 * 1000 * 60) {
+                Log.d("提示加速到20迈");
                 AlarmManager.getInstance().play(R.raw.speed_20);
                 startTime = System.currentTimeMillis();
             }
@@ -430,9 +431,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 }
 
                 if (!mathing) {
-                    if (hasTrun && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                    if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                         if (!uploadSuccess) {
                             uploadSuccess = true;
+                            Log.d("提示校准失败");
                             AlarmManager.getInstance().play(R.raw.fail);
                             stopCollect();
                         }
@@ -440,6 +442,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         if (!hasTrun) {
                             if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
                                 // 提示请完成掉头操作
+                                Log.d("提示请完成掉头操作");
                                 AlarmManager.getInstance().play(R.raw.trun);
                                 firstLocationTime = System.currentTimeMillis();
                                 return;
@@ -447,6 +450,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         } else {
                             if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
                                 // 提示请完成加速
+                                Log.d("提示请完成加速");
                                 AlarmManager.getInstance().play(R.raw.speed);
                                 firstLocationTime = System.currentTimeMillis();
                                 return;
@@ -455,7 +459,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     }
                 } else {
                     if (!adjust_success) { // 未校准完成
-                        if (hasTrun && maxSpeed >= 55 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
+                        if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                             if (!uploadSuccess) {
                                 uploadSuccess = true;
                                 stopCollect();
@@ -464,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                             if (!hasTrun) {
                                 if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
                                     // 提示请完成掉头操作
+                                    Log.d("提示请完成掉头操作");
                                     AlarmManager.getInstance().play(R.raw.trun);
                                     firstLocationTime = System.currentTimeMillis();
                                     return;
@@ -471,6 +476,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                             } else {
                                 if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
                                     // 提示请完成加速
+                                    Log.d("提示请完成加速");
                                     AlarmManager.getInstance().play(R.raw.speed);
                                     firstLocationTime = System.currentTimeMillis();
                                     return;
@@ -481,6 +487,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         // 校准完成
                         if (!notify) { // 未通知
                             notify = true;
+                            Log.d("提示校准完成");
                             AlarmManager.getInstance().play(R.raw.success);
                             EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
                         }

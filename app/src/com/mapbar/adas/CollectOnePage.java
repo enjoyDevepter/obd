@@ -24,7 +24,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     private View reportV;
     @ViewInject(R.id.confirm)
     private TextView confirmV;
-    private Timer timer;
+    private Timer timer = new Timer();
     private TimerTask timerTask;
     private int time = 15;
 
