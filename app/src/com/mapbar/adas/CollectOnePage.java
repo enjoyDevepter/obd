@@ -33,7 +33,6 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
         super.onResume();
         back.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
-        confirmV.setOnClickListener(this);
         title.setText("深度校准步骤");
         timerTask = new TimerTask() {
             @Override

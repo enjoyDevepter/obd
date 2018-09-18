@@ -32,7 +32,6 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
         super.onResume();
         title.setText("深度校准准备");
         back.setVisibility(View.GONE);
-        confirmV.setOnClickListener(this);
         reportV.setOnClickListener(this);
         confirmV.setSelected(false);
         back.setVisibility(View.GONE);
