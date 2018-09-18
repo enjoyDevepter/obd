@@ -22,8 +22,10 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
-    private Timer timer = new Timer();
+    private Timer timer;
     private int time = 15;
+    private boolean ishow;
+
 
     @Override
     public void onResume() {
@@ -32,26 +34,30 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
         back.setOnClickListener(this);
         confirmV.setSelected(false);
         reportV.setVisibility(View.GONE);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (time <= 0 && timer != null) {
-                            timer.cancel();
-                            timer = null;
-                            confirmV.setText("我已准备好了");
-                            confirmV.setSelected(true);
-                            confirmV.setOnClickListener(InstallationGuideTwoPage.this);
-                        } else {
-                            confirmV.setText("我已准备好了(" + time + "s)");
+        if (!ishow) {
+            ishow = true;
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (time <= 0 && timer != null) {
+                                timer.cancel();
+                                timer = null;
+                                confirmV.setText("我已准备好了");
+                                confirmV.setSelected(true);
+                                confirmV.setOnClickListener(InstallationGuideTwoPage.this);
+                            } else {
+                                confirmV.setText("我已准备好了(" + time + "s)");
+                            }
+                            time--;
                         }
-                        time--;
-                    }
-                });
-            }
-        }, 1000, 1000);
+                    });
+                }
+            }, 1000, 1000);
+        }
     }
 
     @Override

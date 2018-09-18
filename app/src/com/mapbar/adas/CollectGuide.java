@@ -26,6 +26,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
     private TextView confirmV;
     private Timer timer = new Timer();
     private int time = 10;
+    private boolean ishow;
 
     @Override
     public void onResume() {
@@ -35,26 +36,32 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
         reportV.setOnClickListener(this);
         confirmV.setSelected(false);
         back.setVisibility(View.GONE);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (time <= 0 && timer != null) {
-                            timer.cancel();
-                            timer = null;
-                            confirmV.setText("确认已拉手刹、并打火");
-                            confirmV.setSelected(true);
-                            confirmV.setOnClickListener(CollectGuide.this);
-                        } else {
-                            confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
+        if (!ishow) {
+            ishow = true;
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (time <= 0 && timer != null) {
+                                timer.cancel();
+                                timer = null;
+                                confirmV.setText("确认已拉手刹、并打火");
+                                confirmV.setSelected(true);
+                                confirmV.setOnClickListener(CollectGuide.this);
+                            } else {
+                                confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
+                            }
+                            time--;
                         }
-                        time--;
-                    }
-                });
-            }
-        }, 1000, 1000);
+                    });
+                }
+            }, 1000, 1000);
+        } else {
+            confirmV.setSelected(true);
+            confirmV.setOnClickListener(CollectGuide.this);
+        }
     }
 
     @Override

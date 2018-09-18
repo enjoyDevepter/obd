@@ -341,6 +341,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     list60.add(HexUtils.byte2HexStr(pack));
                 }
                 break;
+            case OBDEvent.COLLECT_DATA_FOR_CAR:
+                new Thread(new CarRunnable((byte[]) data)).start();
+                break;
         }
     }
 
@@ -627,6 +630,57 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         });
     }
 
+
+    private void uploadCarData(String filePath) {
+
+        final File file = new File(filePath);
+
+        Log.d("uploadCarData input ");
+
+        MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
+        RequestBody fileBody = RequestBody.create(type, file);
+
+        RequestBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.ALTERNATIVE)
+                //一样的效果
+                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
+                .addPart(MultipartBody.Part.createFormData("type", "4"))
+                .addPart(Headers.of(
+                        "Content-Disposition",
+                        "form-data; name=\"file\"; filename=\"location\"")
+                        , fileBody).build();
+
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_ERROR_FILE)
+                .post(multipartBody)
+                .build();
+
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("uploadCarData onFailure " + e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("uploadCarData success " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+//                        if (file.exists()) {
+//                            file.delete();
+//                        }
+                    }
+                } catch (JSONException e) {
+                    Log.d("uploadCarData failure " + e.getMessage());
+                }
+            }
+        });
+    }
+
     private class FileRunnable implements Runnable {
 
         private String fileName;
@@ -711,5 +765,37 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         }
     }
 
+    private class CarRunnable implements Runnable {
+
+        private byte[] data;
+
+        public CarRunnable(byte[] data) {
+            this.data = data;
+        }
+
+        @Override
+        public void run() {
+            try {
+                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "obd_collect" + File.separator);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File file = new File(dir, "car");
+                try {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+                    bw.write(HexUtils.byte2HexStr(data));
+                    bw.flush();
+                    bw.close();
+                    fos.close();
+                    // 上传
+                    uploadCarData(file.getPath());
+                } catch (FileNotFoundException e) {
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

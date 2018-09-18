@@ -122,4 +122,7 @@ public class OBDEvent {
      * 采集数据
      */
     public static final int COLLECT_DATA = 180; // 采集数据
+    public static final int COLLECT_DATA_FOR_CAR = 190; // 全车数据
+
+
 }

@@ -25,6 +25,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
     private Timer timer = new Timer();
     private TimerTask timerTask;
     private int time = 10;
+    private boolean ishow;
 
     @Override
     public void onResume() {
@@ -33,29 +34,32 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
         reportV.setVisibility(View.GONE);
         confirmV.setSelected(false);
         back.setVisibility(View.GONE);
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (time <= 0 && timer != null) {
-                            timer.cancel();
-                            timer = null;
-                            timerTask.cancel();
-                            timerTask = null;
-                            confirmV.setText("确认已拉手刹、并打火");
-                            confirmV.setSelected(true);
-                            confirmV.setOnClickListener(InstallationGuidePage.this);
-                        } else {
-                            confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
+        if (!ishow) {
+            ishow = true;
+            timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (time <= 0 && timer != null) {
+                                timer.cancel();
+                                timer = null;
+                                timerTask.cancel();
+                                timerTask = null;
+                                confirmV.setText("确认已拉手刹、并打火");
+                                confirmV.setSelected(true);
+                                confirmV.setOnClickListener(InstallationGuidePage.this);
+                            } else {
+                                confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
+                            }
+                            time--;
                         }
-                        time--;
-                    }
-                });
-            }
-        };
-        timer.schedule(timerTask, 1000, 1000);
+                    });
+                }
+            };
+            timer.schedule(timerTask, 1000, 1000);
+        }
     }
 
     @Override

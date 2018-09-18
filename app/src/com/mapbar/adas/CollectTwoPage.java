@@ -31,12 +31,6 @@ public class CollectTwoPage extends AppBasePage implements View.OnClickListener 
         title.setText("深度校准(图示)");
     }
 
-    @Override
-    public boolean onBackPressed() {
-        PageManager.finishActivity(MainActivity.getInstance());
-        return true;
-    }
-
 
     @Override
     public void onClick(View v) {

@@ -64,6 +64,7 @@ public class BlueManager {
     private static final int MSG_UN_LEGALITY = 90; // BoxId 不合法
     private static final int MSG_NORMAL = 100; // 胎压盒子可以正常使用
     private static final int MSG_COLLECT_DATA = 110; // 采集数据
+    private static final int MSG_COLLECT_DATA_FOR_CAR = 120; // 全车数据
 
 
     private static final int MSG_VERIFY = 2;
@@ -763,6 +764,13 @@ public class BlueManager {
                     bundle.putByteArray("status", content);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
+                } else if (content[1] == 2) {
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_COLLECT_DATA_FOR_CAR;
+                    bundle.putByteArray("status", content);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 }
             }
 //                if (result[1] == 00) { // 通用错误
@@ -1145,6 +1153,15 @@ public class BlueManager {
                         public void run() {
                             Log.d("OBDEvent.COLLECT_DATA");
                             notifyBleCallBackListener(OBDEvent.COLLECT_DATA, bundle.getByteArray("status"));
+                        }
+                    });
+                    break;
+                case MSG_COLLECT_DATA_FOR_CAR:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.COLLECT_DATA_FOR_CAR");
+                            notifyBleCallBackListener(OBDEvent.COLLECT_DATA_FOR_CAR, bundle.getByteArray("status"));
                         }
                     });
                     break;

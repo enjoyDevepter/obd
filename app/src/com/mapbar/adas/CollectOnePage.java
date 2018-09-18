@@ -27,36 +27,44 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     private Timer timer = new Timer();
     private TimerTask timerTask;
     private int time = 15;
+    private boolean ishow;
 
     @Override
     public void onResume() {
         super.onResume();
         back.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
+        confirmV.setSelected(false);
         title.setText("深度校准步骤");
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (time <= 0 && timer != null) {
-                            timer.cancel();
-                            timer = null;
-                            timerTask.cancel();
-                            timerTask = null;
-                            confirmV.setText("下一步");
-                            confirmV.setSelected(true);
-                            confirmV.setOnClickListener(CollectOnePage.this);
-                        } else {
-                            confirmV.setText("下一步(" + time + "s)");
+        if (!ishow) {
+            ishow = true;
+            timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (time <= 0 && timer != null) {
+                                timer.cancel();
+                                timer = null;
+                                timerTask.cancel();
+                                timerTask = null;
+                                confirmV.setText("下一步");
+                                confirmV.setSelected(true);
+                                confirmV.setOnClickListener(CollectOnePage.this);
+                            } else {
+                                confirmV.setText("下一步(" + time + "s)");
+                            }
+                            time--;
                         }
-                        time--;
-                    }
-                });
-            }
-        };
-        timer.schedule(timerTask, 1000, 1000);
+                    });
+                }
+            };
+            timer.schedule(timerTask, 1000, 1000);
+        } else {
+            confirmV.setSelected(true);
+            confirmV.setOnClickListener(CollectOnePage.this);
+        }
     }
 
     @Override
@@ -68,12 +76,6 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
             timer = null;
         }
         super.onStop();
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        PageManager.finishActivity(MainActivity.getInstance());
-        return true;
     }
 
 
