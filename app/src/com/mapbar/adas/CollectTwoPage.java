@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 import org.simple.eventbus.EventBus;
@@ -39,6 +41,7 @@ public class CollectTwoPage extends AppBasePage implements View.OnClickListener 
                 PageManager.back();
                 break;
             case R.id.confirm:
+                BlueManager.getInstance().send(ProtocolUtils.run());
                 EventBus.getDefault().post(getDate().getBoolean("matching"), EventBusTags.START_COLLECT);
                 CollectPage collectPage = new CollectPage();
                 Bundle bundle = new Bundle();

@@ -6,8 +6,6 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.hamster.BlueManager;
-import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 import java.util.Timer;
@@ -26,7 +24,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     private TextView confirmV;
     private Timer timer = new Timer();
     private TimerTask timerTask;
-    private int time = 15;
+    private int time = 3;
     private boolean ishow;
 
     @Override
@@ -86,7 +84,6 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
                 PageManager.back();
                 break;
             case R.id.confirm:
-                BlueManager.getInstance().send(ProtocolUtils.run());
                 CollectTwoPage collectTwoPage = new CollectTwoPage();
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("matching", getDate().getBoolean("matching"));

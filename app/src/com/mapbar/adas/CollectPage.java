@@ -48,7 +48,6 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
         title.setText("深度校准");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
-        BlueManager.getInstance().send(ProtocolUtils.run());
         showProgress();
         matching = getDate().getBoolean("matching");
         GlobalUtil.getHandler().postDelayed(new Runnable() {

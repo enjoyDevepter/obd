@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
      * 航向集合
      */
     private LinkedList<Float> bears = new LinkedList<>();
+    private LinkedList<Long> bearsTime = new LinkedList<>();
 
     private Map<Integer, List<String>> collecData = new HashMap<>();
     private List<String> list20 = new ArrayList();
@@ -412,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     .append(location.getLongitude()).append("#")
                     .append(location.getLatitude()).append("#");
             locationList.add(sb.toString());
-            Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
 
             if (!startCollect && startTime != 0 && System.currentTimeMillis() - startTime > 2 * 1000 * 60) {
                 Log.d("提示加速到20迈");
@@ -422,10 +422,13 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
             if (startCollect) {
                 if (currentSpeed > 15) {
-                    if (bears.size() > 20) {
-                        bears.peekFirst();
+                    Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
+                    if (bears.size() > 9) {
+                        bears.pollFirst();
+                        bearsTime.pollFirst();
                     }
                     bears.addLast(location.getBearing());
+                    bearsTime.addLast(location.getTime());
                 }
                 if (!hasTrun) {
                     if (hasTurn()) {
@@ -465,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                             if (!uploadSuccess) {
                                 uploadSuccess = true;
+                                AlarmManager.getInstance().play(R.raw.success);
                                 stopCollect();
                             }
                         } else {
@@ -510,8 +514,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private boolean hasTurn() {
         if (bears.size() > 2) {
             float first = bears.getFirst();
+            long firstTime = bearsTime.getFirst();
             float last = bears.getLast();
-            if (160 <= Math.abs(last - first) && Math.abs(last - first) <= 200) {
+            long lastTime = bearsTime.getLast();
+            if (160 <= Math.abs(last - first) && Math.abs(last - first) <= 200 && lastTime - firstTime <= 10000) {
                 return true;
             }
         }

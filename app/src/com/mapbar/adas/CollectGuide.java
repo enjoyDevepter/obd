@@ -25,7 +25,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
     @ViewInject(R.id.confirm)
     private TextView confirmV;
     private Timer timer = new Timer();
-    private int time = 10;
+    private int time = 3;
     private boolean ishow;
 
     @Override
