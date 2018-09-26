@@ -12,11 +12,11 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/reason_one"
+            android:id="@+id/current"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="35dp"
-            android:layout_marginRight="35dp"
+            android:layout_marginLeft="@dimen/common_margin_lr"
+            android:layout_marginRight="@dimen/common_margin_lr"
             android:layout_marginTop="20dp"
             android:lineSpacingExtra="4dp"
             android:text="请您确认车辆已打火！\n请您务必确认已打火后再点击确认按钮!"
@@ -26,13 +26,13 @@
 
 
         <TextView
-            android:id="@+id/reason_two"
+            android:id="@+id/before"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
-            android:gravity="center_horizontal"
+            android:gravity="left"
             android:lineSpacingExtra="4dp"
             android:text="可能存在以下原因：\n1、车辆未打火，请您打火！\n打火检测到数据后页面将会自动跳转！\n\n2、您更换了车辆。\n一个盒子只能支持一辆车"
             android:textColor="@color/text_color"
@@ -45,12 +45,12 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="80dp"
         android:background="@drawable/btn_bg"
         android:gravity="center"
-        android:text="确认，我已打火!"
+        android:text="确认已打火"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
 

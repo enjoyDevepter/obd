@@ -50,18 +50,18 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
                                 timer = null;
                                 timerTask.cancel();
                                 timerTask = null;
-                                confirmV.setText("下一步");
+                                confirmV.setText("查看图示");
                                 confirmV.setEnabled(true);
                                 confirmV.setOnClickListener(CollectOnePage.this);
                             } else {
-                                confirmV.setText("下一步(" + time + "s)");
+                                confirmV.setText("查看图示(" + time + "s)");
                             }
                             time--;
                         }
                     });
                 }
             };
-            timer.schedule(timerTask, 1000, 1000);
+            timer.schedule(timerTask, 0, 1000);
         } else {
             confirmV.setEnabled(true);
             confirmV.setOnClickListener(CollectOnePage.this);

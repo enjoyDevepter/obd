@@ -27,4 +27,6 @@
     <dimen name="size_456">228dp</dimen>
     <dimen name="size_14">7dp</dimen>
 
+    <dimen name="common_margin_lr">25dp</dimen>
+
 </resources>

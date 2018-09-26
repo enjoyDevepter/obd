@@ -10,30 +10,30 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="5dp"
         android:text="首次使用必须深度校准，否则会误报或者漏报！"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/title_size" />
+        android:textSize="@dimen/text_size" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="40dp"
         android:text="第一步：请停车拉手刹！\n自动挡挂P档、并拉手刹；手动挡挂空挡、并拉手刹\n\n第二步：请将车辆打火！\n请将车辆打火！！"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/title_size" />
+        android:textSize="@dimen/text_size" />
 
     <TextView
         android:id="@+id/confirm"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="50dp"
         android:background="@drawable/btn_bg"
         android:gravity="center"

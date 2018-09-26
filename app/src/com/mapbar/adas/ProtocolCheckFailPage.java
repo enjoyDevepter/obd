@@ -43,17 +43,17 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
-    @ViewInject(R.id.reason_one)
+    @ViewInject(R.id.before)
     private View beforeMatchingV;
-    @ViewInject(R.id.reason_two)
-    private View currentMatchingV;
+    @ViewInject(R.id.current)
+    private TextView currentMatchingTV;
     @ViewInject(R.id.confirm)
     private TextView confirmV;
     private CustomDialog dialog;
 
     private volatile boolean showConfirm;
     private volatile int times = 1;
-    private int time = 3;
+    private int time = 15;
     private Timer timer;
     private TimerTask timerTask;
     private volatile OBDStatusInfo obdStatusInfo;
@@ -69,11 +69,11 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         beforeMatching = getDate().getBoolean("before_matching");
         if (beforeMatching) {
             beforeMatchingV.setVisibility(View.VISIBLE);
-            currentMatchingV.setVisibility(View.INVISIBLE);
+            currentMatchingTV.setVisibility(View.INVISIBLE);
             confirmV.setVisibility(View.INVISIBLE);
         } else {
             beforeMatchingV.setVisibility(View.INVISIBLE);
-            currentMatchingV.setVisibility(View.VISIBLE);
+            currentMatchingTV.setVisibility(View.VISIBLE);
             confirmV.setVisibility(View.VISIBLE);
         }
         BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
@@ -95,7 +95,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.NO_PARAM: // 删除参数逻辑
-                dismissProgress();
                 obdStatusInfo = (OBDStatusInfo) data;
                 if (null != timer) {
                     timer.cancel();
@@ -112,9 +111,9 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 obdStatusInfo = (OBDStatusInfo) data;
                 if (!showConfirm) {
                     showConfirm = true;
-                    time = 3;
+                    time = 15;
                     initTimer();
-                    timer.schedule(timerTask, 3000, 1000);
+                    timer.schedule(timerTask, 0, 1000);
                 }
                 BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
                 break;
@@ -153,11 +152,11 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                             timer = null;
                             timerTask.cancel();
                             timerTask = null;
-                            confirmV.setText("确认，我已打火!");
+                            confirmV.setText("确认已打火");
                             confirmV.setEnabled(true);
                             confirmV.setOnClickListener(ProtocolCheckFailPage.this);
                         } else {
-                            confirmV.setText("确认，我已打火!(" + time + "s)");
+                            confirmV.setText("确认已打火(" + time + "s)");
                         }
                         time--;
                     }
@@ -215,12 +214,13 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     cleanParams(obdStatusInfo);
                 } else {
                     times++;
-                    confirmV.setText("请您再次确认车辆已打火！\n请您务必确认已打火后再点击确认按钮!");
+                    currentMatchingTV.setText("请您再次确认车辆已打火！\n请您务必确认已打火后再点击确认按钮!");
+                    confirmV.setText("确认已打火");
                     confirmV.setOnClickListener(null);
                     confirmV.setEnabled(false);
                     time = 3;
                     initTimer();
-                    timer.schedule(timerTask, 3000, 1000);
+                    timer.schedule(timerTask, 0, 1000);
                 }
                 break;
         }
@@ -286,7 +286,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-        showProgress();
         Request request = new Request.Builder()
                 .url(URLUtils.CLEAR_PARAM)
                 .post(requestBody)
@@ -298,7 +297,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -311,7 +309,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 cleanParams(obdStatusInfo);
                                             }

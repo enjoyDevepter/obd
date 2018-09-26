@@ -10,7 +10,7 @@
         android:id="@+id/car_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="35dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
         android:text="当前选择车型："
         android:textColor="@color/text_color"
         android:textSize="@dimen/text_size" />
@@ -18,8 +18,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginTop="@dimen/common_margin_lr"
         android:lineSpacingExtra="4dp"
         android:text="车型选择之后不可以修改! \n\n请您务必正确选择！\n 否则会导致胎压盒子无法使用！"
         android:textColor="#FF009488"
@@ -28,8 +28,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="50dp"
         android:orientation="horizontal">
 
