@@ -269,8 +269,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-//                                closeV.setVisibility(View.VISIBLE);
-//                                statusTV.setText("您的盒子可能为盗版盒子,\n请联系商家或厂家客服\nwww.obdbox.cn");
+                                StatusInfoPage statusInfoPage = new StatusInfoPage();
+                                Bundle bundle1 = new Bundle();
+                                bundle1.putBoolean("fake", true);
+                                statusInfoPage.setDate(bundle1);
+                                PageManager.go(statusInfoPage);
                             }
                         });
                     }
@@ -543,8 +546,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     PageManager.go(collectGuide);
                                     break;
                                 case 3: // 临时车型，参数已采集
-//                                    closeV.setVisibility(View.VISIBLE);
-//                                    statusTV.setText("您的胎压盒子还在进一步校准中，\n请耐心等待，整个校准过程大概需要十几分钟,\n如果遇到长时间没有校准完成，您可以联系我们的客服!");
+                                    StatusInfoPage statusInfoPage = new StatusInfoPage();
+                                    Bundle bundle1 = new Bundle();
+                                    bundle1.putBoolean("fake", false);
+                                    statusInfoPage.setDate(bundle1);
+                                    PageManager.go(statusInfoPage);
                                     break;
                             }
                         }
