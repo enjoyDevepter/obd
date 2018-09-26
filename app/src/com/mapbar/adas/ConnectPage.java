@@ -15,7 +15,7 @@ import com.miyuan.obd.R;
 @PageSetting(contentViewId = R.layout.connect_layout, toHistory = false)
 public class ConnectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -32,7 +32,6 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        reportV.setVisibility(View.GONE);
         title.setText("连接盒子");
         retry.setOnClickListener(this);
         BlueManager.getInstance().startScan();

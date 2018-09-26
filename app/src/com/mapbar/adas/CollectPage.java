@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -34,7 +35,7 @@ import okhttp3.Response;
 @PageSetting(contentViewId = R.layout.collect_layout)
 public class CollectPage extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -42,13 +43,20 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
     private View reportV;
     private boolean matching;
 
+    @ViewInject(R.id.status)
+    private View statusV;
+
+    private AnimationDrawable animationDrawable;
+
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("深度校准");
+        title.setText("正在深度校准");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
-        showProgress();
+        statusV.setBackgroundResource(R.drawable.check_status_bg);
+        animationDrawable = (AnimationDrawable) statusV.getBackground();
+        animationDrawable.start();
         matching = getDate().getBoolean("matching");
         GlobalUtil.getHandler().postDelayed(new Runnable() {
             @Override
@@ -68,7 +76,6 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
 
     @Subscriber(tag = EventBusTags.COLLECT_FINISHED)
     private void updateCollectStauts(int type) {
-        dismissProgress();
         CollectFinish collectFinish = new CollectFinish();
         Bundle bundle = new Bundle();
         bundle.putBoolean("success", matching);
@@ -91,6 +98,7 @@ public class CollectPage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
+        animationDrawable.stop();
         EventBus.getDefault().unregister(this);
     }
 

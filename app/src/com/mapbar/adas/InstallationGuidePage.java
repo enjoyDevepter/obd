@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,17 +15,21 @@ import java.util.TimerTask;
 @PageSetting(contentViewId = R.layout.installation_guide_layout)
 public class InstallationGuidePage extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.first)
+    TextView firstTV;
+    @ViewInject(R.id.second)
+    TextView secondTV;
+    @ViewInject(R.id.title)
     private TextView title;
-    @ViewInject(R.id.confirm)
-    private TextView confirmV;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
+    @ViewInject(R.id.confirm)
+    private TextView confirmV;
     private Timer timer = new Timer();
     private TimerTask timerTask;
-    private int time = 10;
+    private int time = 2;
     private boolean ishow;
 
     @Override
@@ -32,8 +37,10 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
         super.onResume();
         title.setText("安装引导一");
         reportV.setVisibility(View.GONE);
-        confirmV.setSelected(false);
         back.setVisibility(View.GONE);
+        confirmV.setEnabled(false);
+        firstTV.setText(Html.fromHtml("第一步：<font color='#009488'>请停车拉手刹!</font><br><font color='#4A4A4A'>自动挡挂P档、并拉手刹；手动挡挂空挡、并拉手刹。</font><br><br>"));
+        secondTV.setText(Html.fromHtml("第二步：<font color='#009488'>请将车辆打火!</font><br><font color='#4A4A4A'>请确保车辆已打火</font><br><br>请完成以上操作后，再点击确认按钮！<br>否则会导致安装失败！"));
         if (!ishow) {
             ishow = true;
             timerTask = new TimerTask() {
@@ -48,7 +55,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
                                 timerTask.cancel();
                                 timerTask = null;
                                 confirmV.setText("确认已拉手刹、并打火");
-                                confirmV.setSelected(true);
+                                confirmV.setEnabled(true);
                                 confirmV.setOnClickListener(InstallationGuidePage.this);
                             } else {
                                 confirmV.setText("确认已拉手刹、并打火(" + time + "s)");

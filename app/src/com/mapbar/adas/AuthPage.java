@@ -31,14 +31,14 @@ import okhttp3.Response;
 @PageSetting(contentViewId = R.layout.auth_layout)
 public class AuthPage extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
+    @ViewInject(R.id.back)
+    private View back;
     @ViewInject(R.id.report)
     private View reportV;
     @ViewInject(R.id.next)
     private TextView next;
-    @ViewInject(R.id.back)
-    private View back;
     @ViewInject(R.id.scan)
     private View scanV;
     @ViewInject(R.id.sn_01)
@@ -96,6 +96,8 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             case R.id.scan:
                 Intent intent = new Intent(GlobalUtil.getMainActivity(), CaptureActivity.class);
                 GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
+                break;
+            case R.id.report:
                 break;
         }
     }

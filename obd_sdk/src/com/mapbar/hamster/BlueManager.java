@@ -616,7 +616,7 @@ public class BlueManager {
                     }
                     // 判断是否授权
                     if ((content[5] & 15) == 0) { // 未授权或者授权过期或者授权失败
-                        if ((content[5] >> 4) != 0) { // 授权成功
+                        if ((content[5] >> 4) != 0) { // 授权失败
                             Message message = mHandler.obtainMessage();
                             Bundle bundle = new Bundle();
                             bundle.putSerializable("obd_status_info", obdStatusInfo);

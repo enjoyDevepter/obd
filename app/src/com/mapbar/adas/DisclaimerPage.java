@@ -12,7 +12,7 @@ import static com.mapbar.adas.preferences.SettingPreferencesConfig.DISCALIMER_VI
 
 @PageSetting(transparent = true, toHistory = false, contentViewId = R.layout.disclaimer_layout)
 public class DisclaimerPage extends AppBasePage implements View.OnClickListener {
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -52,7 +52,7 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
                     PageManager.go(new OBDAuthPage());
                 } else {
                     BlueManager.getInstance().stopScan(false);
-                    PageManager.go(new ConnectPage());
+                    PageManager.go(new InstallationGuidePage());
                 }
                 break;
             case R.id.disagree:

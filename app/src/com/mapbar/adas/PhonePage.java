@@ -33,16 +33,18 @@ import okhttp3.Response;
 @PageSetting(contentViewId = R.layout.phone_layout)
 public class PhonePage extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
+    @ViewInject(R.id.back)
+    private View back;
     @ViewInject(R.id.report)
     private View reportV;
     @ViewInject(R.id.content)
     private EditText content;
     @ViewInject(R.id.next)
     private TextView next;
-    @ViewInject(R.id.back)
-    private View back;
+    @ViewInject(R.id.close)
+    private View closeV;
     private CustomDialog dialog;
 
     @Override
@@ -52,6 +54,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
         next.setOnClickListener(this);
         back.setOnClickListener(this);
         reportV.setOnClickListener(this);
+        closeV.setOnClickListener(this);
     }
 
     @Override
@@ -82,6 +85,9 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 break;
             case R.id.report:
                 uploadLog();
+                break;
+            case R.id.close:
+                content.setText("");
                 break;
         }
     }

@@ -6,19 +6,26 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_tittle" />
+    <include layout="@layout/tittle_layout" />
 
+    <View
+        android:id="@+id/status"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/check_status_bg" />
 
     <TextView
-        android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp"
-        android:text="正在深度校准中，请稍等......"
-        android:textColor="#ff000000"
-        android:textSize="20sp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        android:gravity="left"
+        android:lineSpacingExtra="4dp"
+        android:text="正在深度校准中，请不要关闭手机APP"
+        android:textColor="@color/text_color"
+        android:textSize="@dimen/text_size" />
+
 
 </LinearLayout>

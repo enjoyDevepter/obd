@@ -16,7 +16,7 @@ import java.util.TimerTask;
 @PageSetting(contentViewId = R.layout.collect_guide_layout)
 public class CollectGuide extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -25,7 +25,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
     @ViewInject(R.id.confirm)
     private TextView confirmV;
     private Timer timer = new Timer();
-    private int time = 3;
+    private int time = 10;
     private boolean ishow;
 
     @Override
@@ -34,7 +34,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
         title.setText("深度校准准备");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
-        confirmV.setSelected(false);
+        confirmV.setEnabled(false);
         back.setVisibility(View.GONE);
         if (!ishow) {
             ishow = true;
@@ -48,7 +48,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                                 timer.cancel();
                                 timer = null;
                                 confirmV.setText("确认已拉手刹、并打火");
-                                confirmV.setSelected(true);
+                                confirmV.setEnabled(true);
                                 confirmV.setOnClickListener(CollectGuide.this);
                             } else {
                                 confirmV.setText("确认已拉手刹、并打火(" + time + "s)");
@@ -59,7 +59,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                 }
             }, 1000, 1000);
         } else {
-            confirmV.setSelected(true);
+            confirmV.setEnabled(true);
             confirmV.setOnClickListener(CollectGuide.this);
         }
     }

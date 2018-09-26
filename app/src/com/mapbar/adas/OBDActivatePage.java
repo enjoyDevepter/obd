@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
@@ -37,20 +38,29 @@ import okhttp3.Response;
 public class OBDActivatePage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
 
     String carName = "";
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
+
+    @ViewInject(R.id.status)
+    private View statusV;
+
+    private AnimationDrawable animationDrawable;
+
     private CustomDialog dialog;
 
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("正在激活胎压盒子");
+        title.setText("激活设备");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
+        statusV.setBackgroundResource(R.drawable.check_status_bg);
+        animationDrawable = (AnimationDrawable) statusV.getBackground();
+        animationDrawable.start();
         activate();
     }
 
@@ -63,13 +73,13 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
     @Override
     public void onStop() {
         super.onStop();
+        animationDrawable.stop();
         BlueManager.getInstance().removeCallBackListener(this);
     }
 
 
     private void activate() {
 
-        showProgress();
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("boxId", getDate().get("boxId"));
@@ -95,7 +105,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -168,7 +177,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
         GlobalUtil.getHandler().post(new Runnable() {
             @Override
             public void run() {
-                dismissProgress();
                 dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                         .setViewListener(new CustomDialog.ViewListener() {
                             @Override
@@ -222,7 +230,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -259,7 +266,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         try {
                             final JSONObject result = new JSONObject(responese);
                             if ("000".equals(result.optString("status"))) {

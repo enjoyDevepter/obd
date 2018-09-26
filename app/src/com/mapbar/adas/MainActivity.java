@@ -1,8 +1,10 @@
 package com.mapbar.adas;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -10,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -21,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
+import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.utils.AlarmManager;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
@@ -191,6 +195,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         BlueManager.getInstance().init(this);
 
         EventBus.getDefault().register(this);
+
+        ImmersionBar.with(this)
+                .fitsSystemWindows(true)
+                .statusBarDarkFont(true)
+                .statusBarColor(android.R.color.white)
+                .init(); //初始化，默认透明状态栏和黑色导航栏
     }
 
     @Override
@@ -202,11 +212,22 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         setFirst(false);
         BlueManager.getInstance().addBleCallBackListener(this);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
     }
 
     @Override
     protected void onDestroy() {
+        ImmersionBar.with(this).destroy(); //不调用该方法，如果界面bar发生改变，在不关闭app的情况下，退出此界面再进入将记忆最后一次bar改变的状态
         super.onDestroy();
         BlueManager.getInstance().disconnect();
         MainActivity.INSTANCE = null;
@@ -229,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private void addTasks() {
         TaskManager.getInstance()
                 .addTask(new SDInitTask())
-//                .addTask(new LogInitTask())
                 .addTask(new DisclaimerTask())
                 .addTask(new LocationCheckTask())
                 .addTask(new UpdateTask());
@@ -242,6 +262,16 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         this.mathing = mathing;
         startTime = System.currentTimeMillis();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
         heartTimer = new Timer();
         heartTimer.schedule(new TimerTask() {
@@ -420,8 +450,10 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 startTime = System.currentTimeMillis();
             }
 
+            Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
+
             if (startCollect) {
-                if (currentSpeed > 15) {
+                if (currentSpeed > 10) {
                     Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
                     if (bears.size() > 9) {
                         bears.pollFirst();
@@ -517,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             long firstTime = bearsTime.getFirst();
             float last = bears.getLast();
             long lastTime = bearsTime.getLast();
-            if (160 <= Math.abs(last - first) && Math.abs(last - first) <= 200 && lastTime - firstTime <= 10000) {
+            if (150 <= Math.abs(last - first) && Math.abs(last - first) <= 210 && lastTime - firstTime <= 10000) {
                 return true;
             }
         }
@@ -653,7 +685,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .addPart(MultipartBody.Part.createFormData("type", "4"))
                 .addPart(Headers.of(
                         "Content-Disposition",
-                        "form-data; name=\"file\"; filename=\"location\"")
+                        "form-data; name=\"file\"; filename=\"car\"")
                         , fileBody).build();
 
 

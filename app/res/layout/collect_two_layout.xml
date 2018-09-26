@@ -6,36 +6,36 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_tittle" />
+    <include layout="@layout/tittle_layout" />
+
+    <View
+        android:layout_width="156dp"
+        android:layout_height="270dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/run" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="30dp"
         android:text="请您提前选择好路况，\n再点击准备好了按钮!"
-        android:textColor="#ff000000"
-        android:textSize="20sp" />
-
-
-    <View
-        android:layout_width="300dp"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:background="@drawable/diaotou" />
-
+        android:textColor="#FF009488"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/confirm"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/buttom_bg"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/btn_bg"
         android:gravity="center"
-        android:text="下一步"
+        android:text="开始深度校准"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
 

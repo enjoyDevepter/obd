@@ -29,18 +29,18 @@ import okhttp3.Response;
 public class ConfirmCarPage extends AppBasePage implements View.OnClickListener {
 
     String carName = "";
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
+    @ViewInject(R.id.back)
+    private View back;
+    @ViewInject(R.id.report)
+    private View reportV;
     @ViewInject(R.id.next)
     private TextView next;
     @ViewInject(R.id.car_info)
     private TextView carInfo;
-    @ViewInject(R.id.back)
-    private View back;
     @ViewInject(R.id.goback)
     private View goBack;
-    @ViewInject(R.id.report)
-    private View reportV;
 
     @Override
     public void onResume() {

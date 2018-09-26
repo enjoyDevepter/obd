@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,8 +14,7 @@ import java.util.TimerTask;
 
 @PageSetting(contentViewId = R.layout.collect_one_layout)
 public class CollectOnePage extends AppBasePage implements View.OnClickListener {
-
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -22,9 +22,11 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     private View reportV;
     @ViewInject(R.id.confirm)
     private TextView confirmV;
+    @ViewInject(R.id.info)
+    private TextView infoTV;
     private Timer timer = new Timer();
     private TimerTask timerTask;
-    private int time = 3;
+    private int time = 15;
     private boolean ishow;
 
     @Override
@@ -32,8 +34,9 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
         super.onResume();
         back.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
-        confirmV.setSelected(false);
+        confirmV.setEnabled(false);
         title.setText("深度校准步骤");
+        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>第一步：提速至20km/h;<br>第二步：掉头；<br>第三步:缓慢提速至60km/h以上并</font><font color='#009488'>保持直线行驶</font>若干分钟，直至校准完成！<br><br>注意：<font color='#009488'>请不要急加速或急减速！</font><br><br><font color='#4A4A4A'>请在安全行驶的前提下操作！<br>校准完成后APP会语音提示您！</font><br><br>"));
         if (!ishow) {
             ishow = true;
             timerTask = new TimerTask() {
@@ -48,7 +51,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
                                 timerTask.cancel();
                                 timerTask = null;
                                 confirmV.setText("下一步");
-                                confirmV.setSelected(true);
+                                confirmV.setEnabled(true);
                                 confirmV.setOnClickListener(CollectOnePage.this);
                             } else {
                                 confirmV.setText("下一步(" + time + "s)");
@@ -60,7 +63,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
             };
             timer.schedule(timerTask, 1000, 1000);
         } else {
-            confirmV.setSelected(true);
+            confirmV.setEnabled(true);
             confirmV.setOnClickListener(CollectOnePage.this);
         }
     }

@@ -15,7 +15,7 @@ import org.simple.eventbus.EventBus;
 @PageSetting(contentViewId = R.layout.collect_two_layout, toHistory = false)
 public class CollectTwoPage extends AppBasePage implements View.OnClickListener {
 
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -30,7 +30,7 @@ public class CollectTwoPage extends AppBasePage implements View.OnClickListener 
         reportV.setVisibility(View.GONE);
         confirmV.setOnClickListener(this);
         back.setOnClickListener(this);
-        title.setText("深度校准(图示)");
+        title.setText("深度校准图示");
     }
 
 

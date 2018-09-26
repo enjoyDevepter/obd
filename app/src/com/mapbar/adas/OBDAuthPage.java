@@ -1,11 +1,15 @@
 package com.mapbar.adas;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,31 +47,37 @@ import okhttp3.Response;
 public class OBDAuthPage extends AppBasePage implements BleCallBackListener, LocationListener, View.OnClickListener {
 
     OBDStatusInfo obdStatusInfo;
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
     @ViewInject(R.id.status)
-    private TextView statusTV;
-    @ViewInject(R.id.close)
-    private View closeV;
+    private View statusV;
     private volatile boolean verified;
     private CustomDialog dialog;
     private LocationManager locationManager;
     private volatile boolean needNotifyParamsSuccess;
     private volatile boolean needNotifyVerifiedSuccess;
 
+    private AnimationDrawable animationDrawable;
+
     @Override
     public void onResume() {
         super.onResume();
         title.setText("获取盒子状态");
         reportV.setOnClickListener(this);
-        closeV.setOnClickListener(this);
         back.setVisibility(View.GONE);
+        statusV.setBackgroundResource(R.drawable.check_status_bg);
+        animationDrawable = (AnimationDrawable) statusV.getBackground();
+        animationDrawable.start();
         verify();
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
     }
 
@@ -81,7 +91,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
      * 授权
      */
     private void verify() {
-        showProgress();
         final Request request = new Request.Builder().url(URLUtils.GET_TIME).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -111,7 +120,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     @Override
     public void onStop() {
         super.onStop();
-        dismissProgress();
+        animationDrawable.stop();
         verified = false;
         BlueManager.getInstance().removeCallBackListener(this);
     }
@@ -126,7 +135,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.UNREGISTERED://未注册
-                dismissProgress();
 //                // 激活
                 obdStatusInfo = (OBDStatusInfo) data;
                 Log.d("obdStatusInfo  " + obdStatusInfo);
@@ -158,7 +166,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             case OBDEvent.PARAM_UPDATE_FAIL:
                 break;
             case OBDEvent.CURRENT_MISMATCHING:
-                dismissProgress();
                 ProtocolCheckFailPage checkFailPage = new ProtocolCheckFailPage();
                 Bundle checkFailPageBundle = new Bundle();
                 checkFailPageBundle.putBoolean("before_matching", false);
@@ -166,7 +173,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 PageManager.go(checkFailPage);
                 break;
             case OBDEvent.BEFORE_MATCHING:
-                dismissProgress();
                 ProtocolCheckFailPage protocolCheckFailPage = new ProtocolCheckFailPage();
                 Bundle protocolCheckFailPageBundle = new Bundle();
                 protocolCheckFailPageBundle.putBoolean("before_matching", true);
@@ -174,7 +180,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 PageManager.go(protocolCheckFailPage);
                 break;
             case OBDEvent.UN_ADJUST:
-                dismissProgress();
                 CollectGuide collectGuide = new CollectGuide();
                 Bundle collectBundle = new Bundle();
                 collectBundle.putBoolean("matching", true);
@@ -183,7 +188,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 PageManager.go(collectGuide);
                 break;
             case OBDEvent.NORMAL:
-                dismissProgress();
                 MainPage mainPage = new MainPage();
                 Bundle mainBundle = new Bundle();
                 mainBundle.putSerializable("obdStatusInfo", (OBDStatusInfo) data);
@@ -222,7 +226,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -266,9 +269,8 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                closeV.setVisibility(View.VISIBLE);
-                                dismissProgress();
-                                statusTV.setText("您的盒子可能为盗版盒子,\n请联系商家或厂家客服\nwww.obdbox.cn");
+//                                closeV.setVisibility(View.VISIBLE);
+//                                statusTV.setText("您的盒子可能为盗版盒子,\n请联系商家或厂家客服\nwww.obdbox.cn");
                             }
                         });
                     }
@@ -288,7 +290,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         GlobalUtil.getHandler().post(new Runnable() {
             @Override
             public void run() {
-                dismissProgress();
                 dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                         .setViewListener(new CustomDialog.ViewListener() {
                             @Override
@@ -349,7 +350,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -488,9 +488,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
             case R.id.report:
                 uploadLog();
                 break;
-            case R.id.close:
-                PageManager.finishActivity(MainActivity.getInstance());
-                break;
         }
     }
 
@@ -546,9 +543,8 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     PageManager.go(collectGuide);
                                     break;
                                 case 3: // 临时车型，参数已采集
-                                    dismissProgress();
-                                    closeV.setVisibility(View.VISIBLE);
-                                    statusTV.setText("您的胎压盒子还在进一步校准中，\n请耐心等待，整个校准过程大概需要十几分钟,\n如果遇到长时间没有校准完成，您可以联系我们的客服!");
+//                                    closeV.setVisibility(View.VISIBLE);
+//                                    statusTV.setText("您的胎压盒子还在进一步校准中，\n请耐心等待，整个校准过程大概需要十几分钟,\n如果遇到长时间没有校准完成，您可以联系我们的客服!");
                                     break;
                             }
                         }

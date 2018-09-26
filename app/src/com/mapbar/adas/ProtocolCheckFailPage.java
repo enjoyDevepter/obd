@@ -37,8 +37,7 @@ import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.protocol_check_fail_layout, toHistory = false)
 public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
-
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
     private View back;
@@ -65,8 +64,8 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         super.onResume();
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
-        confirmV.setSelected(false);
-        title.setText("未检测到车辆数据");
+        confirmV.setEnabled(false);
+        title.setText("未检测到车辆数据!");
         beforeMatching = getDate().getBoolean("before_matching");
         if (beforeMatching) {
             beforeMatchingV.setVisibility(View.VISIBLE);
@@ -155,7 +154,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                             timerTask.cancel();
                             timerTask = null;
                             confirmV.setText("确认，我已打火!");
-                            confirmV.setSelected(true);
+                            confirmV.setEnabled(true);
                             confirmV.setOnClickListener(ProtocolCheckFailPage.this);
                         } else {
                             confirmV.setText("确认，我已打火!(" + time + "s)");
@@ -216,8 +215,9 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     cleanParams(obdStatusInfo);
                 } else {
                     times++;
+                    confirmV.setText("请您再次确认车辆已打火！\n请您务必确认已打火后再点击确认按钮!");
                     confirmV.setOnClickListener(null);
-                    confirmV.setSelected(false);
+                    confirmV.setEnabled(false);
                     time = 3;
                     initTimer();
                     timer.schedule(timerTask, 3000, 1000);

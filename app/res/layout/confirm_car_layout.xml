@@ -2,52 +2,35 @@
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <include layout="@layout/layout_tittle" />
+    <include layout="@layout/tittle_layout" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingLeft="20dp"
-        android:paddingTop="20dp">
+    <TextView
+        android:id="@+id/car_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:text="当前选择车型："
+        android:textColor="@color/text_color"
+        android:textSize="@dimen/text_size" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="20dp"
-            android:text="当前选择车型："
-            android:textColor="#FF555555"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/car_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="20dp"
-            android:textColor="#FF555555"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
-            android:text="车型选择之后不可以修改! \n请您务必正确选择！ \n\n 否则会导致胎压盒子无法使用！"
-            android:textColor="#FFFF0000"
-            android:textSize="20sp" />
-
-    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="40dp"
+        android:lineSpacingExtra="4dp"
+        android:text="车型选择之后不可以修改! \n\n请您务必正确选择！\n 否则会导致胎压盒子无法使用！"
+        android:textColor="#FF009488"
+        android:textSize="@dimen/text_size" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="50dp"
         android:orientation="horizontal">
 
         <TextView

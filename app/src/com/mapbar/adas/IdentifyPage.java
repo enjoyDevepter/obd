@@ -32,19 +32,31 @@ import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.identifying_layout)
 public class IdentifyPage extends AppBasePage implements View.OnClickListener {
-
-    @ViewInject(R.id.title_text)
+    @ViewInject(R.id.title)
     private TextView title;
-    @ViewInject(R.id.content)
-    private EditText content;
-    @ViewInject(R.id.next)
-    private TextView next;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.report)
     private View reportV;
+    @ViewInject(R.id.next)
+    private TextView next;
     @ViewInject(R.id.phone)
     private TextView phone;
+    @ViewInject(R.id.retry)
+    private View retryV;
+    @ViewInject(R.id.one)
+    private EditText oneET;
+    @ViewInject(R.id.two)
+    private EditText twoET;
+    @ViewInject(R.id.three)
+    private EditText threeET;
+    @ViewInject(R.id.four)
+    private EditText fourET;
+    @ViewInject(R.id.five)
+    private EditText fiveET;
+    @ViewInject(R.id.six)
+    private EditText sixET;
+
     private CustomDialog dialog;
 
     @Override
@@ -71,16 +83,24 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             case R.id.report:
                 uploadLog();
                 break;
+            case R.id.retry:
+                break;
         }
     }
 
     private void check() {
-        final String identify = content.getText().toString();
-        if (GlobalUtil.isEmpty(identify)) {
+        final String one = oneET.getText().toString();
+        final String two = twoET.getText().toString();
+        final String three = threeET.getText().toString();
+        final String four = fourET.getText().toString();
+        final String five = fiveET.getText().toString();
+        final String six = sixET.getText().toString();
+        if (GlobalUtil.isEmpty(one) || GlobalUtil.isEmpty(two) || GlobalUtil.isEmpty(three) || GlobalUtil.isEmpty(four) || GlobalUtil.isEmpty(five) || GlobalUtil.isEmpty(six)) {
             Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
             return;
         }
         showProgress();
+        final String identify = one + two + three + four + five + six;
         next.setEnabled(false);
         JSONObject jsonObject = new JSONObject();
         try {
