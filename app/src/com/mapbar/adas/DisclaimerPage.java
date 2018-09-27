@@ -52,7 +52,7 @@ public class DisclaimerPage extends AppBasePage implements View.OnClickListener 
                     PageManager.go(new OBDAuthPage());
                 } else {
                     BlueManager.getInstance().stopScan(false);
-                    PageManager.go(new InstallationGuidePage());
+                    PageManager.go(new ConnectPage());
                 }
                 break;
             case R.id.disagree:
