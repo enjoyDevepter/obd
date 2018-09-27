@@ -212,12 +212,12 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 break;
             case R.id.confirm:
                 if (times >= 2) {
+                    confirmV.setEnabled(false);
                     cleanParams(obdStatusInfo);
                 } else {
                     times++;
                     currentMatchingTV.setText("请您再次确认车辆已打火！\n请您务必确认已打火后再点击确认按钮!");
                     confirmV.setText("确认已打火");
-                    confirmV.setOnClickListener(null);
                     confirmV.setEnabled(false);
                     time = 15;
                     initTimer();
@@ -335,6 +335,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
+                confirmV.setEnabled(true);
                 Log.d("cleanParams success " + responese);
                 try {
                     final JSONObject result = new JSONObject(responese);

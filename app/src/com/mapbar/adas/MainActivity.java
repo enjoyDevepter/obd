@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.zxing.client.android.CaptureActivity;
 import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.utils.AlarmManager;
+import com.mapbar.adas.utils.PermissionUtil;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
@@ -35,6 +36,7 @@ import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +57,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import me.jessyan.rxerrorhandler.core.RxErrorHandler;
+import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -206,6 +210,28 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onResume() {
         super.onResume();
+
+        PermissionUtil.requestPermissionForInit(new PermissionUtil.RequestPermission() {
+            @Override
+            public void onRequestPermissionSuccess() {
+                //request permission success, do something.
+            }
+
+            @Override
+            public void onRequestPermissionFailure(List<String> permissions) {
+                PageManager.finishActivity(MainActivity.this);
+            }
+
+            @Override
+            public void onRequestPermissionFailureWithAskNeverAgain(List<String> permissions) {
+                PageManager.finishActivity(MainActivity.this);
+            }
+        }, new RxPermissions(MainActivity.getInstance()), RxErrorHandler.builder().with(MainActivity.getInstance()).responseErrorListener(new ResponseErrorListener() {
+            @Override
+            public void handleResponseError(Context context, Throwable t) {
+
+            }
+        }).build());
         if (isFirst()) {
             addTasks();
         }
@@ -249,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
     private void addTasks() {
         TaskManager.getInstance()
-                .addTask(new SDInitTask())
+//                .addTask(new SDInitTask())
                 .addTask(new DisclaimerTask())
                 .addTask(new LocationCheckTask())
                 .addTask(new UpdateTask());

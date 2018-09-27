@@ -74,14 +74,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
                 PageManager.back();
                 break;
             case R.id.next:
-                IdentifyPage page = new IdentifyPage();
-                Bundle bundle = new Bundle();
-                bundle.putString("boxId", getDate().getString("boxId"));
-                bundle.putString("sn", getDate().getString("sn"));
-                bundle.putString("phone", content.getText().toString());
-                page.setDate(bundle);
-                PageManager.go(page);
-//                getMSN();
+                getMSN();
                 break;
             case R.id.report:
                 uploadLog();
