@@ -31,8 +31,8 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener {
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         confirmV.setOnClickListener(this);
-//        success = getDate().getBoolean("success");
-        if (false) {
+        success = getDate().getBoolean("success");
+        if (success) {
             title.setText("深度校准成功");
             confirmV.setText("关闭");
             successTV.setText(Html.fromHtml("<font color='#4A4A4A'>恭喜您！胎压盒子可以正常使用了！<br><br><br>当轮胎亏气时,</font><font color='#009488'>胎压盒子会发出连续蜂鸣声！</font><font color='#4A4A4A'>此时您需要停车并用APP连接盒子，点击“校准”后可以停止蜂鸣！如果继续亏气，仍然会再次蜂鸣！</font>"));

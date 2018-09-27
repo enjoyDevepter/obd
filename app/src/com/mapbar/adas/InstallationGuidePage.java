@@ -29,7 +29,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
     private TextView confirmV;
     private Timer timer = new Timer();
     private TimerTask timerTask;
-    private int time = 2;
+    private int time = 10;
     private boolean ishow;
 
     @Override
@@ -38,9 +38,9 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
         title.setText("安装引导一");
         reportV.setVisibility(View.GONE);
         back.setVisibility(View.GONE);
-        confirmV.setEnabled(false);
         firstTV.setText(Html.fromHtml("第一步：<font color='#009488'>请停车拉手刹!</font><br><font color='#4A4A4A'>自动挡挂P档、并拉手刹；手动挡挂空挡、并拉手刹。</font><br><br>"));
         secondTV.setText(Html.fromHtml("第二步：<font color='#009488'>请将车辆打火!</font><br><font color='#4A4A4A'>请确保车辆已打火</font><br><br>请完成以上操作后，再点击确认按钮！<br>否则会导致安装失败！"));
+        confirmV.setEnabled(ishow);
         if (!ishow) {
             ishow = true;
             timerTask = new TimerTask() {
@@ -66,6 +66,8 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
                 }
             };
             timer.schedule(timerTask, 0, 1000);
+        } else {
+            confirmV.setOnClickListener(this);
         }
     }
 

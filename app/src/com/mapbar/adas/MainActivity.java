@@ -528,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                             notify = true;
                             Log.d("提示校准完成");
                             AlarmManager.getInstance().play(R.raw.success);
-                            EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
+                            EventBus.getDefault().post(1, EventBusTags.COLLECT_FINISHED);
                         }
                     }
                 }

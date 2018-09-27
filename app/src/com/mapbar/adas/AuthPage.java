@@ -2,6 +2,7 @@ package com.mapbar.adas;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,11 +20,14 @@ import com.miyuan.obd.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -56,9 +60,9 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         super.onResume();
         title.setText("输入授权码");
         next.setOnClickListener(this);
+        reportV.setOnClickListener(this);
         scanV.setOnClickListener(this);
         back.setOnClickListener(this);
-        reportV.setVisibility(View.GONE);
 
         if (getDate() != null && null != getDate().get("sn")) {
             String sn = (String) getDate().get("sn");
@@ -98,9 +102,11 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
                 break;
             case R.id.report:
+                uploadLog();
                 break;
         }
     }
+
 
     private void check() {
 
@@ -113,7 +119,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请输入授权码", Toast.LENGTH_LONG).show();
             return;
         }
-        showProgress();
         next.setEnabled(false);
         final StringBuilder sn = new StringBuilder();
         sn.append(sn01).append("-").append(sn02).append("-").append(sn03).append("-").append(sn04);
@@ -138,7 +143,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -151,7 +155,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 check();
                                             }
@@ -173,7 +176,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 String responese = response.body().string();
                 Log.d(responese);
                 try {
-                    dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         PhonePage page = new PhonePage();
@@ -197,4 +199,55 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             }
         });
     }
+
+    private void uploadLog() {
+        Log.d("AuthPage uploadLog ");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File[] logs = dir.listFiles();
+
+        if (null != logs && logs.length > 0) {
+            final StringBuilder sn = new StringBuilder();
+            sn.append(sn_01.getText().toString()).append("-").append(sn_02.getText().toString()).append("-").append(sn_03.getText().toString()).append("-").append(sn_04.getText().toString());
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", sn.toString()))
+                    .addPart(MultipartBody.Part.createFormData("type", "1"));
+            for (File file : logs) {
+                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            }
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_ERROR_FILE)
+                    .post(builder.build())
+                    .build();
+
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("AuthPage uploadLog onFailure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("AuthPage uploadLog success " + responese);
+                    try {
+                        final JSONObject result = new JSONObject(responese);
+                        if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            for (File delete : logs) {
+                                delete.delete();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.d("AuthPage uploadLog failure " + e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
 }

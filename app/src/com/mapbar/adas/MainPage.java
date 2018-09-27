@@ -273,6 +273,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     try {
                         final JSONObject result = new JSONObject(responese);
                         if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             for (File delete : logs) {
                                 delete.delete();
                             }

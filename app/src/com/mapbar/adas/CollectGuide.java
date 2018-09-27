@@ -33,8 +33,8 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
         super.onResume();
         title.setText("深度校准准备");
         back.setVisibility(View.GONE);
-        reportV.setOnClickListener(this);
-        confirmV.setEnabled(false);
+        reportV.setVisibility(View.GONE);
+        confirmV.setEnabled(ishow);
         back.setVisibility(View.GONE);
         if (!ishow) {
             ishow = true;
@@ -59,8 +59,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                 }
             }, 1000, 1000);
         } else {
-            confirmV.setEnabled(true);
-            confirmV.setOnClickListener(CollectGuide.this);
+            confirmV.setOnClickListener(this);
         }
     }
 

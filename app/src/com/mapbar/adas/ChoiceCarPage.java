@@ -105,7 +105,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 getCarBrands();
                                             }
@@ -188,7 +187,6 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 getCarModelForBrands(id);
                                             }
                                         });
@@ -349,6 +347,12 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                     try {
                         final JSONObject result = new JSONObject(responese);
                         if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             for (File delete : logs) {
                                 delete.delete();
                             }

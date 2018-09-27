@@ -20,6 +20,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -43,7 +45,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
     @ViewInject(R.id.phone)
     private TextView phone;
     @ViewInject(R.id.retry)
-    private View retryV;
+    private TextView retryTV;
     @ViewInject(R.id.one)
     private EditText oneET;
     @ViewInject(R.id.two)
@@ -56,6 +58,9 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
     private EditText fiveET;
     @ViewInject(R.id.six)
     private EditText sixET;
+    private Timer timer = new Timer();
+    private TimerTask timerTask;
+    private int time = 60;
 
     private CustomDialog dialog;
 
@@ -69,6 +74,30 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
         if (getDate() != null) {
             phone.setText(getDate().getString("phone"));
         }
+        retryTV.setEnabled(false);
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (time <= 0 && timer != null) {
+                            timer.cancel();
+                            timer = null;
+                            timerTask.cancel();
+                            timerTask = null;
+                            retryTV.setText("重新发送");
+                            retryTV.setEnabled(true);
+                            retryTV.setOnClickListener(IdentifyPage.this);
+                        } else {
+                            retryTV.setText("(" + time + "s)后重发");
+                        }
+                        time--;
+                    }
+                });
+            }
+        };
+        timer.schedule(timerTask, 0, 1000);
     }
 
     @Override
@@ -84,9 +113,93 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 uploadLog();
                 break;
             case R.id.retry:
+                getMSN();
                 break;
         }
     }
+
+    private void getMSN() {
+        String phone = getDate().getString("phone");
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("phone", phone);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        next.setEnabled(false);
+        Log.d("IdentifyPage get MSN input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.GET_SMS).post(requestBody).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("IdentifyPage get MSN failure " + e.getMessage());
+
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                confirm.setEnabled(false);
+                                                getMSN();
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("IdentifyPage get MSN " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                next.setEnabled(true);
+                                Toast.makeText(GlobalUtil.getContext(), "发送成功", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                next.setEnabled(true);
+                                Toast.makeText(GlobalUtil.getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    Log.d("IdentifyPage get MSN failure " + e.getMessage());
+                }
+            }
+        });
+
+    }
+
 
     private void check() {
         final String one = oneET.getText().toString();
@@ -99,7 +212,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
             Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
             return;
         }
-        showProgress();
         final String identify = one + two + three + four + five + six;
         next.setEnabled(false);
         JSONObject jsonObject = new JSONObject();
@@ -121,7 +233,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        dismissProgress();
                         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                                 .setViewListener(new CustomDialog.ViewListener() {
                                     @Override
@@ -134,7 +245,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 check();
                                             }
@@ -156,7 +266,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 String responese = response.body().string();
                 Log.d(responese);
                 try {
-                    dismissProgress();
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         ChoiceCarPage choiceCarPage = new ChoiceCarPage();
@@ -213,6 +322,12 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                     try {
                         final JSONObject result = new JSONObject(responese);
                         if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             for (File delete : logs) {
                                 delete.delete();
                             }

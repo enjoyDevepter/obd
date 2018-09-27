@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
@@ -218,7 +219,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     confirmV.setText("确认已打火");
                     confirmV.setOnClickListener(null);
                     confirmV.setEnabled(false);
-                    time = 3;
+                    time = 15;
                     initTimer();
                     timer.schedule(timerTask, 0, 1000);
                 }
@@ -256,6 +257,12 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     try {
                         final JSONObject result = new JSONObject(responese);
                         if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             for (File delete : logs) {
                                 delete.delete();
                             }

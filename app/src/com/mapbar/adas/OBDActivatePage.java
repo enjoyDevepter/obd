@@ -4,6 +4,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
@@ -117,7 +118,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 activate();
                                             }
@@ -161,8 +161,9 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                 activateSuccess((OBDStatusInfo) data);
                 break;
             case OBDEvent.AUTHORIZATION_FAIL:
-                authFail("授权失败!请联系客服!");
                 // 上传日志
+                uploadLog();
+                authFail("授权失败!请联系客服!");
                 break;
         }
     }
@@ -242,7 +243,6 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 activateSuccess(obdStatusInfo);
                                             }
@@ -321,6 +321,12 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
                     try {
                         final JSONObject result = new JSONObject(responese);
                         if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             for (File delete : logs) {
                                 delete.delete();
                             }

@@ -28,7 +28,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     @ViewInject(R.id.confirm)
     private TextView confirmV;
     private Timer timer;
-    private int time = 2;
+    private int time = 15;
     private boolean ishow;
 
 
@@ -37,7 +37,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
         super.onResume();
         title.setText("安装引导二");
         back.setOnClickListener(this);
-        confirmV.setEnabled(false);
+        confirmV.setEnabled(ishow);
         reportV.setVisibility(View.GONE);
         firstTV.setText(Html.fromHtml("第一步：<font color='#009488'>请检查轮胎胎压一致</font><br><font color='#4A4A4A'>（建议使用胎压计测量）</font><br><br>"));
         secondTV.setText(Html.fromHtml("第二步：<font color='#4A4A4A'>请您准备好以下工具</font><br>1、<font color='#009488'>手机</font><font color='#4A4A4A'>（注册收取验证码）</font><br>2、<font color='#009488'>包装盒</font><font color='#4A4A4A'>（获取授权码）</font>"));
@@ -64,6 +64,8 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
                     });
                 }
             }, 1000, 1000);
+        } else {
+            confirmV.setOnClickListener(this);
         }
     }
 

@@ -155,6 +155,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 break;
             case OBDEvent.AUTHORIZATION_FAIL:
                 authFail("授权失败!请联系客服!");
+                uploadLog();
             case OBDEvent.NO_PARAM: // 无参数
                 obdStatusInfo = (OBDStatusInfo) data;
                 checkOBDVersion();
@@ -238,7 +239,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 getLisense();
                                             }
@@ -365,7 +365,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                showProgress();
                                                 confirm.setEnabled(false);
                                                 authSuccess();
                                             }
@@ -598,6 +597,12 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     try {
                         final JSONObject result = new JSONObject(responese);
                         if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             for (File delete : logs) {
                                 delete.delete();
                             }

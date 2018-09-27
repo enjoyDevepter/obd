@@ -25,6 +25,7 @@ public class StatusInfoPage extends AppBasePage implements View.OnClickListener 
         super.onResume();
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
+        confirmV.setOnClickListener(this);
         title.setText("获取盒子状态!");
         boolean fake = getDate().getBoolean("fake");
         statusTV.setText(fake ? "您的盒子可能为盗版盒子，请联系商家或厂家客服。" : "您的胎压盒子还在进一步校准中，请耐心等待。整个校准过程大概需要十几分钟，如果遇到长时间没有校准完成，您可以联系我们的客服。");
