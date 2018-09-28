@@ -15,6 +15,15 @@ public class OBDVersion {
     private int size;
     private String params;
     private String create_time;
+    private boolean upload;
+
+    public boolean isUpload() {
+        return upload;
+    }
+
+    public void setUpload(boolean upload) {
+        this.upload = upload;
+    }
 
     public String getStatus() {
         return status;

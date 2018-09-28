@@ -30,8 +30,24 @@
         android:layout_marginTop="50dp"
         android:background="@drawable/btn_bg"
         android:gravity="center"
-        android:text="查看图示"
+        android:text="马上开始"
         android:textColor="#ffffffff"
         android:textSize="18sp" />
+
+
+    <TextView
+        android:id="@+id/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/go_back_bg"
+        android:gravity="center"
+        android:text="以后再说，退出APP"
+        android:textColor="#ff000000"
+        android:textSize="18sp" />
+
 
 </LinearLayout>

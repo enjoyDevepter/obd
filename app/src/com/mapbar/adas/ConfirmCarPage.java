@@ -42,6 +42,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
     private TextView carInfo;
     @ViewInject(R.id.goback)
     private View goBack;
+    private int times = 1;
 
     @Override
     public void onResume() {
@@ -68,16 +69,19 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
                 uploadLog();
                 break;
             case R.id.next:
-                OBDActivatePage page = new OBDActivatePage();
-                Bundle bundle = new Bundle();
-                bundle.putString("boxId", getDate().getString("boxId"));
-                bundle.putString("phone", getDate().getString("phone"));
-                bundle.putString("code", getDate().getString("code"));
-                bundle.putString("sn", getDate().getString("sn").toString());
-                bundle.putString("carId", getDate().getString("carId").toString());
-                bundle.putString("carName", getDate().get("carName").toString());
-                page.setDate(bundle);
-                PageManager.go(page);
+                if (times >= 2) {
+                    OBDActivatePage page = new OBDActivatePage();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("boxId", getDate().getString("boxId"));
+                    bundle.putString("phone", getDate().getString("phone"));
+                    bundle.putString("code", getDate().getString("code"));
+                    bundle.putString("sn", getDate().getString("sn").toString());
+                    bundle.putString("carId", getDate().getString("carId").toString());
+                    bundle.putString("carName", getDate().get("carName").toString());
+                    page.setDate(bundle);
+                    PageManager.go(page);
+                }
+                times++;
                 break;
         }
     }

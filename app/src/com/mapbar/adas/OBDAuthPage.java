@@ -181,12 +181,15 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 PageManager.go(protocolCheckFailPage);
                 break;
             case OBDEvent.UN_ADJUST:
-                CollectGuide collectGuide = new CollectGuide();
-                Bundle collectBundle = new Bundle();
-                collectBundle.putBoolean("matching", true);
-                collectBundle.putString("sn", obdStatusInfo.getSn());
-                collectGuide.setDate(collectBundle);
-                PageManager.go(collectGuide);
+                PageManager.go(new CollectLastPage());
+//                CollectGuide collectGuide = new CollectGuide();
+//                Bundle collectBundle = new Bundle();
+//                collectBundle.putBoolean("matching", true);
+//                collectBundle.putString("sn", obdStatusInfo.getSn());
+//                collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
+//                collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
+//                collectGuide.setDate(collectBundle);
+//                PageManager.go(collectGuide);
                 break;
             case OBDEvent.NORMAL:
                 MainPage mainPage = new MainPage();
@@ -541,15 +544,20 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     Bundle bundle = new Bundle();
                                     bundle.putBoolean("matching", false);
                                     bundle.putString("sn", obdStatusInfo.getSn());
+                                    bundle.putString("pVersion", obdStatusInfo.getpVersion());
+                                    bundle.putString("bVersion", obdStatusInfo.getbVersion());
                                     collectGuide.setDate(bundle);
                                     PageManager.go(collectGuide);
                                     break;
                                 case 3: // 临时车型，参数已采集
-                                    StatusInfoPage statusInfoPage = new StatusInfoPage();
-                                    Bundle bundle1 = new Bundle();
-                                    bundle1.putBoolean("fake", false);
-                                    statusInfoPage.setDate(bundle1);
-                                    PageManager.go(statusInfoPage);
+                                    CollectFinish collectFinish = new CollectFinish();
+                                    Bundle collectBundle = new Bundle();
+                                    collectBundle.putString("sn", obdStatusInfo.getSn());
+                                    collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
+                                    collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
+                                    collectBundle.putBoolean("success", false);
+                                    collectFinish.setDate(collectBundle);
+                                    PageManager.go(collectFinish);
                                     break;
                             }
                         }

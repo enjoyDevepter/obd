@@ -7,16 +7,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.preferences.SettingPreferencesConfig;
@@ -25,7 +22,6 @@ import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.adas.view.NumberSeekBar;
-import com.mapbar.adas.view.SensitiveView;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
@@ -57,15 +53,12 @@ import okhttp3.Response;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.ADJUST_START;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.ADJUST_SUCCESS;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_WARM;
-import static com.mapbar.adas.view.SensitiveView.Type.LOW;
-import static com.mapbar.adas.view.SensitiveView.Type.MEDIUM;
 
 @PageSetting(contentViewId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     private static final int UNIT = 1024;
     CustomDialog dialog = null;
     CustomDialog updateDialog = null;
-    private SensitiveView.Type type = SensitiveView.Type.MEDIUM;
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.title_text)
@@ -98,9 +91,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private ProgressBar progressBar;
     private DownloadManager downloadManager;
     private long mTaskId;
-    private Handler mMainHandler = new Handler(Looper.getMainLooper());
-    private HandlerThread mWorkerThread;
-    private Handler mHandler;
+    //    private Handler mMainHandler = new Handler(Looper.getMainLooper());
+//    private HandlerThread mWorkerThread;
+//    private Handler mHandler;
     private int time = 10;
     private Timer timer;
     private TimerTask timerTask;
@@ -167,15 +160,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         BlueManager.getInstance().addBleCallBackListener(this);
         obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
         getUserInfo();
-//        if (getDate() != null) {
-//            if (getDate().getBoolean("showStudy")) {
-//                showStudy();
-//                return;
-//            }
-//        }
-
         checkOBDVersion(obdStatusInfo);
-
         heartTimer = new Timer();
         heartTimer.schedule(new TimerTask() {
             @Override
@@ -183,15 +168,12 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 BlueManager.getInstance().send(ProtocolUtils.sentHeart());
             }
         }, 1000 * 30, 1000 * 60);
-    }
+        ImmersionBar.with(MainActivity.getInstance())
+                .fitsSystemWindows(true)
+                .statusBarDarkFont(true)
+                .statusBarColor(R.color.main_title_color)
+                .init(); //初始化，默认透明状态栏和黑色导航栏
 
-    @Override
-    public void onStart() {
-        Log.d("onStartonStartonStartonStart");
-        super.onStart();
-        mWorkerThread = new HandlerThread(MainPage.class.getSimpleName());
-        mWorkerThread.start();
-        mHandler = new WorkerHandler(mMainHandler, mWorkerThread.getLooper());
     }
 
     @Override
@@ -199,11 +181,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         super.onStop();
         BlueManager.getInstance().send(ProtocolUtils.stopGetTirePressureStatusUpdateSucess());
         BlueManager.getInstance().removeCallBackListener(this);
-        mHandler.removeMessages(0);
-        mWorkerThread.quitSafely();
-        mHandler = null;
-        mWorkerThread = null;
-
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -331,19 +308,13 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
-                        sensitiveView = (NumberSeekBar) view.findViewById(R.id.sensitive);
+                        sensitiveView = view.findViewById(R.id.sensitive);
                         sensitiveView.setCurProgress(obdStatusInfo.getSensitive());
                         view.findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().send(ProtocolUtils.setSensitive(type == LOW ? 01 : type == MEDIUM ? 02 : 03));
+                                BlueManager.getInstance().send(ProtocolUtils.setSensitive(sensitiveView.getCurProgress()));
                                 dialog.dismiss();
-                            }
-                        });
-                        sensitiveView.setOnProgressChangeListener(new NumberSeekBar.OnProgressChangeListener() {
-                            @Override
-                            public void onProgress(int progress) {
-                                BlueManager.getInstance().send(ProtocolUtils.setSensitive(progress));
                             }
                         });
                     }
@@ -519,11 +490,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case OBDEvent.OBD_STUDY:
                 AlarmManager.getInstance().play(R.raw.begin);
-                mHandler.sendEmptyMessage(0);
+//                mHandler.sendEmptyMessage(0);
                 break;
             case OBDEvent.OBD_STUDY_PROGRESS:
                 if ((Integer) data >= 0) {
-                    mHandler.sendEmptyMessage(0);
+//                    mHandler.sendEmptyMessage(0);
                 } else {
                     // 弹出胎压学习对话框
                     showStudy();
@@ -918,27 +889,5 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
 
         BlueManager.getInstance().send(ProtocolUtils.updateForUnit(index, date));
-    }
-
-    private final class WorkerHandler extends Handler {
-
-        private Handler mainHandler;
-
-        WorkerHandler(Handler handler, Looper looper) {
-            super(looper);
-            mainHandler = handler;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            mainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
-                    WorkerHandler.this.sendEmptyMessage(0);
-                }
-            }, 3000);
-        }
     }
 }

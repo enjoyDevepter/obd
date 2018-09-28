@@ -86,6 +86,8 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("matching", getDate().getBoolean("matching"));
                 bundle.putString("sn", getDate().getString("sn"));
+                bundle.putString("pVersion", getDate().getString("pVersion"));
+                bundle.putString("bVersion", getDate().getString("bVersion"));
                 collectOnePage.setDate(bundle);
                 PageManager.go(collectOnePage);
                 break;

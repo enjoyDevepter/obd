@@ -96,6 +96,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.NO_PARAM: // 删除参数逻辑
+                confirmV.setEnabled(true);
                 obdStatusInfo = (OBDStatusInfo) data;
                 if (null != timer) {
                     timer.cancel();
@@ -105,6 +106,8 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 Bundle collectBundle = new Bundle();
                 collectBundle.putString("sn", obdStatusInfo.getSn());
                 collectBundle.putBoolean("matching", false);
+                collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
+                collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
                 collectGuide.setDate(collectBundle);
                 PageManager.go(collectGuide);
                 break;
@@ -127,6 +130,8 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("matching", true);
                 bundle.putString("sn", obdStatusInfo.getSn());
+                bundle.putString("pVersion", obdStatusInfo.getpVersion());
+                bundle.putString("bVersion", obdStatusInfo.getbVersion());
                 guide.setDate(bundle);
                 PageManager.go(guide);
                 break;
@@ -213,6 +218,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             case R.id.confirm:
                 if (times >= 2) {
                     confirmV.setEnabled(false);
+                    confirmV.setOnClickListener(null);
                     cleanParams(obdStatusInfo);
                 } else {
                     times++;
@@ -335,7 +341,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                confirmV.setEnabled(true);
                 Log.d("cleanParams success " + responese);
                 try {
                     final JSONObject result = new JSONObject(responese);

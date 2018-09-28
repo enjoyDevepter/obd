@@ -24,6 +24,8 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     private View reportV;
     @ViewInject(R.id.confirm)
     private TextView confirmV;
+    @ViewInject(R.id.cancel)
+    private View cancelV;
     @ViewInject(R.id.info)
     private TextView infoTV;
     private Timer timer = new Timer();
@@ -35,6 +37,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     public void onResume() {
         super.onResume();
         back.setOnClickListener(this);
+        cancelV.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
         confirmV.setEnabled(ishow);
         title.setText("深度校准步骤");
@@ -52,11 +55,14 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
                                 timer = null;
                                 timerTask.cancel();
                                 timerTask = null;
-                                confirmV.setText("查看图示");
+                                confirmV.setText("马上开始");
                                 confirmV.setEnabled(true);
                                 confirmV.setOnClickListener(CollectOnePage.this);
                             } else {
-                                confirmV.setText("查看图示(" + time + "s)");
+                                if (time == 5) {
+                                    BlueManager.getInstance().send(ProtocolUtils.run());
+                                }
+                                confirmV.setText("马上开始(" + time + "s)");
                             }
                             time--;
                         }
@@ -88,13 +94,17 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
                 PageManager.back();
                 break;
             case R.id.confirm:
-                BlueManager.getInstance().send(ProtocolUtils.run());
                 CollectTwoPage collectTwoPage = new CollectTwoPage();
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("matching", getDate().getBoolean("matching"));
                 bundle.putString("sn", getDate().getString("sn"));
+                bundle.putString("pVersion", getDate().getString("pVersion"));
+                bundle.putString("bVersion", getDate().getString("bVersion"));
                 collectTwoPage.setDate(bundle);
                 PageManager.go(collectTwoPage);
+                break;
+            case R.id.cancel:
+                PageManager.finishActivity(MainActivity.getInstance());
                 break;
         }
     }

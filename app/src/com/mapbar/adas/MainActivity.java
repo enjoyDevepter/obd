@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
      * 航向集合
      */
     private LinkedList<Float> bears = new LinkedList<>();
+    private LinkedList<Integer> adjustSpeed = new LinkedList<>();
     private LinkedList<Long> bearsTime = new LinkedList<>();
 
     private Map<Integer, List<String>> collecData = new HashMap<>();
@@ -93,16 +94,15 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private List<String> locationList = new ArrayList<>();
     private long lastLocationTime;
     private long firstLocationTime;
+    private long turnLocationTime;
     private Timer heartTimer;
     private volatile double maxSpeed = 0;
-    private boolean mathing;
-    private volatile boolean adjust_success;
-    private boolean notify;
     private boolean startCollect;
     private OBDStatusInfo obdStatusInfo;
     private StringBuilder sb = new StringBuilder();
     private volatile boolean hasTrun = false;
     private long startTime;
+    private boolean adjusting;
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -238,17 +238,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         setFirst(false);
         BlueManager.getInstance().addBleCallBackListener(this);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
     }
 
     @Override
@@ -280,12 +269,27 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .addTask(new LocationCheckTask())
                 .addTask(new UpdateTask());
         TaskManager.getInstance().next();
+    }
 
+    @Subscriber(tag = EventBusTags.ADJUST)
+    private void startAdjust(String id) {
+        adjusting = true;
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
     }
 
     @Subscriber(tag = EventBusTags.START_COLLECT)
     private void startCollect(boolean mathing) {
-        this.mathing = mathing;
         startTime = System.currentTimeMillis();
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -377,7 +381,11 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 updateStatusInfo(obdStatusInfo);
                 break;
             case OBDEvent.ADJUST_SUCCESS:
-                adjust_success = true;
+                if (adjusting) {
+                    adjusting = false;
+                    locationManager.removeUpdates(this);
+                    EventBus.getDefault().post(0, EventBusTags.ADJUST_SUCCESS);
+                }
                 break;
             case OBDEvent.COLLECT_DATA:
                 byte[] onePackage = (byte[]) data;
@@ -452,59 +460,69 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     public void onLocationChanged(Location location) {
         if ("gps".equals(location.getProvider())) {
+
             if (firstLocationTime == 0) {
                 firstLocationTime = System.currentTimeMillis();
             }
             lastLocationTime = System.currentTimeMillis();
             currentSpeed = (int) (location.getSpeed() * 3.6);
-            maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
-            if (!startCollect && currentSpeed > 15) {
-                startCollect = true;
-                BlueManager.getInstance().send(ProtocolUtils.startCollect());
-            }
-            sb = new StringBuilder();
-            sb.append(location.getTime()).append("#")
-                    .append(location.getSpeed()).append("#")
-                    .append(currentSpeed).append("#")
-                    .append(location.getLongitude()).append("#")
-                    .append(location.getLatitude()).append("#");
-            locationList.add(sb.toString());
 
-            if (!startCollect && startTime != 0 && System.currentTimeMillis() - startTime > 2 * 1000 * 60) {
-                Log.d("提示加速到20迈");
-                AlarmManager.getInstance().play(R.raw.speed_20);
-                startTime = System.currentTimeMillis();
-            }
-
-            Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
-
-            if (startCollect) {
-                if (currentSpeed > 10) {
-                    Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
-                    if (bears.size() > 9) {
-                        bears.pollFirst();
-                        bearsTime.pollFirst();
-                    }
-                    bears.addLast(location.getBearing());
-                    bearsTime.addLast(location.getTime());
+            if (adjusting) {
+                if (currentSpeed < 50) {
+                    adjustSpeed.addLast(currentSpeed);
                 }
-                if (!hasTrun) {
-                    if (hasTurn()) {
-                        hasTrun = true;
-                    }
+                if (adjustSpeed.size() >= 40) {
+                    AlarmManager.getInstance().play(R.raw.adjust_last);
+                    adjustSpeed.clear();
+                }
+                return;
+            } else {
+                maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
+                if (!startCollect && currentSpeed > 15) {
+                    startCollect = true;
+                    BlueManager.getInstance().send(ProtocolUtils.startCollect());
+                }
+                sb = new StringBuilder();
+                sb.append(location.getTime()).append("#")
+                        .append(location.getSpeed()).append("#")
+                        .append(currentSpeed).append("#")
+                        .append(location.getLongitude()).append("#")
+                        .append(location.getLatitude()).append("#");
+                locationList.add(sb.toString());
+
+                if (!startCollect && startTime != 0 && System.currentTimeMillis() - startTime > 40 * 1000) {
+                    Log.d("提示加速到20迈");
+                    AlarmManager.getInstance().play(R.raw.speed_20);
+                    startTime = System.currentTimeMillis();
                 }
 
-                if (!mathing) {
+                Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
+
+                if (startCollect) {
+                    if (currentSpeed > 10) {
+                        Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
+                        if (bears.size() > 9) {
+                            bears.pollFirst();
+                            bearsTime.pollFirst();
+                        }
+                        bears.addLast(location.getBearing());
+                        bearsTime.addLast(location.getTime());
+                    }
+                    if (!hasTrun) {
+                        if (hasTurn()) {
+                            turnLocationTime = System.currentTimeMillis();
+                            hasTrun = true;
+                        }
+                    }
+//                if (!mathing) {
                     if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                         if (!uploadSuccess) {
                             uploadSuccess = true;
-                            Log.d("提示校准失败");
-                            AlarmManager.getInstance().play(R.raw.fail);
                             stopCollect();
                         }
                     } else {
                         if (!hasTrun) {
-                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
+                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 40) {
                                 // 提示请完成掉头操作
                                 Log.d("提示请完成掉头操作");
                                 AlarmManager.getInstance().play(R.raw.trun);
@@ -512,53 +530,20 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                                 return;
                             }
                         } else {
-                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
+                            if (System.currentTimeMillis() - turnLocationTime >= 5 || System.currentTimeMillis() - firstLocationTime >= 1000 * 40) {
                                 // 提示请完成加速
+                                turnLocationTime = Long.MAX_VALUE;
                                 Log.d("提示请完成加速");
-                                AlarmManager.getInstance().play(R.raw.speed);
+                                AlarmManager.getInstance().play(R.raw.speed_60);
                                 firstLocationTime = System.currentTimeMillis();
                                 return;
                             }
                         }
                     }
-                } else {
-                    if (!adjust_success) { // 未校准完成
-                        if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
-                            if (!uploadSuccess) {
-                                uploadSuccess = true;
-                                AlarmManager.getInstance().play(R.raw.success);
-                                stopCollect();
-                            }
-                        } else {
-                            if (!hasTrun) {
-                                if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
-                                    // 提示请完成掉头操作
-                                    Log.d("提示请完成掉头操作");
-                                    AlarmManager.getInstance().play(R.raw.trun);
-                                    firstLocationTime = System.currentTimeMillis();
-                                    return;
-                                }
-                            } else {
-                                if (System.currentTimeMillis() - firstLocationTime >= 1000 * 60) {
-                                    // 提示请完成加速
-                                    Log.d("提示请完成加速");
-                                    AlarmManager.getInstance().play(R.raw.speed);
-                                    firstLocationTime = System.currentTimeMillis();
-                                    return;
-                                }
-                            }
-                        }
-                    } else {
-                        // 校准完成
-                        if (!notify) { // 未通知
-                            notify = true;
-                            Log.d("提示校准完成");
-                            AlarmManager.getInstance().play(R.raw.success);
-                            EventBus.getDefault().post(1, EventBusTags.COLLECT_FINISHED);
-                        }
-                    }
                 }
+
             }
+
         }
     }
 

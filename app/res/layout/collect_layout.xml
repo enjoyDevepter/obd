@@ -8,6 +8,18 @@
 
     <include layout="@layout/tittle_layout" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
+        android:layout_marginTop="10dp"
+        android:gravity="left"
+        android:lineSpacingExtra="4dp"
+        android:text="请您保持直行，并提速至60km/h,\n\n当路线不够直时，请提前减速至40km/h"
+        android:textColor="@color/text_color"
+        android:textSize="@dimen/text_size" />
+
     <View
         android:id="@+id/status"
         android:layout_width="60dp"

@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <include layout="@layout/tittle_layout" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
+        android:text="请您选择合适的路段并保持60km/h以上的速度，并保持直线行驶约5分钟！\n\n当路线不够直时，请提前减速至40km/h以下"
+        android:textColor="@color/text_color"
+        android:textSize="@dimen/text_size" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/confirm"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@drawable/buttom_bg"
+            android:gravity="center"
+            android:text="开始校准"
+            android:textColor="#ff000000"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/next"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/go_back_bg"
+            android:gravity="center"
+            android:text="以后再说"
+            android:textColor="#FFFFFFFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

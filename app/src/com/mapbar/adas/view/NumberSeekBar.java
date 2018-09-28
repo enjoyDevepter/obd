@@ -90,8 +90,8 @@ public class NumberSeekBar extends View {
 
     private void init(Context context, AttributeSet attributeSet) {
         TypedArray array = context.obtainStyledAttributes(attributeSet, R.styleable.NumberSeekBar);
-        minProgress = array.getInt(R.styleable.NumberSeekBar_min_point, 20);
-        maxProgress = array.getInt(R.styleable.NumberSeekBar_max_point, 150);
+        minProgress = array.getInt(R.styleable.NumberSeekBar_min_point, 0);
+        maxProgress = array.getInt(R.styleable.NumberSeekBar_max_point, 100);
 
         textPaint = new TextPaint();
         textPaint.setAntiAlias(true);
@@ -232,17 +232,6 @@ public class NumberSeekBar extends View {
         setMeasuredDimension(width, height);
     }
 
-    public void setCurProgress(int curProgress) {
-        this.curProgress = curProgress;
-        currentIndex = (float) ((curProgress - minProgress) / unint) + progressRect.left;
-        if (currentIndex > this.width - textWid - circleInnerHeight) {//预防设置的值过大或者过小导致画出边界
-            currentIndex = this.width - textWid - circleInnerHeight;
-        } else if (currentIndex < textWid) {
-            currentIndex = textWid;
-        }
-        setCurrentIndex(currentIndex);
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         detector.onTouchEvent(ev);
@@ -253,7 +242,6 @@ public class NumberSeekBar extends View {
         }
         return true;
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -272,6 +260,21 @@ public class NumberSeekBar extends View {
         canvas.drawText(minProgress + "", progressRect.left, bottomTexBaseLineY, bottomTextPaint);
         bottomTextPaint.setTextAlign(Paint.Align.RIGHT);
         canvas.drawText(maxProgress + "", progressRect.right, bottomTexBaseLineY, bottomTextPaint);
+    }
+
+    public int getCurProgress() {
+        return curProgress;
+    }
+
+    public void setCurProgress(int curProgress) {
+        this.curProgress = curProgress;
+        currentIndex = (float) ((curProgress - minProgress) / unint) + progressRect.left;
+        if (currentIndex > this.width - textWid - circleInnerHeight) {//预防设置的值过大或者过小导致画出边界
+            currentIndex = this.width - textWid - circleInnerHeight;
+        } else if (currentIndex < textWid) {
+            currentIndex = textWid;
+        }
+        setCurrentIndex(currentIndex);
     }
 
     /**

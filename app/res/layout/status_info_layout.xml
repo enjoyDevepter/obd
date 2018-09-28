@@ -16,7 +16,6 @@
         android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="10dp"
         android:lineSpacingExtra="4dp"
-        android:text="您的胎压盒子还在进一步校准中，请耐心等待。整个校准过程大概需要十几分钟，如果遇到长时间没有校准完成，您可以联系我们的客服。"
         android:textColor="@color/text_color"
         android:textSize="@dimen/text_size" />
 

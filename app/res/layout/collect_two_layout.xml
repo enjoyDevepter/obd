@@ -8,10 +8,21 @@
 
     <include layout="@layout/tittle_layout" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="@dimen/common_margin_lr"
+        android:layout_marginRight="@dimen/common_margin_lr"
+        android:layout_marginTop="10dp"
+        android:text="请不要关闭手机，不要关闭APP，正在深度校准中。"
+        android:textColor="@color/text_color"
+        android:textSize="@dimen/text_size" />
+
     <FrameLayout
         android:layout_width="200dp"
         android:layout_height="320dp"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="20dp">
 
         <View
             android:layout_width="match_parent"
@@ -39,31 +50,5 @@
             android:textSize="10sp" />
 
     </FrameLayout>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="@dimen/common_margin_lr"
-        android:layout_marginRight="@dimen/common_margin_lr"
-        android:layout_marginTop="30dp"
-        android:text="@string/confir"
-        android:textColor="#FF009488"
-        android:textSize="15sp" />
-
-    <TextView
-        android:id="@+id/confirm"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="@dimen/common_margin_lr"
-        android:layout_marginRight="@dimen/common_margin_lr"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/btn_bg"
-        android:gravity="center"
-        android:text="开始深度校准"
-        android:textColor="#ffffffff"
-        android:textSize="18sp" />
 
 </LinearLayout>
