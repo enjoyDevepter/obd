@@ -11,4 +11,7 @@
     <color name="title">#FF4A4A4A</color>
     <color name="text_color">#FF4A4A4A</color>
     <color name="main_title_color">#FF009488</color>
+    <color name="input_buttom_color">#FFA0A0A0</color>
+
+
 </resources>

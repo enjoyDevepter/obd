@@ -3,7 +3,6 @@ package com.mapbar.adas;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +11,7 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.adas.view.CustomInputView;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -34,6 +34,8 @@ import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.identifying_layout)
 public class IdentifyPage extends AppBasePage implements View.OnClickListener {
+    @ViewInject(R.id.content)
+    CustomInputView contentIV;
     @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
@@ -46,18 +48,6 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
     private TextView phone;
     @ViewInject(R.id.retry)
     private TextView retryTV;
-    @ViewInject(R.id.one)
-    private EditText oneET;
-    @ViewInject(R.id.two)
-    private EditText twoET;
-    @ViewInject(R.id.three)
-    private EditText threeET;
-    @ViewInject(R.id.four)
-    private EditText fourET;
-    @ViewInject(R.id.five)
-    private EditText fiveET;
-    @ViewInject(R.id.six)
-    private EditText sixET;
     private Timer timer = new Timer();
     private TimerTask timerTask;
     private int time = 60;
@@ -202,17 +192,11 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
 
 
     private void check() {
-        final String one = oneET.getText().toString();
-        final String two = twoET.getText().toString();
-        final String three = threeET.getText().toString();
-        final String four = fourET.getText().toString();
-        final String five = fiveET.getText().toString();
-        final String six = sixET.getText().toString();
-        if (GlobalUtil.isEmpty(one) || GlobalUtil.isEmpty(two) || GlobalUtil.isEmpty(three) || GlobalUtil.isEmpty(four) || GlobalUtil.isEmpty(five) || GlobalUtil.isEmpty(six)) {
+        if (contentIV.getPasswordString().length() <= 6) {
             Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
             return;
         }
-        final String identify = one + two + three + four + five + six;
+        final String identify = contentIV.getPasswordString();
         next.setEnabled(false);
         JSONObject jsonObject = new JSONObject();
         try {

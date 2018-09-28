@@ -514,7 +514,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                             hasTrun = true;
                         }
                     }
-//                if (!mathing) {
                     if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
                         if (!uploadSuccess) {
                             uploadSuccess = true;

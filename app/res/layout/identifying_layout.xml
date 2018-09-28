@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:psd="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
@@ -54,104 +55,136 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <!-- <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="@dimen/common_margin_lr"
+         android:layout_marginRight="@dimen/common_margin_lr"
+         android:layout_marginTop="30dp"
+         android:orientation="horizontal">
+
+         <EditText
+             android:id="@+id/one"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:layout_marginRight="10dp"
+             android:layout_weight="1"
+             android:background="@drawable/input_bg"
+             android:gravity="center_horizontal"
+             android:imeOptions="actionNext"
+             android:inputType="number"
+             android:maxLength="1"
+             android:nextFocusForward="@+id/two"
+             android:paddingBottom="20dp"
+             android:textColor="#FFAEAEAE"
+             android:textSize="40sp" />
+
+         <EditText
+             android:id="@+id/two"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:layout_marginRight="10dp"
+             android:layout_weight="1"
+             android:background="@drawable/input_bg"
+             android:gravity="center_horizontal"
+             android:imeOptions="actionNext"
+             android:inputType="number"
+             android:maxLength="1"
+             android:nextFocusForward="@+id/three"
+             android:paddingBottom="20dp"
+             android:textColor="#FFAEAEAE"
+             android:textCursorDrawable="@null"
+             android:textSize="40sp" />
+
+         <EditText
+             android:id="@+id/three"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:layout_marginRight="10dp"
+             android:layout_weight="1"
+             android:background="@drawable/input_bg"
+             android:gravity="center_horizontal"
+             android:imeOptions="actionNext"
+             android:inputType="number"
+             android:maxLength="1"
+             android:nextFocusForward="@+id/four"
+             android:paddingBottom="20dp"
+             android:textColor="#FFAEAEAE"
+             android:textCursorDrawable="@null"
+             android:textSize="40sp" />
+
+         <EditText
+             android:id="@+id/four"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:layout_marginRight="10dp"
+             android:layout_weight="1"
+             android:background="@drawable/input_bg"
+             android:gravity="center_horizontal"
+             android:imeOptions="actionNext"
+             android:inputType="number"
+             android:maxLength="1"
+             android:nextFocusForward="@+id/five"
+             android:paddingBottom="20dp"
+             android:textColor="#FFAEAEAE"
+             android:textCursorDrawable="@null"
+             android:textSize="40sp" />
+
+         <EditText
+             android:id="@+id/five"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:layout_marginRight="10dp"
+             android:layout_weight="1"
+             android:background="@drawable/input_bg"
+             android:gravity="center_horizontal"
+             android:imeOptions="actionNext"
+             android:inputType="number"
+             android:maxLength="1"
+             android:imeOptions="actionNext"
+             android:nextFocusForward="@+id/six"
+             android:paddingBottom="20dp"
+             android:textColor="#FFAEAEAE"
+             android:textCursorDrawable="@null"
+             android:textSize="40sp" />
+
+         <EditText
+             android:id="@+id/six"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:layout_weight="1"
+             android:background="@drawable/input_bg"
+             android:gravity="center_horizontal"
+             android:imeOptions="actionDone"
+             android:inputType="number"
+             android:maxLength="1"
+             android:nextFocusForward="@+id/next"
+             android:paddingBottom="20dp"
+             android:textColor="#FFAEAEAE"
+             android:textCursorDrawable="@null"
+             android:textSize="40sp" />
+
+     </LinearLayout>-->
+
+
+    <com.mapbar.adas.view.CustomInputView
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/common_margin_lr"
         android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="30dp"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/one"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bg"
-            android:gravity="center_horizontal"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingBottom="20dp"
-            android:textColor="#FFAEAEAE"
-            android:textSize="40sp" />
-
-        <EditText
-            android:id="@+id/two"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bg"
-            android:gravity="center_horizontal"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingBottom="20dp"
-            android:textColor="#FFAEAEAE"
-            android:textSize="40sp" />
-
-        <EditText
-            android:id="@+id/three"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bg"
-            android:gravity="center_horizontal"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingBottom="20dp"
-            android:textColor="#FFAEAEAE"
-            android:textSize="40sp" />
-
-        <EditText
-            android:id="@+id/four"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bg"
-            android:gravity="center_horizontal"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingBottom="20dp"
-            android:textColor="#FFAEAEAE"
-            android:textSize="40sp" />
-
-        <EditText
-            android:id="@+id/five"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/input_bg"
-            android:gravity="center_horizontal"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingBottom="20dp"
-            android:textColor="#FFAEAEAE"
-            android:textSize="40sp" />
-
-        <EditText
-            android:id="@+id/six"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:background="@drawable/input_bg"
-            android:gravity="center_horizontal"
-            android:inputType="number"
-            android:maxLength="1"
-            android:paddingBottom="20dp"
-            android:textColor="#FFAEAEAE"
-            android:textSize="40sp" />
-
-    </LinearLayout>
+        android:inputType="number"
+        android:textColor="#FFAEAEAE"
+        android:textSize="40sp"
+        psd:maxCount="6"
+        psd:psdType="bottomLine" />
 
     <TextView
         android:id="@+id/next"
@@ -162,6 +195,7 @@
         android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="40dp"
         android:background="@drawable/btn_bg"
+        android:focusable="true"
         android:gravity="center"
         android:text="下一步"
         android:textColor="#FFFFFFFF"

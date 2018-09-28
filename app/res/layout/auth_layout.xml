@@ -20,7 +20,13 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/input_bg"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:maxLength="4"
+            android:nextFocusForward="@+id/sn_02"
             android:paddingLeft="10dp"
+            android:singleLine="true"
             android:textSize="17sp" />
 
         <View
@@ -35,7 +41,13 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/input_bg"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:maxLength="4"
+            android:nextFocusForward="@+id/sn_03"
             android:paddingLeft="10dp"
+            android:singleLine="true"
             android:textSize="17sp" />
 
         <View
@@ -50,7 +62,13 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/input_bg"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:maxLength="4"
+            android:nextFocusForward="@+id/sn_04"
             android:paddingLeft="10dp"
+            android:singleLine="true"
             android:textSize="17sp" />
 
         <View
@@ -65,7 +83,13 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@drawable/input_bg"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:maxLength="4"
+            android:nextFocusForward="@+id/next"
             android:paddingLeft="10dp"
+            android:singleLine="true"
             android:textSize="17sp" />
     </LinearLayout>
 

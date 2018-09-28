@@ -69,4 +69,5 @@ dependencies {
     compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     compile 'me.jessyan:rxerrorhandler:2.1.1'
     compile 'io.reactivex.rxjava2:rxjava:2.1.12'
+    compile 'com.jungly:gridPasswordView:0.3'
 }

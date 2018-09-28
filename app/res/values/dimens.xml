@@ -28,5 +28,6 @@
     <dimen name="size_14">7dp</dimen>
 
     <dimen name="common_margin_lr">25dp</dimen>
+    <dimen name="custom_input_text_size">40sp</dimen>
 
 </resources>
