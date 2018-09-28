@@ -181,15 +181,14 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 PageManager.go(protocolCheckFailPage);
                 break;
             case OBDEvent.UN_ADJUST:
-                PageManager.go(new CollectLastPage());
-//                CollectGuide collectGuide = new CollectGuide();
-//                Bundle collectBundle = new Bundle();
-//                collectBundle.putBoolean("matching", true);
-//                collectBundle.putString("sn", obdStatusInfo.getSn());
-//                collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
-//                collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
-//                collectGuide.setDate(collectBundle);
-//                PageManager.go(collectGuide);
+                CollectGuide collectGuide = new CollectGuide();
+                Bundle collectBundle = new Bundle();
+                collectBundle.putBoolean("matching", true);
+                collectBundle.putString("sn", obdStatusInfo.getSn());
+                collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
+                collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
+                collectGuide.setDate(collectBundle);
+                PageManager.go(collectGuide);
                 break;
             case OBDEvent.NORMAL:
                 MainPage mainPage = new MainPage();
