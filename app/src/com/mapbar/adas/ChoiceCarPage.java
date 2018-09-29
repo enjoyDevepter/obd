@@ -125,7 +125,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onResponse(final Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                Log.d("getCarBrands success " + responese);
+                Log.d("getCarBrands success ");
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
@@ -206,7 +206,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
-                Log.d("getCarModelForBrands success " + responese);
+                Log.d("getCarModelForBrands success ");
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {

@@ -1,8 +1,15 @@
 package com.mapbar.adas;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,10 +27,10 @@ import com.miyuan.obd.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.simple.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -35,7 +42,7 @@ import okhttp3.Response;
 
 
 @PageSetting(contentViewId = R.layout.collect_layout)
-public class CollectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+public class CollectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener, LocationListener {
 
     @ViewInject(R.id.title)
     private TextView title;
@@ -45,6 +52,12 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
     private View reportV;
     @ViewInject(R.id.status)
     private View statusV;
+
+    private int currentSpeed;
+
+    private LinkedList<Integer> adjustSpeed = new LinkedList<>();
+
+    private LocationManager locationManager;
 
     private AnimationDrawable animationDrawable;
 
@@ -60,30 +73,18 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
         GlobalUtil.getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                AlarmManager.getInstance().play(R.raw.adjust_last);
                 BlueManager.getInstance().send(ProtocolUtils.study());
             }
         }, 2000);
-
-        EventBus.getDefault().post("1", EventBusTags.ADJUST);
-        // FIXME: 2018/9/28
-        // 播放语音
-        GlobalUtil.getHandler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AlarmManager.getInstance().play(R.raw.adjust_last);
-            }
-        }, 1000);
+        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
 
     }
-
-//    @Subscriber(tag = EventBusTags.ADJUST_SUCCESS)
-//    private void adjustSuccess(int id) {
-//        CollectFinish collectFinish = new CollectFinish();
-//        Bundle bundle = new Bundle();
-//        bundle.putBoolean("success", true);
-//        collectFinish.setDate(bundle);
-//        PageManager.go(collectFinish);
-//    }
 
     @Override
     public boolean onBackPressed() {
@@ -93,16 +94,15 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
 
     @Override
     public void onStart() {
-        super.onStart();
         BlueManager.getInstance().addBleCallBackListener(this);
-        EventBus.getDefault().register(this);
+        super.onStart();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        locationManager.removeUpdates(this);
         BlueManager.getInstance().removeCallBackListener(this);
-        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @Override
@@ -172,6 +172,7 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.ADJUST_SUCCESS:
+                locationManager.removeUpdates(this);
                 CollectFinish collectFinish = new CollectFinish();
                 Bundle bundle = new Bundle();
                 bundle.putBoolean("success", true);
@@ -179,5 +180,36 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
                 PageManager.go(collectFinish);
                 break;
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if ("gps".equals(location.getProvider())) {
+            currentSpeed = (int) (location.getSpeed() * 3.6);
+            if (currentSpeed < 50) {
+                adjustSpeed.addLast(currentSpeed);
+                if (adjustSpeed.size() >= 40) {
+                    AlarmManager.getInstance().play(R.raw.adjust_last);
+                    adjustSpeed.clear();
+                }
+            } else {
+                adjustSpeed.clear();
+            }
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

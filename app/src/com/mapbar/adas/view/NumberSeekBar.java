@@ -257,9 +257,9 @@ public class NumberSeekBar extends View {
         canvas.drawCircle(thumbCx, thumbCy, circleHeight / 2, thumbPaintBig);
         canvas.drawText(curProgress + "", thumbCx, topTexBaseLineY, textPaint);
         bottomTextPaint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText("最底" + "", progressRect.left, bottomTexBaseLineY, bottomTextPaint);
+        canvas.drawText("最低" + "", progressRect.left, bottomTexBaseLineY, bottomTextPaint);
         bottomTextPaint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText("最低" + "", progressRect.right, bottomTexBaseLineY, bottomTextPaint);
+        canvas.drawText("最高" + "", progressRect.right, bottomTexBaseLineY, bottomTextPaint);
     }
 
     public int getCurProgress() {

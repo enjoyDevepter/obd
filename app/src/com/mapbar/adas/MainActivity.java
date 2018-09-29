@@ -1,18 +1,12 @@
 package com.mapbar.adas;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -25,7 +19,6 @@ import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.gyf.barlibrary.ImmersionBar;
-import com.mapbar.adas.utils.AlarmManager;
 import com.mapbar.adas.utils.PermissionUtil;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
@@ -33,7 +26,6 @@ import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.HexUtils;
-import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -41,7 +33,6 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.simple.eventbus.EventBus;
-import org.simple.eventbus.Subscriber;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,13 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
 import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener;
@@ -69,40 +54,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements BleCallBackListener, LocationListener {
+public class MainActivity extends AppCompatActivity implements BleCallBackListener {
 
     private static MainActivity INSTANCE = null;
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;
-    private boolean uploadSuccess;
-    private LocationManager locationManager;
 
-    private int currentSpeed;
 
-    /**
-     * 航向集合
-     */
-    private LinkedList<Float> bears = new LinkedList<>();
-    private LinkedList<Integer> adjustSpeed = new LinkedList<>();
-    private LinkedList<Long> bearsTime = new LinkedList<>();
-
-    private Map<Integer, List<String>> collecData = new HashMap<>();
-    private List<String> list20 = new ArrayList();
-    private List<String> list2060 = new ArrayList();
-    private List<String> list60 = new ArrayList();
-    private List<String> locationList = new ArrayList<>();
-    private long lastLocationTime;
-    private long firstLocationTime;
-    private long turnLocationTime;
-    private Timer heartTimer;
-    private volatile double maxSpeed = 0;
-    private boolean startCollect;
     private OBDStatusInfo obdStatusInfo;
-    private StringBuilder sb = new StringBuilder();
-    private volatile boolean hasTrun = false;
-    private long startTime;
-    private boolean adjusting;
+
 
     public MainActivity() {
         if (null == MainActivity.INSTANCE) {
@@ -192,10 +153,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
         setColor(this, Color.parseColor("#FF35BDB2"));
 
-        collecData.put(20, list20);
-        collecData.put(2060, list2060);
-        collecData.put(60, list60);
-
         BlueManager.getInstance().init(this);
 
         EventBus.getDefault().register(this);
@@ -237,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         }
         setFirst(false);
         BlueManager.getInstance().addBleCallBackListener(this);
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     }
 
     @Override
@@ -248,10 +204,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         MainActivity.INSTANCE = null;
         EventBus.getDefault().unregister(this);
         BlueManager.getInstance().removeCallBackListener(this);
-        if (null != heartTimer) {
-            heartTimer.cancel();
-            heartTimer = null;
-        }
     }
 
     public boolean isFirst() {
@@ -269,56 +221,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .addTask(new LocationCheckTask())
                 .addTask(new UpdateTask());
         TaskManager.getInstance().next();
-    }
-
-    @Subscriber(tag = EventBusTags.ADJUST)
-    private void startAdjust(String id) {
-        adjusting = true;
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
-    }
-
-    @Subscriber(tag = EventBusTags.START_COLLECT)
-    private void startCollect(boolean mathing) {
-        startTime = System.currentTimeMillis();
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
-        heartTimer = new Timer();
-        heartTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                BlueManager.getInstance().send(ProtocolUtils.sentHeart());
-            }
-        }, 1000, 60 * 1000);
-    }
-
-    private void stopCollecct() {
-        locationManager.removeUpdates(this);
-        if (null != heartTimer) {
-            heartTimer.cancel();
-            heartTimer = null;
-        }
-        BlueManager.getInstance().send(ProtocolUtils.stopCollect());
     }
 
     @Override
@@ -381,30 +283,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 updateStatusInfo(obdStatusInfo);
                 break;
             case OBDEvent.ADJUST_SUCCESS:
-                if (adjusting) {
-                    adjusting = false;
-                    locationManager.removeUpdates(this);
-                    EventBus.getDefault().post(0, EventBusTags.ADJUST_SUCCESS);
-                }
-                break;
-            case OBDEvent.COLLECT_DATA:
-                byte[] onePackage = (byte[]) data;
-                if (System.currentTimeMillis() - lastLocationTime > 5000) { // 超过5s没获取到定位，数据丢弃
-                    return;
-                }
-                byte[] speed = new byte[]{(byte) currentSpeed};
-                byte[] time = HexUtils.longToByte(lastLocationTime);
-                byte[] pack = new byte[speed.length + time.length + onePackage.length];
-                System.arraycopy(speed, 0, pack, 0, speed.length);
-                System.arraycopy(time, 0, pack, speed.length, time.length);
-                System.arraycopy(onePackage, 0, pack, speed.length + time.length, onePackage.length);
-                if (currentSpeed < 20) {
-                    list20.add(HexUtils.byte2HexStr(pack));
-                } else if (currentSpeed >= 20 || currentSpeed <= 60) {
-                    list2060.add(HexUtils.byte2HexStr(pack));
-                } else {
-                    list60.add(HexUtils.byte2HexStr(pack));
-                }
                 break;
             case OBDEvent.COLLECT_DATA_FOR_CAR:
                 new Thread(new CarRunnable((byte[]) data)).start();
@@ -457,226 +335,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        if ("gps".equals(location.getProvider())) {
-
-            if (firstLocationTime == 0) {
-                firstLocationTime = System.currentTimeMillis();
-            }
-            lastLocationTime = System.currentTimeMillis();
-            currentSpeed = (int) (location.getSpeed() * 3.6);
-
-            if (adjusting) {
-                if (currentSpeed < 50) {
-                    adjustSpeed.addLast(currentSpeed);
-                }
-                if (adjustSpeed.size() >= 40) {
-                    AlarmManager.getInstance().play(R.raw.adjust_last);
-                    adjustSpeed.clear();
-                }
-                return;
-            } else {
-                maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
-                if (!startCollect && currentSpeed > 15) {
-                    startCollect = true;
-                    BlueManager.getInstance().send(ProtocolUtils.startCollect());
-                }
-                sb = new StringBuilder();
-                sb.append(location.getTime()).append("#")
-                        .append(location.getSpeed()).append("#")
-                        .append(currentSpeed).append("#")
-                        .append(location.getLongitude()).append("#")
-                        .append(location.getLatitude()).append("#");
-                locationList.add(sb.toString());
-
-                if (!startCollect && startTime != 0 && System.currentTimeMillis() - startTime > 40 * 1000) {
-                    Log.d("提示加速到20迈");
-                    AlarmManager.getInstance().play(R.raw.speed_20);
-                    startTime = System.currentTimeMillis();
-                }
-
-                Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
-
-                if (startCollect) {
-                    if (currentSpeed > 10) {
-                        Log.d("location.getBearing() " + location.getBearing() + "     currentSpeed  " + currentSpeed);
-                        if (bears.size() > 9) {
-                            bears.pollFirst();
-                            bearsTime.pollFirst();
-                        }
-                        bears.addLast(location.getBearing());
-                        bearsTime.addLast(location.getTime());
-                    }
-                    if (!hasTrun) {
-                        if (hasTurn()) {
-                            turnLocationTime = System.currentTimeMillis();
-                            hasTrun = true;
-                        }
-                    }
-                    if (hasTrun && maxSpeed >= 50 && (list20.size() > 0 || list2060.size() > 0 || list60.size() > 0)) {
-                        if (!uploadSuccess) {
-                            uploadSuccess = true;
-                            stopCollect();
-                        }
-                    } else {
-                        if (!hasTrun) {
-                            if (System.currentTimeMillis() - firstLocationTime >= 1000 * 40) {
-                                // 提示请完成掉头操作
-                                Log.d("提示请完成掉头操作");
-                                AlarmManager.getInstance().play(R.raw.trun);
-                                firstLocationTime = System.currentTimeMillis();
-                                return;
-                            }
-                        } else {
-                            if (System.currentTimeMillis() - turnLocationTime >= 5 || System.currentTimeMillis() - firstLocationTime >= 1000 * 40) {
-                                // 提示请完成加速
-                                turnLocationTime = Long.MAX_VALUE;
-                                Log.d("提示请完成加速");
-                                AlarmManager.getInstance().play(R.raw.speed_60);
-                                firstLocationTime = System.currentTimeMillis();
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void stopCollect() {
-        stopCollecct();
-        EventBus.getDefault().post(0, EventBusTags.COLLECT_FINISHED);
-        new Thread(new FileRunnable("Normal2050")).start();
-        new Thread(new LocationRunnable("location")).start();
-    }
-
-    private boolean hasTurn() {
-        if (bears.size() > 2) {
-            float first = bears.getFirst();
-            long firstTime = bearsTime.getFirst();
-            float last = bears.getLast();
-            long lastTime = bearsTime.getLast();
-            if (150 <= Math.abs(last - first) && Math.abs(last - first) <= 210 && lastTime - firstTime <= 10000) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    private void uploadCollectData(String filePath) {
-        final File file = new File(filePath);
-
-        Log.d("uploadCollectData input ");
-
-        MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
-        RequestBody fileBody = RequestBody.create(type, file);
-
-        RequestBody multipartBody = new MultipartBody.Builder()
-                .setType(MultipartBody.ALTERNATIVE)
-                //一样的效果
-                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
-                .addPart(MultipartBody.Part.createFormData("type", "2"))
-                .addPart(Headers.of(
-                        "Content-Disposition",
-                        "form-data; name=\"file\"; filename=\"Normal2050\"")
-                        , fileBody).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_ERROR_FILE)
-                .post(multipartBody)
-                .build();
-
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("uploadCollectData onFailure " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("uploadCollectData success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-//                        if (file.exists()) {
-//                            file.delete();
-//                        }
-                    }
-                } catch (JSONException e) {
-                    Log.d("uploadCollectData failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    private void uploadLocationData(String filePath) {
-
-        final File file = new File(filePath);
-
-        Log.d("uploadLocationData input ");
-
-        MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
-        RequestBody fileBody = RequestBody.create(type, file);
-
-        RequestBody multipartBody = new MultipartBody.Builder()
-                .setType(MultipartBody.ALTERNATIVE)
-                //一样的效果
-                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
-                .addPart(MultipartBody.Part.createFormData("type", "3"))
-                .addPart(Headers.of(
-                        "Content-Disposition",
-                        "form-data; name=\"file\"; filename=\"location\"")
-                        , fileBody).build();
-
-
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_ERROR_FILE)
-                .post(multipartBody)
-                .build();
-
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("uploadCollectData onFailure " + e.getMessage());
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("uploadCollectData success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-//                        if (file.exists()) {
-//                            file.delete();
-//                        }
-                    }
-                } catch (JSONException e) {
-                    Log.d("uploadCollectData failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
-
     private void uploadCarData(String filePath) {
 
         final File file = new File(filePath);
@@ -716,99 +374,15 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-//                        if (file.exists()) {
-//                            file.delete();
-//                        }
+                        if (file.exists()) {
+                            file.delete();
+                        }
                     }
                 } catch (JSONException e) {
                     Log.d("uploadCarData failure " + e.getMessage());
                 }
             }
         });
-    }
-
-    private class FileRunnable implements Runnable {
-
-        private String fileName;
-
-        public FileRunnable(String fileName) {
-            this.fileName = fileName;
-        }
-
-        @Override
-        public void run() {
-            try {
-                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "obd_collect" + File.separator);
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                File file = new File(dir, fileName);
-                try {
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-
-                    for (String str : list20) {
-                        bw.write(str);
-                        bw.newLine();
-                        bw.flush();
-                    }
-                    for (String str : list2060) {
-                        bw.write(str);
-                        bw.newLine();
-                        bw.flush();
-                    }
-                    for (String str : list60) {
-                        bw.write(str);
-                        bw.newLine();
-                        bw.flush();
-                    }
-                    bw.close();
-                    fos.close();
-                    // 上传
-                    uploadCollectData(file.getPath());
-                } catch (FileNotFoundException e) {
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private class LocationRunnable implements Runnable {
-
-        private String fileName;
-
-        public LocationRunnable(String fileName) {
-            this.fileName = fileName;
-        }
-
-        @Override
-        public void run() {
-            try {
-                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "obd_collect" + File.separator);
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                File file = new File(dir, fileName);
-                try {
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-
-                    for (String str : locationList) {
-                        bw.write(str);
-                        bw.newLine();
-                        bw.flush();
-                    }
-                    bw.close();
-                    fos.close();
-                    // 上传
-                    uploadLocationData(file.getPath());
-                } catch (FileNotFoundException e) {
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private class CarRunnable implements Runnable {
