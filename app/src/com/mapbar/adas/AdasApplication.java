@@ -34,7 +34,7 @@ public class AdasApplication extends Application {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         String fileName = sdf.format(new Date(System.currentTimeMillis()));
         String dirPath = MapbarStorageUtil.getCurrentValidMapbarPath();
-        final File file = new File(dirPath, fileName);
+        final File file = new File(dirPath, fileName + ".error");
         FileOutputStream fos = null;
         try {
             if (!file.exists()) {

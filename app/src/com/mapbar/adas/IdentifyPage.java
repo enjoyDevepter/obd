@@ -54,6 +54,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
 
     private CustomDialog dialog;
 
+
     @Override
     public void onResume() {
         super.onResume();
@@ -192,7 +193,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
 
 
     private void check() {
-        if (contentIV.getPasswordString().length() <= 6) {
+        if (contentIV.getPasswordString().length() < 6) {
             Toast.makeText(getContext(), "请输入验证码", Toast.LENGTH_LONG).show();
             return;
         }

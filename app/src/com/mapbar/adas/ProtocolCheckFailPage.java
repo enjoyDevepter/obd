@@ -59,13 +59,13 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     private TimerTask timerTask;
     private volatile OBDStatusInfo obdStatusInfo;
     private boolean beforeMatching;
+    private boolean timeOut;
 
     @Override
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
-        confirmV.setEnabled(false);
         title.setText("未检测到车辆数据!");
         beforeMatching = getDate().getBoolean("before_matching");
         if (beforeMatching) {
@@ -76,6 +76,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             beforeMatchingV.setVisibility(View.INVISIBLE);
             currentMatchingTV.setVisibility(View.VISIBLE);
             confirmV.setVisibility(View.VISIBLE);
+            confirmV.setEnabled(timeOut);
         }
         BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
     }
@@ -101,6 +102,10 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 if (null != timer) {
                     timer.cancel();
                     timer = null;
+                }
+                if (null != timerTask) {
+                    timerTask.cancel();
+                    timerTask = null;
                 }
                 CollectGuide collectGuide = new CollectGuide();
                 Bundle collectBundle = new Bundle();
@@ -230,6 +235,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     @Override
                     public void run() {
                         if (time <= 0 && timer != null) {
+                            timeOut = true;
                             timer.cancel();
                             timer = null;
                             timerTask.cancel();
@@ -249,42 +255,6 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         timer = new Timer();
     }
 
-    /**
-     * 授权失败
-     *
-     * @param reason
-     */
-    private void authFail(final String reason) {
-        GlobalUtil.getHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                        .setViewListener(new CustomDialog.ViewListener() {
-                            @Override
-                            public void bindView(View view) {
-                                ((TextView) (view.findViewById(R.id.confirm))).setText("确认");
-                                ((TextView) (view.findViewById(R.id.info))).setText(reason);
-                                ((TextView) (view.findViewById(R.id.title))).setText("授权失败");
-                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        // 退出应用
-                                        PageManager.finishActivity(MainActivity.getInstance());
-                                    }
-                                });
-                            }
-                        })
-                        .setLayoutRes(R.layout.dailog_common_warm)
-                        .setCancelOutside(false)
-                        .setDimAmount(0.5f)
-                        .isCenter(true)
-                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                        .show();
-            }
-        });
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -298,8 +268,10 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     cleanParams(obdStatusInfo);
                 } else {
                     times++;
+                    timeOut = false;
                     currentMatchingTV.setText("请您再次确认车辆已打火！\n请您务必确认已打火后再点击确认按钮!");
                     confirmV.setText("确认已打火");
+                    confirmV.setOnClickListener(null);
                     confirmV.setEnabled(false);
                     time = 15;
                     initTimer();
@@ -432,10 +404,9 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
 
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         BlueManager.getInstance().removeCallBackListener(this);
-
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -445,5 +416,4 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             timerTask = null;
         }
     }
-
 }

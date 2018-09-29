@@ -30,18 +30,18 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     private Timer timer;
     private int time = 15;
     private boolean ishow;
-
+    private boolean timeOut;
 
     @Override
     public void onResume() {
         super.onResume();
         title.setText("安装引导二");
         back.setOnClickListener(this);
-        confirmV.setEnabled(ishow);
         reportV.setVisibility(View.GONE);
         firstTV.setText(Html.fromHtml("第一步：<font color='#009488'>请检查轮胎胎压一致</font><br><font color='#4A4A4A'>（建议使用胎压计测量）</font><br><br>"));
         secondTV.setText(Html.fromHtml("第二步：<font color='#4A4A4A'>请您准备好以下工具</font><br>1、<font color='#009488'>手机</font><font color='#4A4A4A'>（注册收取验证码）</font><br>2、<font color='#009488'>包装盒</font><font color='#4A4A4A'>（获取授权码）</font>"));
         if (!ishow) {
+            confirmV.setEnabled(ishow);
             ishow = true;
             timer = new Timer();
             timer.schedule(new TimerTask() {
@@ -51,6 +51,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
                         @Override
                         public void run() {
                             if (time <= 0 && timer != null) {
+                                timeOut = true;
                                 timer.cancel();
                                 timer = null;
                                 confirmV.setText("我已准备好了");
@@ -65,7 +66,10 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
                 }
             }, 1000, 1000);
         } else {
-            confirmV.setOnClickListener(this);
+            if (timeOut) {
+                confirmV.setEnabled(ishow);
+                confirmV.setOnClickListener(this);
+            }
         }
     }
 
@@ -75,13 +79,14 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     }
 
     @Override
-    public void onStop() {
+    public void onDestroy() {
         if (null != timer) {
             timer.cancel();
             timer = null;
         }
-        super.onStop();
+        super.onDestroy();
     }
+
 
     @Override
     public void onClick(View v) {

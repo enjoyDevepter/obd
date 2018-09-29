@@ -212,6 +212,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 if (null != dialog) {
                     dialog.dismiss();
                 }
+                ADJUST_START.set(true);
                 BlueManager.getInstance().send(ProtocolUtils.study());
                 break;
             case R.id.report:

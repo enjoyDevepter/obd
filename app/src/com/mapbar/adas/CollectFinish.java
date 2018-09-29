@@ -104,7 +104,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     public void onStop() {
         BlueManager.getInstance().removeCallBackListener(this);
         super.onStop();
-        if (null != timer) {
+        if (!success && null != timer) {
             timerTask.cancel();
             timerTask = null;
             timer.cancel();

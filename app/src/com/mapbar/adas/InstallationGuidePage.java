@@ -31,6 +31,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
     private TimerTask timerTask;
     private int time = 10;
     private boolean ishow;
+    private boolean timeOut;
 
     @Override
     public void onResume() {
@@ -40,8 +41,8 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
         back.setVisibility(View.GONE);
         firstTV.setText(Html.fromHtml("第一步：<font color='#009488'>请停车拉手刹!</font><br><font color='#4A4A4A'>自动挡挂P档、并拉手刹；手动挡挂空挡、并拉手刹。</font><br><br>"));
         secondTV.setText(Html.fromHtml("第二步：<font color='#009488'>请将车辆打火!</font><br><font color='#4A4A4A'>请确保车辆已打火</font><br><br>请完成以上操作后，再点击确认按钮！<br>否则会导致安装失败！"));
-        confirmV.setEnabled(ishow);
         if (!ishow) {
+            confirmV.setEnabled(ishow);
             ishow = true;
             timerTask = new TimerTask() {
                 @Override
@@ -54,6 +55,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
                                 timer = null;
                                 timerTask.cancel();
                                 timerTask = null;
+                                timeOut = true;
                                 confirmV.setText("确认已拉手刹、并打火");
                                 confirmV.setEnabled(true);
                                 confirmV.setOnClickListener(InstallationGuidePage.this);
@@ -67,24 +69,22 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
             };
             timer.schedule(timerTask, 0, 1000);
         } else {
-            confirmV.setOnClickListener(this);
+            if (timeOut) {
+                confirmV.setEnabled(ishow);
+                confirmV.setOnClickListener(this);
+            }
         }
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
+    public void onDestroy() {
         if (null != timerTask) {
             timerTask.cancel();
             timerTask = null;
             timer.cancel();
             timer = null;
         }
-        super.onStop();
+        super.onDestroy();
     }
 
     @Override
@@ -96,7 +96,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
             case R.id.confirm:
                 InstallationGuideTwoPage authPage = new InstallationGuideTwoPage();
                 Bundle bundle = new Bundle();
-                bundle.putString("boxId", getDate().getString("boxId"));
+//                bundle.putString("boxId", getDate().getString("boxId"));
                 authPage.setDate(bundle);
                 PageManager.go(authPage);
                 break;

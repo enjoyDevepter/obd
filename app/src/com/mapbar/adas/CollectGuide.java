@@ -27,6 +27,8 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
     private Timer timer = new Timer();
     private int time = 10;
     private boolean ishow;
+    private boolean timeOut;
+
 
     @Override
     public void onResume() {
@@ -34,9 +36,9 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
         title.setText("深度校准准备");
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
-        confirmV.setEnabled(ishow);
         back.setVisibility(View.GONE);
         if (!ishow) {
+            confirmV.setEnabled(ishow);
             ishow = true;
             timer.schedule(new TimerTask() {
                 @Override
@@ -45,6 +47,7 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                         @Override
                         public void run() {
                             if (time <= 0 && timer != null) {
+                                timeOut = true;
                                 timer.cancel();
                                 timer = null;
                                 confirmV.setText("确认已拉手刹、并打火");
@@ -59,22 +62,19 @@ public class CollectGuide extends AppBasePage implements View.OnClickListener {
                 }
             }, 1000, 1000);
         } else {
-            confirmV.setOnClickListener(this);
+            if (timeOut) {
+                confirmV.setEnabled(true);
+                confirmV.setOnClickListener(this);
+            }
         }
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
+    public void onDestroy() {
         if (null != timer) {
             timer.cancel();
             timer = null;
         }
-        super.onStop();
     }
 
     @Override
