@@ -75,9 +75,13 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
     public void onStop() {
         super.onStop();
         animationDrawable.stop();
-        BlueManager.getInstance().removeCallBackListener(this);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BlueManager.getInstance().removeCallBackListener(this);
+    }
 
     private void activate() {
 

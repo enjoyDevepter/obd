@@ -96,7 +96,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
             case R.id.confirm:
                 InstallationGuideTwoPage authPage = new InstallationGuideTwoPage();
                 Bundle bundle = new Bundle();
-//                bundle.putString("boxId", getDate().getString("boxId"));
+                bundle.putString("boxId", getDate().getString("boxId"));
                 authPage.setDate(bundle);
                 PageManager.go(authPage);
                 break;

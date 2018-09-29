@@ -177,8 +177,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         BlueManager.getInstance().send(ProtocolUtils.stopGetTirePressureStatusUpdateSucess());
         BlueManager.getInstance().removeCallBackListener(this);
         if (timer != null) {
@@ -212,7 +212,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 if (null != dialog) {
                     dialog.dismiss();
                 }
-                ADJUST_START.set(true);
                 BlueManager.getInstance().send(ProtocolUtils.study());
                 break;
             case R.id.report:

@@ -102,7 +102,7 @@ public class NumberSeekBar extends View {
 
         bottomTextPaint = new TextPaint();
         bottomTextPaint.setAntiAlias(true);
-        bottomTextPaint.setTextSize(LayoutUtils.getPxByDimens(R.dimen.textSize48));
+        bottomTextPaint.setTextSize(LayoutUtils.getPxByDimens(R.dimen.textSize30));
         bottomTextPaint.setStyle(Paint.Style.FILL);
         bottomTextPaint.setTextAlign(Paint.Align.LEFT);
         bottomTextPaint.setColor(getResources().getColor(R.color.seekbar_textcolor_red));
@@ -257,9 +257,9 @@ public class NumberSeekBar extends View {
         canvas.drawCircle(thumbCx, thumbCy, circleHeight / 2, thumbPaintBig);
         canvas.drawText(curProgress + "", thumbCx, topTexBaseLineY, textPaint);
         bottomTextPaint.setTextAlign(Paint.Align.LEFT);
-        canvas.drawText(minProgress + "", progressRect.left, bottomTexBaseLineY, bottomTextPaint);
+        canvas.drawText("最底" + "", progressRect.left, bottomTexBaseLineY, bottomTextPaint);
         bottomTextPaint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText(maxProgress + "", progressRect.right, bottomTexBaseLineY, bottomTextPaint);
+        canvas.drawText("最低" + "", progressRect.right, bottomTexBaseLineY, bottomTextPaint);
     }
 
     public int getCurProgress() {

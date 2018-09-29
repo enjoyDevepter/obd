@@ -122,6 +122,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         super.onStop();
         animationDrawable.stop();
         verified = false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         BlueManager.getInstance().removeCallBackListener(this);
     }
 

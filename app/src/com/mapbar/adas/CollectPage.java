@@ -99,11 +99,16 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BlueManager.getInstance().removeCallBackListener(this);
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         animationDrawable.stop();
-        BlueManager.getInstance().removeCallBackListener(this);
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
