@@ -126,14 +126,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 break;
             case OBDEvent.UN_ADJUST:
                 obdStatusInfo = (OBDStatusInfo) data;
-                CollectGuide guide = new CollectGuide();
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("matching", true);
-                bundle.putString("sn", obdStatusInfo.getSn());
-                bundle.putString("pVersion", obdStatusInfo.getpVersion());
-                bundle.putString("bVersion", obdStatusInfo.getbVersion());
-                guide.setDate(bundle);
-                PageManager.go(guide);
+                checkColectStauts();
                 break;
             case OBDEvent.NORMAL:
                 obdStatusInfo = (OBDStatusInfo) data;
@@ -144,6 +137,89 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 PageManager.go(mainPage);
                 break;
         }
+    }
+
+    /**
+     * 获取采集上传状态
+     */
+    private void checkColectStauts() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("checkColectStauts input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_STATUS)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                checkColectStauts();
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("checkColectStauts success " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        String state = result.optString("state");
+                        if ("1".equals(state)) {
+                            PageManager.go(new CollectPage());
+                        } else {
+                            CollectGuide collectGuide = new CollectGuide();
+                            Bundle collectBundle = new Bundle();
+                            collectBundle.putBoolean("matching", true);
+                            collectBundle.putString("sn", obdStatusInfo.getSn());
+                            collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
+                            collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
+                            collectGuide.setDate(collectBundle);
+                            PageManager.go(collectGuide);
+                        }
+                    }
+                } catch (JSONException e) {
+                    Log.d("checkColectStauts failure " + e.getMessage());
+                }
+            }
+        });
     }
 
     private void initTimer() {

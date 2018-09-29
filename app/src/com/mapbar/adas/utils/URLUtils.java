@@ -24,4 +24,5 @@ public class URLUtils {
     public static final String GET_USER_INFO = HOST + "service/box/getUserInfo";
     public static final String UPDATE_TIRE = HOST + "service/data/uploadData";
     public static final String UPDATE_ERROR_FILE = HOST + "service/data/uploadFile";
+    public static final String UPDATE_STATUS = HOST + "service/data/check";
 }
