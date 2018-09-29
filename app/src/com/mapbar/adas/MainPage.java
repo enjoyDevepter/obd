@@ -489,7 +489,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case OBDEvent.OBD_STUDY:
-                AlarmManager.getInstance().play(R.raw.begin);
 //                mHandler.sendEmptyMessage(0);
                 break;
             case OBDEvent.OBD_STUDY_PROGRESS:
@@ -511,14 +510,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.ADJUSTING:
                 if (ADJUST_START.get()) {
                     ADJUST_START.set(false);
-                    AlarmManager.getInstance().play(R.raw.begin);
+                    AlarmManager.getInstance().play(R.raw.main_start_adjust);
                     BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
                 }
                 break;
             case OBDEvent.ADJUST_SUCCESS:
                 if (ADJUST_SUCCESS.get()) {
                     ADJUST_SUCCESS.set(false);
-                    AlarmManager.getInstance().play(R.raw.success);
+                    AlarmManager.getInstance().play(R.raw.main_start_finished);
                 }
                 break;
             case OBDEvent.NORMAL:
