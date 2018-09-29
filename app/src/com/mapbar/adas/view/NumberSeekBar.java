@@ -102,10 +102,10 @@ public class NumberSeekBar extends View {
 
         bottomTextPaint = new TextPaint();
         bottomTextPaint.setAntiAlias(true);
-        bottomTextPaint.setTextSize(LayoutUtils.getPxByDimens(R.dimen.textSize30));
+        bottomTextPaint.setTextSize(LayoutUtils.getPxByDimens(R.dimen.textSize48));
         bottomTextPaint.setStyle(Paint.Style.FILL);
         bottomTextPaint.setTextAlign(Paint.Align.LEFT);
-        bottomTextPaint.setColor(getResources().getColor(R.color.seekbar_textcolor_gray));
+        bottomTextPaint.setColor(getResources().getColor(R.color.seekbar_textcolor_red));
 
         progressPaint = new Paint();
         progressPaint.setAntiAlias(true);
