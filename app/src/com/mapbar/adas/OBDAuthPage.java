@@ -72,7 +72,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         statusV.setBackgroundResource(R.drawable.check_status_bg);
         animationDrawable = (AnimationDrawable) statusV.getBackground();
         animationDrawable.start();
-        verify();
         locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -84,6 +83,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     @Override
     public void onStart() {
         super.onStart();
+        verify();
         BlueManager.getInstance().addBleCallBackListener(this);
     }
 
@@ -121,12 +121,12 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onStop() {
         super.onStop();
         animationDrawable.stop();
-        verified = false;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        verified = false;
         BlueManager.getInstance().removeCallBackListener(this);
     }
 

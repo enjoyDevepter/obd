@@ -208,12 +208,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.reset:
                 showReset();
                 break;
-            case R.id.save:
-                if (null != dialog) {
-                    dialog.dismiss();
-                }
-                BlueManager.getInstance().send(ProtocolUtils.study());
-                break;
             case R.id.report:
                 uploadLog();
                 break;
@@ -309,6 +303,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     @Override
                     public void bindView(View view) {
                         sensitiveView = view.findViewById(R.id.sensitive);
+                        Log.d("obdStatusInfo.getSensitive() " + obdStatusInfo.getSensitive());
                         sensitiveView.setCurProgress(obdStatusInfo.getSensitive());
                         view.findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -340,6 +335,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         view.findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                ADJUST_START.set(true);
+                                ADJUST_SUCCESS.set(true);
                                 BlueManager.getInstance().send(ProtocolUtils.study());
                                 dialog.dismiss();
                             }
@@ -492,22 +489,23 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 //                mHandler.sendEmptyMessage(0);
                 break;
             case OBDEvent.OBD_STUDY_PROGRESS:
-                if ((Integer) data >= 0) {
-//                    mHandler.sendEmptyMessage(0);
-                } else {
-                    // 弹出胎压学习对话框
-                    showStudy();
-                }
+//                if ((Integer) data >= 0) {
+////                    mHandler.sendEmptyMessage(0);
+//                } else {
+//                    // 弹出胎压学习对话框
+//                    showStudy();
+//                }
                 break;
             case OBDEvent.PARAM_UPDATE_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
                 if (needNotifyParamsSuccess) {
                     notifyUpdateSuccess((OBDStatusInfo) data);
-                    showStudy();
                 }
                 break;
             case OBDEvent.PARAM_UPDATE_FAIL:
                 break;
             case OBDEvent.ADJUSTING:
+                obdStatusInfo = (OBDStatusInfo) data;
                 if (ADJUST_START.get()) {
                     ADJUST_START.set(false);
                     AlarmManager.getInstance().play(R.raw.main_start_adjust);
@@ -515,6 +513,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case OBDEvent.ADJUST_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
                 if (ADJUST_SUCCESS.get()) {
                     ADJUST_SUCCESS.set(false);
                     AlarmManager.getInstance().play(R.raw.main_start_finished);

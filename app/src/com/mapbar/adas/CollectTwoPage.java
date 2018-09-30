@@ -85,38 +85,47 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
 
     private StringBuilder sb = new StringBuilder();
 
+    private boolean isCollect;
+
     @Override
     public void onResume() {
         super.onResume();
         reportV.setVisibility(View.GONE);
         back.setVisibility(View.GONE);
         title.setText("开始校准");
-        BlueManager.getInstance().addBleCallBackListener(this);
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
+        if (!isCollect) {
+            isCollect = true;
+            locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
+            GlobalUtil.getHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    AlarmManager.getInstance().play(R.raw.start_adjust);
+                }
+            }, 2000);
+            heartTimer = new Timer();
+            heartTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    BlueManager.getInstance().send(ProtocolUtils.sentHeart());
+                }
+            }, 1000, 60 * 1000);
+
+            collecData.put(20, list20);
+            collecData.put(2060, list2060);
+            collecData.put(60, list60);
+            startTime = System.currentTimeMillis();
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
-        GlobalUtil.getHandler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AlarmManager.getInstance().play(R.raw.start_adjust);
-            }
-        }, 2000);
-        heartTimer = new Timer();
-        heartTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                BlueManager.getInstance().send(ProtocolUtils.sentHeart());
-            }
-        }, 1000, 60 * 1000);
+    }
 
-        collecData.put(20, list20);
-        collecData.put(2060, list2060);
-        collecData.put(60, list60);
-
-        startTime = System.currentTimeMillis();
+    @Override
+    public void onStart() {
+        BlueManager.getInstance().addBleCallBackListener(this);
+        super.onStart();
     }
 
     @Override
@@ -127,6 +136,7 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
 
     @Override
     public void onDestroy() {
+        isCollect = false;
         BlueManager.getInstance().removeCallBackListener(this);
         locationManager.removeUpdates(this);
         if (null != heartTimer) {
@@ -139,16 +149,12 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     @Override
     public void onLocationChanged(Location location) {
         if ("gps".equals(location.getProvider())) {
-
-            if (firstLocationTime == 0) {
-                firstLocationTime = System.currentTimeMillis();
-            }
             lastLocationTime = System.currentTimeMillis();
             currentSpeed = (int) (location.getSpeed() * 3.6);
-
             maxSpeed = currentSpeed > maxSpeed ? currentSpeed : maxSpeed;
             if (!startCollect && currentSpeed > 15) {
                 startCollect = true;
+                firstLocationTime = System.currentTimeMillis();
                 BlueManager.getInstance().send(ProtocolUtils.startCollect());
             }
             sb = new StringBuilder();

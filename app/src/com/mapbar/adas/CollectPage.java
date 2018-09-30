@@ -55,6 +55,8 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
 
     private int currentSpeed;
 
+    private boolean isStudy;
+
     private LinkedList<Integer> adjustSpeed = new LinkedList<>();
 
     private LocationManager locationManager;
@@ -70,20 +72,27 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
         statusV.setBackgroundResource(R.drawable.check_status_bg);
         animationDrawable = (AnimationDrawable) statusV.getBackground();
         animationDrawable.start();
-        GlobalUtil.getHandler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                AlarmManager.getInstance().play(R.raw.adjust_last);
-                BlueManager.getInstance().send(ProtocolUtils.study());
+        if (!isStudy) {
+            isStudy = true;
+            GlobalUtil.getHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    AlarmManager.getInstance().play(R.raw.adjust_last);
+                }
+            }, 2000);
+            GlobalUtil.getHandler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    BlueManager.getInstance().send(ProtocolUtils.study());
+                }
+            }, 5000);
+            locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                return;
             }
-        }, 2000);
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000l, 0, this);
-
     }
 
     @Override
@@ -100,6 +109,7 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
 
     @Override
     public void onDestroy() {
+        isStudy = false;
         locationManager.removeUpdates(this);
         BlueManager.getInstance().removeCallBackListener(this);
         super.onDestroy();
