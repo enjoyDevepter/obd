@@ -48,6 +48,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     private Timer timer = new Timer();
     private TimerTask timerTask;
     private boolean success;
+    private boolean noSupport;
 
     private volatile boolean needNotifyParamsSuccess;
     private OBDStatusInfo obdStatusInfo;
@@ -101,7 +102,11 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
-                PageManager.go(new OBDAuthPage());
+                if (noSupport) {
+                    PageManager.finishActivity(MainActivity.getInstance());
+                } else {
+                    PageManager.go(new OBDAuthPage());
+                }
                 break;
         }
     }
@@ -156,7 +161,9 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
                         public void run() {
                             if (obdVersion.getUpdateState() == 4) {
                                 // 车型不支持
+                                noSupport = true;
                                 title.setText("您的车辆不支持");
+                                confirmV.setOnClickListener(CollectFinish.this);
                                 confirmV.setVisibility(View.VISIBLE);
                                 confirmV.setText("关闭");
                                 if (timerTask != null) {
