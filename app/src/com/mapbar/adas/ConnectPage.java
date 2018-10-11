@@ -71,9 +71,9 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
         BlueManager.getInstance().removeCallBackListener(this);
+        super.onStop();
     }
 
     @Override

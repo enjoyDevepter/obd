@@ -177,10 +177,15 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        BlueManager.getInstance().removeCallBackListener(this);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         BlueManager.getInstance().send(ProtocolUtils.stopGetTirePressureStatusUpdateSucess());
-        BlueManager.getInstance().removeCallBackListener(this);
         if (timer != null) {
             timer.cancel();
             timer = null;

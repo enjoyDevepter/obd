@@ -44,7 +44,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     @ViewInject(R.id.status)
     private TextView statusTV;
     @ViewInject(R.id.confirm)
-    private View confirmV;
+    private TextView confirmV;
     private Timer timer = new Timer();
     private TimerTask timerTask;
     private boolean success;
@@ -92,6 +92,12 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     }
 
     @Override
+    public void onStop() {
+        BlueManager.getInstance().removeCallBackListener(this);
+        super.onStop();
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.confirm:
@@ -104,7 +110,6 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BlueManager.getInstance().removeCallBackListener(this);
         if (!success && null != timer) {
             timerTask.cancel();
             timerTask = null;
@@ -149,17 +154,31 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
                     GlobalUtil.getHandler().post(new Runnable() {
                         @Override
                         public void run() {
-                            switch (obdVersion.getpUpdateState()) {
-                                case 0:  // 无参数更新
-                                    break;
-                                case 1: // 有更新
-                                    needNotifyParamsSuccess = true;
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(getDate().getString("sn"), obdVersion.getParams()));
-                                    break;
-                                case 2: // 临时车型，需要采集
-                                    break;
-                                case 3: // 临时车型，参数已采集
-                                    break;
+                            if (obdVersion.getUpdateState() == 4) {
+                                // 车型不支持
+                                title.setText("您的车辆不支持");
+                                confirmV.setVisibility(View.VISIBLE);
+                                confirmV.setText("关闭");
+                                if (timerTask != null) {
+                                    timerTask.cancel();
+                                    timer.cancel();
+                                    timerTask = null;
+                                    timer = null;
+                                }
+                                statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>校准失败，您的车辆不支持胎压盒子！</font><br><font color='#4A4A4A'>请您联系经销商退货！</font><br><br><font color='#4A4A4A'>给您带来的不便非常抱歉！</font>"));
+                            } else {
+                                switch (obdVersion.getpUpdateState()) {
+                                    case 0:  // 无参数更新
+                                        break;
+                                    case 1: // 有更新
+                                        needNotifyParamsSuccess = true;
+                                        BlueManager.getInstance().send(ProtocolUtils.updateParams(getDate().getString("sn"), obdVersion.getParams()));
+                                        break;
+                                    case 2: // 临时车型，需要采集
+                                        break;
+                                    case 3: // 临时车型，参数已采集
+                                        break;
+                                }
                             }
                         }
                     });
@@ -226,6 +245,12 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
                         needNotifyParamsSuccess = false;
+                        if (null != timer) {
+                            timerTask.cancel();
+                            timerTask = null;
+                            timer.cancel();
+                            timer = null;
+                        }
                         PageManager.go(new OBDAuthPage());
                     } else {
                         GlobalUtil.getHandler().post(new Runnable() {

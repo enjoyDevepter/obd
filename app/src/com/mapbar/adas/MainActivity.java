@@ -129,10 +129,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     protected void onResume() {
         super.onResume();
 
-        if (null != mWakeLock) {
-            mWakeLock.acquire();
-        }
-
         PermissionUtil.requestPermissionForInit(new PermissionUtil.RequestPermission() {
             @Override
             public void onRequestPermissionSuccess() {
@@ -154,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
             }
         }).build());
+
+        if (null != mWakeLock) {
+            mWakeLock.acquire();
+        }
+
         if (isFirst()) {
             addTasks();
         }
@@ -247,9 +248,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             case OBDEvent.OBD_DISCONNECTED:
                 Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
                 PageManager.go(new ConnectPage());
-                break;
-            case OBDEvent.AUTHORIZATION_SUCCESS:
-                obdStatusInfo = (OBDStatusInfo) data;
                 break;
             case OBDEvent.STATUS_UPDATA:
                 obdStatusInfo = (OBDStatusInfo) data;

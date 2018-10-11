@@ -402,11 +402,15 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         });
     }
 
+    @Override
+    public void onStop() {
+        BlueManager.getInstance().removeCallBackListener(this);
+        super.onStop();
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BlueManager.getInstance().removeCallBackListener(this);
         if (timer != null) {
             timer.cancel();
             timer = null;

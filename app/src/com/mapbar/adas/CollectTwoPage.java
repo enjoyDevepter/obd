@@ -129,6 +129,12 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     }
 
     @Override
+    public void onStop() {
+        BlueManager.getInstance().removeCallBackListener(this);
+        super.onStop();
+    }
+
+    @Override
     public boolean onBackPressed() {
         PageManager.finishActivity(MainActivity.getInstance());
         return super.onBackPressed();
@@ -137,7 +143,6 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     @Override
     public void onDestroy() {
         isCollect = false;
-        BlueManager.getInstance().removeCallBackListener(this);
         locationManager.removeUpdates(this);
         if (null != heartTimer) {
             heartTimer.cancel();
