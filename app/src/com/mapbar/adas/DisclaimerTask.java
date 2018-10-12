@@ -28,7 +28,7 @@ public class DisclaimerTask extends BaseTask {
                 PageManager.go(new OBDAuthPage());
             } else {
                 BlueManager.getInstance().stopScan(false);
-                PageManager.go(new ChoiceCarPage());
+                PageManager.go(new ConnectPage());
             }
         }
         complate();
