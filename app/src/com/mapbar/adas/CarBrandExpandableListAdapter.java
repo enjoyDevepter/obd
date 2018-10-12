@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.miyuan.obd.R;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by guomin on 2018/6/4.
@@ -17,14 +17,17 @@ import java.util.ArrayList;
 
 public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private ArrayList<CarModel> carModels;
+    private List<CarModel> carModels;
 
-    public CarBrandExpandableListAdapter(ArrayList<CarModel> carModels) {
+    public CarBrandExpandableListAdapter(List<CarModel> carModels) {
         this.carModels = carModels;
     }
 
+    public List<CarModel> getCarModels() {
+        return carModels;
+    }
 
-    public void setCarModels(ArrayList<CarModel> carModels) {
+    public void setCarModels(List<CarModel> carModels) {
         this.carModels = carModels;
     }
 
@@ -35,7 +38,8 @@ public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return carModels.get(groupPosition).getStyles().size();
+        List<CarStyle> carStyleList = carModels.get(groupPosition).getStyles();
+        return carStyleList == null ? 0 : carStyleList.size();
     }
 
     @Override
@@ -45,7 +49,9 @@ public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return carModels.get(groupPosition).getStyles().get(childPosition);
+        List<CarStyle> carStyleList = carModels.get(groupPosition).getStyles();
+//        return carStyleList == null ? 0 : carStyleList.size();
+        return carStyleList == null ? null : carStyleList.get(childPosition);
     }
 
     @Override
@@ -69,7 +75,7 @@ public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(GlobalUtil.getContext()).inflate(R.layout.model_item, parent, false);
             groupViewHolder = new GroupViewHolder();
-            groupViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.car_name);
+            groupViewHolder.tvTitle = convertView.findViewById(R.id.car_name);
             convertView.setTag(groupViewHolder);
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
@@ -85,7 +91,7 @@ public class CarBrandExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(GlobalUtil.getContext()).inflate(R.layout.model_style_item, parent, false);
             childViewHolder = new ChildViewHolder();
-            childViewHolder.tvTitle = (TextView) convertView.findViewById(R.id.car_name);
+            childViewHolder.tvTitle = convertView.findViewById(R.id.car_name);
             convertView.setTag(childViewHolder);
         } else {
             childViewHolder = (ChildViewHolder) convertView.getTag();

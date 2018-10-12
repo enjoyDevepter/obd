@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class CarModel {
     private String name;
+    private String id;
     private ArrayList<CarStyle> styles;
 
     public String getName() {
@@ -26,10 +27,19 @@ public class CarModel {
         this.styles = styles;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "CarModel{" +
                 "name='" + name + '\'' +
+                ", id='" + id + '\'' +
                 ", styles=" + styles +
                 '}';
     }

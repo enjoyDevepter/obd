@@ -73,7 +73,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
         } else {
             confirmV.setVisibility(View.GONE);
             title.setText("需要继续深度校准");
-            statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>由于您的车辆胎压不够灵敏，需要继续深度校准，深度校准过程一般需要10分钟，这期间可以关闭手机APP，可以按照任意路线行驶（无须按指定路线行驶）。</font><br><br><br><font color='#4A4A4A'>请您每个每隔</font><font color='#009488'>15分钟</font><font color='#4A4A4A'>连接手机APP检查校准结果，避免校准失败导致误报或漏报.</font><br><br><font color='#4A4A4A'>如果长时间深度校准未完成时，可以联系我司客服人员！</font>"));
+            statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>由于您的车辆胎压不够灵敏，需要继续深度校准，这个过程大概需要半小时。</font><br><br><font color='#4A4A4A'>这期间可以按照任意路线行驶。</font><font color='#009488'>只有当APP提示校准完成后，才可以正常监测胎压，否则会发生严重误报和漏报的现象。</font><font color='#4A4A4A'>深度校准期间，请您每隔十几分钟用手机APP连接盒子一次并检查校准结果（也可以不关闭APP，校准成功后APP会自动提醒）。</font><br><br>"));
             // 每隔1s一次获取参数
             timerTask = new TimerTask() {
                 @Override
@@ -159,7 +159,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
                     GlobalUtil.getHandler().post(new Runnable() {
                         @Override
                         public void run() {
-                            if (obdVersion.getUpdateState() == 4) {
+                            if (obdVersion.getUpdateState() == 6) {
                                 // 车型不支持
                                 noSupport = true;
                                 title.setText("您的车辆不支持");

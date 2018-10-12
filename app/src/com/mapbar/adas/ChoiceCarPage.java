@@ -73,6 +73,9 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
         super.onStop();
     }
 
+    /**
+     * 获取品牌
+     */
     private void getCarBrands() {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -214,7 +217,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                         GlobalUtil.getHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                showModle(carInfos);
+                                showModle(carInfos.get(0).getModels());
                             }
                         });
                     } else {
@@ -233,11 +236,95 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
     }
 
-    private void showModle(List<CarInfo> result) {
-        carBrandExpandableListAdapter = new CarBrandExpandableListAdapter(result.get(0).getModels());
+    private void getCarStyleForModel(final String id, final int groupIndex) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", id);
+            jsonObject.put("type", "3");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("getCarStyleForModel input " + jsonObject.toString());
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        final Request request = new Request.Builder()
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .url(URLUtils.GET_CAR_BRAND).post(requestBody).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Log.d("getCarStyleForModel failure " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                getCarStyleForModel(id, groupIndex);
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("getCarStyleForModel success ");
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        carInfos = JSON.parseArray(result.optString("brands"), CarInfo.class);
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                CarModel carModel = carBrandExpandableListAdapter.getCarModels().get(groupIndex);
+                                carModel.setStyles(null);
+                                carModel.setStyles(carInfos.get(0).getModels().get(0).getStyles());
+                                carBrandExpandableListAdapter.notifyDataSetChanged();
+//                                showModle(carInfos);
+                            }
+                        });
+                    } else {
+                        GlobalUtil.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+
+    private void showModle(List<CarModel> result) {
+        carBrandExpandableListAdapter = new CarBrandExpandableListAdapter(result);
         expandableListView.setAdapter(carBrandExpandableListAdapter);
         expandableListView.setDivider(new ColorDrawable(0xfff8f9fa));
-        expandableListView.setChildDivider(new ColorDrawable(0xfff));
+        expandableListView.setChildDivider(new ColorDrawable(0xffff));
         expandableListView.setDividerHeight(2);
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
@@ -246,15 +333,12 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
                 for (int i = 0; i < carBrandExpandableListAdapter.getGroupCount(); i++) {
                     if (i != groupPosition) {
                         expandableListView.collapseGroup(i);
-                        CarModel carModel = (CarModel) carBrandExpandableListAdapter.getGroup(i);
-                        for (CarStyle style : carModel.getStyles()) {
-                            style.setChoice(false);
-                        }
                     }
                 }
+                CarModel carModel = (CarModel) carBrandExpandableListAdapter.getGroup(groupPosition);
+                getCarStyleForModel(carModel.getId(), groupPosition);
             }
         });
-
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {

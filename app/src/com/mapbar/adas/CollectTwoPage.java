@@ -163,8 +163,7 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
                 BlueManager.getInstance().send(ProtocolUtils.startCollect());
             }
             sb = new StringBuilder();
-            sb.append(location.getTime()).append("#")
-                    .append(location.getSpeed()).append("#")
+            sb.append(lastLocationTime).append("#")
                     .append(currentSpeed).append("#")
                     .append(location.getLongitude()).append("#")
                     .append(location.getLatitude()).append("#");
