@@ -48,7 +48,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
     private TextView phone;
     @ViewInject(R.id.retry)
     private TextView retryTV;
-    private Timer timer = new Timer();
+    private Timer timer;
     private TimerTask timerTask;
     private int time = 60;
 
@@ -88,6 +88,7 @@ public class IdentifyPage extends AppBasePage implements View.OnClickListener {
                 });
             }
         };
+        timer = new Timer();
         timer.schedule(timerTask, 0, 1000);
     }
 

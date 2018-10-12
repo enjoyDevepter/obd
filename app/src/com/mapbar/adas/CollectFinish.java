@@ -159,33 +159,31 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
                     GlobalUtil.getHandler().post(new Runnable() {
                         @Override
                         public void run() {
-                            if (obdVersion.getUpdateState() == 6) {
-                                // 车型不支持
-                                noSupport = true;
-                                title.setText("您的车辆不支持");
-                                confirmV.setOnClickListener(CollectFinish.this);
-                                confirmV.setVisibility(View.VISIBLE);
-                                confirmV.setText("关闭");
-                                if (timerTask != null) {
-                                    timerTask.cancel();
-                                    timer.cancel();
-                                    timerTask = null;
-                                    timer = null;
-                                }
-                                statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>校准失败，您的车辆不支持胎压盒子！</font><br><font color='#4A4A4A'>请您联系经销商退货！</font><br><br><font color='#4A4A4A'>给您带来的不便非常抱歉！</font>"));
-                            } else {
-                                switch (obdVersion.getpUpdateState()) {
-                                    case 0:  // 无参数更新
-                                        break;
-                                    case 1: // 有更新
-                                        needNotifyParamsSuccess = true;
-                                        BlueManager.getInstance().send(ProtocolUtils.updateParams(getDate().getString("sn"), obdVersion.getParams()));
-                                        break;
-                                    case 2: // 临时车型，需要采集
-                                        break;
-                                    case 3: // 临时车型，参数已采集
-                                        break;
-                                }
+                            switch (obdVersion.getpUpdateState()) {
+                                case 0:  // 无参数更新
+                                    break;
+                                case 1: // 有更新
+                                    needNotifyParamsSuccess = true;
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(getDate().getString("sn"), obdVersion.getParams()));
+                                    break;
+                                case 2: // 临时车型，需要采集
+                                    break;
+                                case 3: // 临时车型，参数已采集
+                                    break;
+                                case 6: // 车型不支持
+                                    noSupport = true;
+                                    title.setText("您的车辆不支持");
+                                    confirmV.setOnClickListener(CollectFinish.this);
+                                    confirmV.setVisibility(View.VISIBLE);
+                                    confirmV.setText("关闭");
+                                    if (timerTask != null) {
+                                        timerTask.cancel();
+                                        timer.cancel();
+                                        timerTask = null;
+                                        timer = null;
+                                    }
+                                    statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>校准失败，您的车辆不支持胎压盒子！</font><br><font color='#4A4A4A'>请您联系经销商退货！</font><br><br><font color='#4A4A4A'>给您带来的不便非常抱歉！</font>"));
+                                    break;
                             }
                         }
                     });

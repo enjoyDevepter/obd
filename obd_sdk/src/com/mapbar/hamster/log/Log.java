@@ -17,7 +17,7 @@ public class Log {
     private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     static {
-//        Timber.plant(new Timber.DebugTree());
+        Timber.plant(new Timber.DebugTree());
         Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + "/obd"));
     }
 

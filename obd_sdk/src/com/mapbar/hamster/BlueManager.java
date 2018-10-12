@@ -707,6 +707,7 @@ public class BlueManager {
                         message.setData(bundle);
                         message.what = MSG_ADJUSTING;
                         mHandler.sendMessage(message);
+                        return;
                     }
 
                     if (content[9] == 02) { // 校准完成

@@ -133,7 +133,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 obdStatusInfo = (OBDStatusInfo) data;
                 checkColectStauts();
                 break;
-            case OBDEvent.NORMAL:
+            case OBDEvent.ADJUST_SUCCESS:
                 obdStatusInfo = (OBDStatusInfo) data;
                 MainPage mainPage = new MainPage();
                 Bundle mainBundle = new Bundle();
@@ -208,7 +208,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                     if ("000".equals(result.optString("status"))) {
                         String state = result.optString("state");
                         if ("1".equals(state)) {
-                            PageManager.go(new CollectPage());
+                            PageManager.go(new CollectLastPage());
                         } else {
                             CollectGuide collectGuide = new CollectGuide();
                             Bundle collectBundle = new Bundle();
