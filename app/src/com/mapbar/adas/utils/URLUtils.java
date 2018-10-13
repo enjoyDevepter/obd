@@ -7,7 +7,7 @@ package com.mapbar.adas.utils;
 public class URLUtils {
     //    public static final String HOST = "http://box.iccm.cn/";
 //    public static final String HOST = "http://box.1668288.com/";
-    public static final String HOST = "http://47.92.101.179:8020/";
+    public static final String HOST = "http://tpms.1668288.com/";
     public static final String ACTIVATE = HOST + "service/lisense/activation";
     public static final String ACTIVATE_SUCCESS = HOST + "service/lisense/activationResult";
     public static final String GET_TIME = HOST + "service/tool/getServerTime";
