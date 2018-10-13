@@ -135,7 +135,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.UNREGISTERED://未注册
-//                // 激活
+                // 激活
                 obdStatusInfo = (OBDStatusInfo) data;
                 Log.d("obdStatusInfo  " + obdStatusInfo);
                 InstallationGuidePage obdInitPage = new InstallationGuidePage();
@@ -638,6 +638,15 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     collectFinish.setDate(collectBundle);
                                     PageManager.go(collectFinish);
                                     break;
+                                case 6: // 车型不支持
+                                    CollectFinish finish = new CollectFinish();
+                                    Bundle finishBundle = new Bundle();
+                                    finishBundle.putString("sn", obdStatusInfo.getSn());
+                                    finishBundle.putString("pVersion", obdStatusInfo.getpVersion());
+                                    finishBundle.putString("bVersion", obdStatusInfo.getbVersion());
+                                    finishBundle.putBoolean("success", false);
+                                    finish.setDate(finishBundle);
+                                    PageManager.go(finish);
                             }
                         }
                     });
@@ -659,7 +668,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
         final File[] logs = dir.listFiles();
 
-        if (null != logs && logs.length > 0) {
+        if (null != logs && logs.length > 0 && null != obdStatusInfo) {
             MultipartBody.Builder builder = new MultipartBody.Builder();
             builder.addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
                     .addPart(MultipartBody.Part.createFormData("type", "1"));

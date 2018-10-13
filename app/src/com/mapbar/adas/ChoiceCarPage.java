@@ -17,6 +17,7 @@ import com.mapbar.adas.utils.CarHelper;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.adas.view.IndexSideBar;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -41,6 +42,8 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.brand)
     ListView listView;
+    @ViewInject(R.id.index_letter)
+    IndexSideBar indexSideBar;
     @ViewInject(R.id.expandablelistView)
     ExpandableListView expandableListView;
     @ViewInject(R.id.title_text)
@@ -321,6 +324,9 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
 
     private void showModle(List<CarModel> result) {
+        if (null == result || (result != null && result.size() <= 0)) {
+            return;
+        }
         carBrandExpandableListAdapter = new CarBrandExpandableListAdapter(result);
         expandableListView.setAdapter(carBrandExpandableListAdapter);
         expandableListView.setDivider(new ColorDrawable(0xfff8f9fa));
@@ -362,10 +368,29 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
         final List<CarInfo> carInfos = CarHelper.setupContactInfoList(result);
 
+        // 设置侧边栏中的字母索引
+        List<String> mLetterIndexList = CarHelper.setupLetterIndexList(carInfos);
+        indexSideBar.setLetterIndexList(mLetterIndexList, false);
+
         // 设置联系人列表的信息
         carInfos.get(0).setChoice(true);
         carAdapter = new CarAdapter(getContext(), carInfos);
         listView.setAdapter(carAdapter);
+
+        // 设置侧边栏的触摸事件监听
+        indexSideBar.setOnTouchLetterListener(new IndexSideBar.OnTouchLetterListener() {
+            @Override
+            public void onTouchingLetterListener(String letter) {
+                int position = carAdapter.getPositionForSection(letter.charAt(0));
+                if (position != -1) {
+                    listView.setSelection(position);     // jump to the specified position
+                }
+            }
+
+            @Override
+            public void onTouchedLetterListener() {
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

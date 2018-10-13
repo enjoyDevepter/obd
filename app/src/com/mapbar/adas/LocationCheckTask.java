@@ -45,10 +45,7 @@ public class LocationCheckTask extends BaseTask {
             // may not be found. In that case show the general settings.
             // General settings activity
             intent.setAction(Settings.ACTION_SETTINGS);
-            try {
-                GlobalUtil.getContext().startActivity(intent);
-            } catch (Exception e) {
-            }
+            GlobalUtil.getContext().startActivity(intent);
         }
     }
 }
