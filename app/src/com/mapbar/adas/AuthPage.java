@@ -32,6 +32,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.SN;
+
 @PageSetting(contentViewId = R.layout.auth_layout)
 public class AuthPage extends AppBasePage implements View.OnClickListener {
 
@@ -122,10 +124,11 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
         next.setEnabled(false);
         final StringBuilder sn = new StringBuilder();
         sn.append(sn01).append("-").append(sn02).append("-").append(sn03).append("-").append(sn04);
-
+        String serialNumber = sn.toString();
+        SN.set(serialNumber);
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("serialNumber", sn.toString());
+            jsonObject.put("serialNumber", serialNumber);
             jsonObject.put("boxId", getDate().getString("boxId"));
         } catch (JSONException e) {
             e.printStackTrace();

@@ -23,6 +23,8 @@ public class SettingPreferencesConfig {
 
     public static final StringPreferences CAR = new StringPreferences(SHARED_PREFERENCES_INIT, "car", " ");
 
+    public static final StringPreferences SN = new StringPreferences(SHARED_PREFERENCES_INIT, "sn", "XXXX-XXXX-XXXX-XXXX");
+
     public static final BooleanPreferences ADJUST_START = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_start", true);
 
     public static final BooleanPreferences ADJUST_SUCCESS = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_success", true);

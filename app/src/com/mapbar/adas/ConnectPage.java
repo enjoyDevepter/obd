@@ -29,6 +29,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.SN;
+
 @PageSetting(contentViewId = R.layout.connect_layout, toHistory = false)
 public class ConnectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
 
@@ -123,7 +125,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
 
         if (null != logs && logs.length > 0) {
             MultipartBody.Builder builder = new MultipartBody.Builder();
-            builder.addPart(MultipartBody.Part.createFormData("serialNumber", "XXXX-XXXX-XXXX-XXXX"))
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", SN.get()))
                     .addPart(MultipartBody.Part.createFormData("type", "1"));
             for (File file : logs) {
                 builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
