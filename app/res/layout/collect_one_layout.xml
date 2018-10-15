@@ -27,7 +27,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="@dimen/common_margin_lr"
         android:layout_marginRight="@dimen/common_margin_lr"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/btn_bg"
         android:gravity="center"
         android:text="马上开始"

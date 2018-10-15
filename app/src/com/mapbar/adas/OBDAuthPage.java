@@ -186,7 +186,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 checkColectStauts();
                 break;
             case OBDEvent.ADJUSTING:
-                PageManager.go(new CollectLastPage());
+                PageManager.go(new CollectPage());
                 break;
             case OBDEvent.ADJUST_SUCCESS:
                 MainPage mainPage = new MainPage();
@@ -262,7 +262,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     if ("000".equals(result.optString("status"))) {
                         String state = result.optString("state");
                         if ("1".equals(state)) {
-                            PageManager.go(new CollectLastPage());
+                            PageManager.go(new CollectPage());
                         } else {
                             CollectGuide collectGuide = new CollectGuide();
                             Bundle collectBundle = new Bundle();

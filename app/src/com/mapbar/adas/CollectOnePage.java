@@ -41,7 +41,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
         cancelV.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
         title.setText("深度校准步骤");
-        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>第一步：提速至20km/h;<br>第二步：掉头；<br>第三步：缓慢提速至60km/h以上并</font><font color='#009488'>保持直线行驶</font>若干分钟，直至校准完成！<br><br>注意：<font color='#009488'>请不要急加速或急减速！</font><br><br><font color='#4A4A4A'>请在安全行驶的前提下操作！<br>校准完成后APP会语音提示您！</font><br><br>"));
+        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>第一步：提速至20km/h;<br>第二步：掉头；<br>第三步：缓慢提速至60km/h以上并</font><font color='#009488'>保持直线行驶</font>若干分钟，直至校准完成！<br><br>注意：<font color='#009488'>请不要急加速或急减速！</font><br><font color='#4A4A4A'>请在安全行驶的前提下操作！<br>校准完成后APP会语音提示您！</font><br>"));
         if (!ishow) {
             confirmV.setEnabled(ishow);
             ishow = true;
