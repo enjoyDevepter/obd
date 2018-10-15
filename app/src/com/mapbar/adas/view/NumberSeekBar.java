@@ -114,12 +114,12 @@ public class NumberSeekBar extends View {
 
         thumbPaint = new Paint();
         thumbPaint.setAntiAlias(true);
-        thumbPaint.setARGB(204, 0, 255, 244);
+        thumbPaint.setARGB(204, 46, 166, 156);
         thumbPaint.setStyle(Paint.Style.FILL);
 
         thumbPaintBig = new Paint();
         thumbPaintBig.setAntiAlias(true);
-        thumbPaintBig.setARGB(102, 0, 255, 244);
+        thumbPaintBig.setARGB(102, 46, 166, 156);
         thumbPaintBig.setStyle(Paint.Style.FILL);
 
 
