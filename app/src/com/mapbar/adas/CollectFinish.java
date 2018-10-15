@@ -59,6 +59,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         success = getDate().getBoolean("success");
+        success = false;
         if (success) {
             title.setText("恭喜您");
             confirmV.setOnClickListener(this);
@@ -72,8 +73,8 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
             }, 2000);
         } else {
             confirmV.setVisibility(View.GONE);
-            title.setText("需要继续深度校准");
-            statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>由于您的车辆胎压不够灵敏，需要继续深度校准，这个过程大概需要半小时。</font><br><br><font color='#4A4A4A'>这期间可以按照任意路线行驶。</font><font color='#009488'>只有当APP提示校准完成后，才可以正常监测胎压，否则会发生严重误报和漏报的现象。</font><font color='#4A4A4A'>深度校准期间，请您每隔十几分钟用手机APP连接盒子一次并检查校准结果（也可以不关闭APP，校准成功后APP会自动提醒）。</font><br><br>"));
+            title.setText("需长时间校准-4");
+            statusTV.setText(Html.fromHtml("<font color='#4A4A4A'>当前校准未完成。</font><br><font color='#4A4A4A'>由于您的车辆胎压数据不灵敏，需要继续深度校准，这个过程您不需要专门驾驶，</font><font color='#009488'>什么时候用车什么时候按任意路线自由驾驶即可。</font><font color='#4A4A4A'>这个过程时间不确定、可以关闭手机APP，建议您每次开车之前用手机APP重新连接盒子检查即可。</font><br><br><font color='#009488'>只有当APP提示校准完成后，才可以正常监测胎压，否则会发生严重误报和漏报的现象。</font><font color='#4A4A4A'>请您务必再次用手机连接胎压盒子并检查校准结果。</font>"));
             // 每隔1s一次获取参数
             timerTask = new TimerTask() {
                 @Override

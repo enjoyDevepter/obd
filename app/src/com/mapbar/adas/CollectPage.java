@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,8 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
     private View reportV;
     @ViewInject(R.id.status)
     private View statusV;
+    @ViewInject(R.id.content)
+    private TextView contentTV;
 
     private int currentSpeed;
 
@@ -66,12 +69,13 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("深度校准即将完成");
+        title.setText("校准即将完成-6");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
         statusV.setBackgroundResource(R.drawable.check_status_bg);
         animationDrawable = (AnimationDrawable) statusV.getBackground();
         animationDrawable.start();
+        contentTV.setText(Html.fromHtml("<font color='#4A4A4A'>请您保持</font><font color='#009488'>直行</font><font color='#4A4A4A'>,并提速至</font><font color='#009488'>60km/h以上</font><font color='#4A4A4A'>,路面尽量平整、须直行。</font><br><br><font color='#009488'>当道路不够直、或者路面不平时，请您提前减速至40km/h以下。</font>"));
         if (!isStudy) {
             isStudy = true;
             GlobalUtil.getHandler().postDelayed(new Runnable() {

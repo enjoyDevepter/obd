@@ -9,6 +9,7 @@
     <include layout="@layout/tittle_layout" />
 
     <TextView
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/common_margin_lr"
