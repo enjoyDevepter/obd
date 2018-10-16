@@ -645,8 +645,10 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                                     finishBundle.putString("pVersion", obdStatusInfo.getpVersion());
                                     finishBundle.putString("bVersion", obdStatusInfo.getbVersion());
                                     finishBundle.putBoolean("success", false);
+                                    finishBundle.putBoolean("unPlay", true);
                                     finish.setDate(finishBundle);
                                     PageManager.go(finish);
+                                    break;
                             }
                         }
                     });

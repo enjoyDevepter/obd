@@ -59,7 +59,6 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         success = getDate().getBoolean("success");
-        success = false;
         if (success) {
             title.setText("恭喜您");
             confirmV.setOnClickListener(this);
@@ -84,12 +83,14 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
             };
             BlueManager.getInstance().addBleCallBackListener(this);
             timer.schedule(timerTask, 0, 60 * 1000);
-            GlobalUtil.getHandler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    AlarmManager.getInstance().play(R.raw.adjust_fail);
-                }
-            }, 2000);
+            if (!getDate().getBoolean("unPlay")) {
+                GlobalUtil.getHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlarmManager.getInstance().play(R.raw.adjust_fail);
+                    }
+                }, 2000);
+            }
         }
     }
 
@@ -97,6 +98,12 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     public void onStop() {
         BlueManager.getInstance().removeCallBackListener(this);
         super.onStop();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
+        return true;
     }
 
     @Override

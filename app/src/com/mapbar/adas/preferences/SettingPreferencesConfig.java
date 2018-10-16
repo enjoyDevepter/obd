@@ -27,7 +27,7 @@ public class SettingPreferencesConfig {
 
     public static final BooleanPreferences ADJUST_START = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_start", true);
 
-    public static final BooleanPreferences ADJUST_SUCCESS = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_success", true);
+    public static final BooleanPreferences ADJUST_SUCCESS = new BooleanPreferences(SHARED_PREFERENCES_INIT, "adjust_success", false);
 
     public static final BooleanPreferences TIRE_WARM = new BooleanPreferences(SHARED_PREFERENCES_INIT, "tire_warm", true);
 
