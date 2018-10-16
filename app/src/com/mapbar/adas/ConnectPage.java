@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
@@ -125,7 +126,13 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
 
         if (null != logs && logs.length > 0) {
             MultipartBody.Builder builder = new MultipartBody.Builder();
-            builder.addPart(MultipartBody.Part.createFormData("serialNumber", SN.get()))
+            String sn;
+            if ("XXXX-XXXX-XXXX-XXXX".equals(SN.get())) {
+                sn = Build.MANUFACTURER + "_" + Build.MODEL + "_" + Build.BOARD;
+            } else {
+                sn = SN.get();
+            }
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", sn))
                     .addPart(MultipartBody.Part.createFormData("type", "1"));
             for (File file : logs) {
                 builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
