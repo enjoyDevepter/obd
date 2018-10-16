@@ -328,6 +328,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
     @Override
     public boolean onBackPressed() {
+        if (ADJUST_SUCCESS.get()) {
+            ADJUST_SUCCESS.set(false);
+        }
         PageManager.finishActivity(MainActivity.getInstance());
         return true;
     }
