@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
@@ -51,7 +52,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 @PageSetting(contentViewId = R.layout.collect_two_layout, toHistory = false)
-public class CollectTwoPage extends AppBasePage implements LocationListener, BleCallBackListener {
+public class CollectTwoPage extends AppBasePage implements LocationListener, BleCallBackListener, View.OnClickListener {
 
     @ViewInject(R.id.title)
     private TextView title;
@@ -90,8 +91,8 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     @Override
     public void onResume() {
         super.onResume();
-        reportV.setVisibility(View.GONE);
         back.setVisibility(View.GONE);
+        reportV.setOnClickListener(this);
         title.setText("开始校准");
         if (!isCollect) {
             isCollect = true;
@@ -137,7 +138,7 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     @Override
     public boolean onBackPressed() {
         PageManager.finishActivity(MainActivity.getInstance());
-        return super.onBackPressed();
+        return true;
     }
 
     @Override
@@ -401,6 +402,62 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
         });
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.report:
+                uploadLog();
+                break;
+        }
+    }
+
+    private void uploadLog() {
+        Log.d("CollectTwoPage uploadLog ");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File[] logs = dir.listFiles();
+
+        if (null != logs && logs.length > 0) {
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", getDate().getString("sn")))
+                    .addPart(MultipartBody.Part.createFormData("type", "1"));
+            for (File file : logs) {
+                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+            }
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_ERROR_FILE)
+                    .post(builder.build())
+                    .build();
+
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("CollectTwoPage uploadLog onFailure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("CollectTwoPage uploadLog success " + responese);
+                    try {
+                        final JSONObject result = new JSONObject(responese);
+                        if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            for (File delete : logs) {
+                                delete.delete();
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.d("OBDAuthPage uploadLog failure " + e.getMessage());
+                    }
+                }
+            });
+        }
+    }
 
     private class FileRunnable implements Runnable {
 
