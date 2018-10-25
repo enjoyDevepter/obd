@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,6 +31,8 @@ public abstract class BasePage implements ILifeCycleListener {
     private int mCurrentState = INITING;
 
     private int contentViewId = 0;
+
+    private int contentViewLandId = 0;
     /**
      * 页面id
      * 可能的值是: 1.FragTransaction提交之后生成的id
@@ -60,6 +63,7 @@ public abstract class BasePage implements ILifeCycleListener {
         if (pageSetting != null) {
             setTransparent(pageSetting.transparent());
             setContentViewId(pageSetting.contentViewId());
+            setContentViewLandId(pageSetting.contentViewLandId());
             setToHistory(pageSetting.toHistory());
             setFlag(pageSetting.flag());
         }
@@ -125,6 +129,11 @@ public abstract class BasePage implements ILifeCycleListener {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+        if (newConfig.getLayoutDirection() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+
+        } else if (newConfig.getLayoutDirection() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+
+        }
     }
 
 
@@ -211,11 +220,24 @@ public abstract class BasePage implements ILifeCycleListener {
     }
 
     public int getContentViewId() {
+        if (contentViewLandId != 0) {
+            if (getContext().getResources().getDisplayMetrics().heightPixels < getContext().getResources().getDisplayMetrics().widthPixels) {
+                return contentViewLandId;
+            }
+        }
         return contentViewId;
     }
 
     public void setContentViewId(int contentViewId) {
         this.contentViewId = contentViewId;
+    }
+
+    public int getContentViewLandId() {
+        return contentViewLandId;
+    }
+
+    public void setContentViewLandId(int contentViewLandId) {
+        this.contentViewLandId = contentViewLandId;
     }
 
     public Bundle getDate() {

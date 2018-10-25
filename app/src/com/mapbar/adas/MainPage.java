@@ -54,7 +54,7 @@ import static com.mapbar.adas.preferences.SettingPreferencesConfig.ADJUST_START;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.ADJUST_SUCCESS;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_WARM;
 
-@PageSetting(contentViewId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
+@PageSetting(contentViewId = R.layout.main_layout, contentViewLandId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     private static final int UNIT = 1024;
     CustomDialog dialog = null;

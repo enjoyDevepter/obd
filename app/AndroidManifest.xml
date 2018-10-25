@@ -29,7 +29,7 @@
         android:theme="@android:style/Theme.NoTitleBar">
         <activity
             android:name="com.mapbar.adas.MainActivity"
-            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

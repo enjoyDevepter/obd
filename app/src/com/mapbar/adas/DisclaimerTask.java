@@ -33,5 +33,4 @@ public class DisclaimerTask extends BaseTask {
         }
         complate();
     }
-
 }

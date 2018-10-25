@@ -22,8 +22,13 @@ public abstract class BaseFragment extends Fragment {
      */
     private boolean isTransparent = false;
 
+    public BaseFragment() {
+        super();
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+        System.out.println("=====onConfigurationChanged=====");
         super.onConfigurationChanged(newConfig);
         lifeCycleListener.onConfigurationChanged(newConfig);
     }
@@ -39,10 +44,6 @@ public abstract class BaseFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         System.out.println("=====onCreate=====");
-    }
-
-    public BaseFragment() {
-        super();
     }
 
     @Override
