@@ -66,7 +66,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
         super.onResume();
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
-        title.setText("未检测到车辆数据!");
+        title.setText("未检测到车辆数据");
         beforeMatching = getDate().getBoolean("before_matching");
         if (beforeMatching) {
             beforeMatchingV.setVisibility(View.VISIBLE);
