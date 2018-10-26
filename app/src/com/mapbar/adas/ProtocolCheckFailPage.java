@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -64,6 +65,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
         title.setText("未检测到车辆数据");

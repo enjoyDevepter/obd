@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
 import android.view.View;
@@ -56,6 +57,7 @@ public class OBDActivatePage extends AppBasePage implements BleCallBackListener,
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("激活设备");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);

@@ -42,7 +42,4 @@ public @interface PageSetting {
      * @return
      */
     int contentViewId() default 0;
-
-
-    int contentViewLandId() default 0;
 }

@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -60,6 +61,7 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("输入授权码");
         next.setOnClickListener(this);
         reportV.setOnClickListener(this);

@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -36,6 +37,7 @@ public class InstallationGuidePage extends AppBasePage implements View.OnClickLi
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("安装引导一");
         reportV.setVisibility(View.GONE);
         back.setVisibility(View.GONE);

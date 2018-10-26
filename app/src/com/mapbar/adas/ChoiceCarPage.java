@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -64,6 +65,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("选择车型");
         next.setOnClickListener(this);
         reportV.setOnClickListener(this);

@@ -2,6 +2,7 @@ package com.mapbar.adas;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
@@ -69,6 +70,7 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("校准即将完成-6");
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);

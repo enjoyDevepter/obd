@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -37,6 +38,7 @@ public class CollectOnePage extends AppBasePage implements View.OnClickListener 
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         back.setOnClickListener(this);
         cancelV.setOnClickListener(this);
         reportV.setVisibility(View.GONE);

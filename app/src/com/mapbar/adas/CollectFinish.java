@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         success = getDate().getBoolean("success");

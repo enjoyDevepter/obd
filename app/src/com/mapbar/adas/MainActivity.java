@@ -3,6 +3,7 @@ package com.mapbar.adas;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -120,14 +121,23 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         ImmersionBar.with(this)
                 .fitsSystemWindows(true)
                 .statusBarDarkFont(true)
-                .statusBarColor(android.R.color.white)
+                .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
 
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         if (powerManager != null) {
             mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "WakeLock");
         }
+    }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ImmersionBar.with(this)
+                .fitsSystemWindows(true)
+                .statusBarDarkFont(true)
+                .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
+                .init(); //初始化，默认透明状态栏和黑色导航栏
     }
 
     @Override

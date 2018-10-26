@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -35,6 +36,7 @@ public class InstallationGuideTwoPage extends AppBasePage implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("安装引导二");
         back.setOnClickListener(this);
         reportV.setVisibility(View.GONE);

@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class CollectLastPage extends AppBasePage implements View.OnClickListener
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("深度校准最后一步");
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);

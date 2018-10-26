@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -50,6 +51,7 @@ public class PhonePage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("输入手机号");
         next.setOnClickListener(this);
         back.setOnClickListener(this);

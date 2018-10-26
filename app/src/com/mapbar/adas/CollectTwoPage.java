@@ -2,6 +2,7 @@ package com.mapbar.adas;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -91,6 +92,7 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         back.setVisibility(View.GONE);
         reportV.setOnClickListener(this);
         title.setText("开始校准");
