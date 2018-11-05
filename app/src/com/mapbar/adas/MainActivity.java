@@ -1,14 +1,11 @@
 package com.mapbar.adas;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -16,13 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
 import com.gyf.barlibrary.ImmersionBar;
-import com.mapbar.adas.utils.CustomDialog;
-import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.PermissionUtil;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
@@ -65,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private ViewGroup rootViewGroup;
     private View splashView;
     private PowerManager.WakeLock mWakeLock;
-    private CustomDialog dialog;
     private OBDStatusInfo obdStatusInfo;
 
 
@@ -148,6 +141,15 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             @Override
             public void onRequestPermissionSuccess() {
                 //request permission success, do something.
+                if (null != mWakeLock) {
+                    mWakeLock.acquire();
+                }
+
+                if (isFirst()) {
+                    addTasks();
+                }
+                setFirst(false);
+                BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
             }
 
             @Override
@@ -166,74 +168,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             }
         }).build());
 
-        if (null != mWakeLock) {
-            mWakeLock.acquire();
-        }
-
-        if (isFirst()) {
-            addTasks();
-        }
-        setFirst(false);
-        BlueManager.getInstance().addBleCallBackListener(this);
-
-        if (!isOPen(this)) {
-            showGpsDialog();
-        }
 
     }
 
-    private void showGpsDialog() {
-        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                .setViewListener(new CustomDialog.ViewListener() {
-                    @Override
-                    public void bindView(View view) {
-                        ((TextView) (view.findViewById(R.id.confirm))).setText("开启GPS");
-                        ((TextView) (view.findViewById(R.id.info))).setText("请打开GPS，否则无法完成当前操作!");
-                        ((TextView) (view.findViewById(R.id.title))).setText("GPS异常");
-                        final View confirm = view.findViewById(R.id.confirm);
-                        confirm.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                openGPS(MainActivity.this);
-                                dialog.dismiss();
-                            }
-                        });
-                    }
-                })
-                .setLayoutRes(R.layout.dailog_common_warm)
-                .setCancelOutside(false)
-                .setDimAmount(0.5f)
-                .isCenter(true)
-                .setWidth(OBDUtils.getDimens(this, R.dimen.dailog_width))
-                .show();
-    }
-
-    public boolean isOPen(Context context) {
-        LocationManager locationManager
-                = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        // 通过GPS卫星定位，定位级别可以精确到街（通过24颗卫星定位，在室外和空旷的地方定位准确、速度快）
-        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (gps) {
-            return true;
-        }
-        return false;
-    }
-
-
-    public void openGPS(Context context) {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            GlobalUtil.getContext().startActivity(intent);
-        } catch (ActivityNotFoundException ex) {
-            // The Android SDK doc says that the location settings activity
-            // may not be found. In that case show the general settings.
-            // General settings activity
-            intent.setAction(Settings.ACTION_SETTINGS);
-            GlobalUtil.getContext().startActivity(intent);
-        }
-    }
 
     @Override
     protected void onDestroy() {

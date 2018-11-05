@@ -4,6 +4,7 @@ import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
@@ -91,9 +92,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private ProgressBar progressBar;
     private DownloadManager downloadManager;
     private long mTaskId;
-    //    private Handler mMainHandler = new Handler(Looper.getMainLooper());
-//    private HandlerThread mWorkerThread;
-//    private Handler mHandler;
     private int time = 10;
     private Timer timer;
     private TimerTask timerTask;
@@ -171,9 +169,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         ImmersionBar.with(MainActivity.getInstance())
                 .fitsSystemWindows(true)
                 .statusBarDarkFont(true)
-                .statusBarColor(R.color.main_title_color)
+                .statusBarColor(MainActivity.getInstance().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : R.color.main_title_color)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
-
     }
 
     @Override

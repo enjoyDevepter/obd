@@ -65,6 +65,13 @@ public class BlueManager {
     private static final int MSG_NORMAL = 100; // 胎压盒子可以正常使用
     private static final int MSG_COLLECT_DATA = 110; // 采集数据
     private static final int MSG_COLLECT_DATA_FOR_CAR = 120; // 全车数据
+    private static final int MSG_PHYSICAL_STEP_ONE = 130; // 体检第一步
+    private static final int MSG_PHYSICAL_STEP_TWO = 131; // 体检第二步
+    private static final int MSG_PHYSICAL_STEP_THREE = 132; // 体检第三步
+    private static final int MSG_PHYSICAL_STEP_FOUR = 133; // 体检第四步
+    private static final int MSG_PHYSICAL_STEP_FIVE = 134; // 体检第五步
+    private static final int MSG_PHYSICAL_STEP_SEX = 135; // 体检第六步
+    private static final int MSG_PHYSICAL_STEP_SEVEN = 136; // 体检第七步
 
 
     private static final int MSG_VERIFY = 2;
@@ -84,9 +91,7 @@ public class BlueManager {
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final int CONNECTED = 1; // 连接成功
     private static final int DISCONNECTED = 0; // 断开连接
-    private static final int UN_AUTH = 2; // 未授权
-    private static final int UN_ACTIVATE = 3; //未激活
-    private static final long COMMAND_TIMEOUT = 3000;
+    private static final long COMMAND_TIMEOUT = 5000;
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
     private BluetoothGatt mBluetoothGatt;
@@ -130,6 +135,7 @@ public class BlueManager {
     private byte[] mData;
     private int mCount = 20;
     private Queue<byte[]> mDataQueue;
+    private TimeOutThread timeOutThread;
     private BleWriteCallback bleWriteCallback = new BleWriteCallback() {
         @Override
         public void onWriteSuccess(byte[] justWrite) {
@@ -147,10 +153,9 @@ public class BlueManager {
             realWrite(date);
         }
     };
-    private int mTotalNum;
     private BluetoothManager bluetoothManager;
-    private byte[] result;
     private byte[] currentProtocol;
+    private volatile int currentRepeat = 0;
     private int repeat = 0;
     private LinkedList<byte[]> instructList;
     /**
@@ -176,6 +181,8 @@ public class BlueManager {
                 sentToBox();
             }
         }, "sendMessage").start();
+        timeOutThread = new TimeOutThread();
+        timeOutThread.start();
     }
 
     public static BlueManager getInstance() {
@@ -410,7 +417,7 @@ public class BlueManager {
     /**
      * 蓝牙通信
      */
-    public void sentToBox() {
+    private void sentToBox() {
         while (true) {
             try {
                 byte[] message = queue.take();
@@ -467,6 +474,9 @@ public class BlueManager {
         if (mBluetoothGatt == null) {
             return;
         }
+        if (!split) { // 未拆封包 或者 心跳包
+            timeOutThread.startCommand(true);
+        }
         writeCharacteristic.setValue(data);
         mBluetoothGatt.writeCharacteristic(writeCharacteristic);
     }
@@ -502,12 +512,12 @@ public class BlueManager {
             throw new IllegalArgumentException("split count should higher than 0!");
         }
         mDataQueue = splitByte(mData, mCount);
-        mTotalNum = mDataQueue.size();
         write();
     }
 
     private void write() {
         if (mDataQueue.peek() == null) {
+            timeOutThread.startCommand(true);
             return;
         } else {
             byte[] data = mDataQueue.poll();
@@ -559,6 +569,9 @@ public class BlueManager {
      * @param res
      */
     private synchronized void validateAndNotify(byte[] res) {
+        if (!(res[0] == (byte) 0x09 && res[1] == 01)) {
+            timeOutThread.endCommand();
+        }
         byte[] msg = instructList.pollLast();
         canGo = true;
         if (msg != null && queue.size() == 0) {
@@ -773,106 +786,11 @@ public class BlueManager {
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
+            } else if (content[0] == 8) {
+                if (content[1] == 05) {
+
+                }
             }
-//                if (result[1] == 00) { // 通用错误
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_ERROR;
-//                    bundle.putInt("status", content[0]);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                } else if (result[2] == 01) { // 获取终端状态
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_VERIFY;
-//                    bundle.putInt("status", content[0]);
-//                    switch (bundle.getInt("status")) {
-//                        case 0:
-//                            bundle.putString("value", HexUtils.formatHexString(Arrays.copyOfRange(content, 1, content.length)));
-//                            break;
-//                        case 1:
-//                            bundle.putByteArray("value", content);
-//                            break;
-//                        case 2:
-//                            bundle.putString("value", new String(Arrays.copyOfRange(content, 1, content.length)));
-//                            break;
-//                    }
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                } else if (result[2] == 02) { // 授权结果
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_AUTH_RESULT;
-//                    bundle.putInt("status", content[0]);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                }
-//
-//            } else if (result[1] == 01) {
-//                if (result[2] == 01) { // 获取终端版本
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_OBD_VERSION;
-//                    bundle.putString("sn", new String(Arrays.copyOfRange(content, 0, 19)));
-//                    bundle.putString("version", new String(Arrays.copyOfRange(content, 19, 31)));
-//                    bundle.putString("car_no", new String(Arrays.copyOfRange(content, 31, 43)));
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                }
-//            } else if (result[1] == 02) {
-//                if (result[2] == 01) { // 学习模式确认
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_STUDY;
-//                    bundle.putInt("status", content[0]);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//
-//                } else if (result[2] == 02) { // 学习进度确认
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_STUDY_PROGRESS;
-//                    bundle.putInt("status", content[0]);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//
-//                } else if (result[2] == 03) { // 轮胎状态
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_TIRE_PRESSURE_STATUS;
-//                    bundle.putByteArray("status", content);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                } else if (result[2] == 04) { // 灵敏度确认
-//                }
-//
-//            } else if (result[1] == 03) {
-//                if (result[2] == 01) { // 报警结果确认
-//                }
-//            } else if (result[1] == 05) {
-//                if (result[2] == 01) { // 车型参数更新确认
-//                    Message message = mHandler.obtainMessage();
-//                    message.what = MSG_PARAMS_UPDATE_SUCESS;
-//                    mHandler.sendMessage(message);
-//                }
-//            } else if (result[1] == 06) {
-//                if (result[2] == 01) { // 固件升级确认
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_BEGIN_TO_UPDATE;
-//                    bundle.putInt("status", content[0]);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                } else if (result[2] == 02) { // 升级包刷写反馈
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    message.what = MSG_UPDATE_FOR_ONE_UNIT;
-//                    bundle.putInt("index", content[0]);
-//                    bundle.putInt("status", content[1]);
-//                    message.setData(bundle);
-//                    mHandler.sendMessage(message);
-//                }
-//            }
         }
     }
 
@@ -1167,6 +1085,104 @@ public class BlueManager {
                     });
                     break;
             }
+        }
+    }
+
+
+    private class TimeOutThread extends Thread {
+
+        private static final String TIMEOUTSYNC = "MTIMEOUTSYNC";
+
+        private boolean needStop = false;
+
+        private boolean waitForCommand = false;
+
+        private boolean needRewire = false;
+
+        @Override
+        public synchronized void start() {
+            needStop = false;
+            super.start();
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            while (!needStop) {
+                synchronized (TIMEOUTSYNC) {
+                    if (needStop) {
+                        return;
+                    }
+                    if (waitForCommand) {
+                        try {
+                            Log.d("TimeOutThread wait ");
+                            TIMEOUTSYNC.wait(COMMAND_TIMEOUT);
+                            if (needRewire) {
+                                Log.d("TimeOutThread needRewire ");
+                                if (currentRepeat > 2) {
+                                    currentRepeat = 0;
+                                    mMainHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.d("连续2次响应超时，断开连接！");
+                                            notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
+                                        }
+                                    });
+                                } else {
+                                    Log.d("响应超时，重新发送！");
+                                    if (mDataQueue != null) {
+                                        mDataQueue.clear();
+                                    }
+                                    queue.add(currentProtocol);
+                                    currentRepeat++;
+                                }
+                            }
+                            Log.d("TimeOutThread notifyAll ");
+                            TIMEOUTSYNC.notifyAll();
+                            TIMEOUTSYNC.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        }
+
+        public void startCommand(boolean reset) {
+            if (!waitForCommand) {
+                synchronized (TIMEOUTSYNC) {
+                    Log.d("TimeOutThread startCommand ");
+                    waitForCommand = true;
+                    if (reset) {
+                        needRewire = true;
+                    }
+                    TIMEOUTSYNC.notifyAll();
+                }
+            }
+        }
+
+        public void endCommand() {
+            if (waitForCommand) {
+                synchronized (TIMEOUTSYNC) {
+                    Log.d("TimeOutThread endCommand ");
+                    waitForCommand = false;
+                    needRewire = false;
+                    currentRepeat = 0;
+                    TIMEOUTSYNC.notifyAll();
+                    try {
+                        TIMEOUTSYNC.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        public void cancel() {
+            Log.d("TimeOutThread cancel ");
+            needStop = true;
+            interrupt();
         }
     }
 }
