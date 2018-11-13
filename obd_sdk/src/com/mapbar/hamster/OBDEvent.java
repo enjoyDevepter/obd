@@ -123,6 +123,13 @@ public class OBDEvent {
      */
     public static final int COLLECT_DATA = 180; // 采集数据
     public static final int COLLECT_DATA_FOR_CAR = 190; // 全车数据
+    public static final int PHYSICAL_STEP_ONE = 200; // 体检第一步
+    public static final int PHYSICAL_STEP_TWO = 210; // 体检第二步
+    public static final int PHYSICAL_STEP_THREE = 220; // 体检第三步
+    public static final int PHYSICAL_STEP_FOUR = 230; // 体检第四步
+    public static final int PHYSICAL_STEP_FIVE = 240; // 体检第五步
+    public static final int PHYSICAL_STEP_SEX = 250; // 体检第六步
+    public static final int PHYSICAL_STEP_SEVEN = 260; // 体检第七步
 
 
 }

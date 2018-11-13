@@ -113,7 +113,8 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
                 break;
             case OBDEvent.BLUE_CONNECTED:
                 Log.d("OBDEvent.BLUE_CONNECTED");
-                PageManager.go(new OBDAuthPage());
+//                PageManager.go(new OBDAuthPage());
+                PageManager.go(new PhysicalPage());
                 break;
         }
 

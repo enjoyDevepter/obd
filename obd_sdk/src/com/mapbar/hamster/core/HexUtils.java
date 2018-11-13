@@ -87,6 +87,11 @@ public class HexUtils {
         return ret;
     }
 
+    public static int byteToInt(byte b) {
+        return b & 0xFF;
+    }
+
+
     /**
      * String的字符串转换成unicode的String
      *

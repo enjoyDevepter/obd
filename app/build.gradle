@@ -55,8 +55,6 @@ android {
     }
 }
 
-
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(path: ':core')
@@ -70,4 +68,5 @@ dependencies {
     compile 'me.jessyan:rxerrorhandler:2.1.1'
     compile 'io.reactivex.rxjava2:rxjava:2.1.12'
     compile 'com.jungly:gridPasswordView:0.3'
+    compile 'com.android.support:recyclerview-v7:27.1.1'
 }

@@ -236,7 +236,7 @@ public class ProtocolUtils {
         Log.d("Protocol sendPhysical ===");
         byte[] result = new byte[8];
         result[0] = PROTOCOL_HEAD_TAIL;
-        result[1] = (byte) 88;
+        result[1] = (byte) 136;
         result[2] = (byte) 05;
         result[3] = 01;
         result[4] = 01;

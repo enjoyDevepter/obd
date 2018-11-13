@@ -65,13 +65,7 @@ public class BlueManager {
     private static final int MSG_NORMAL = 100; // 胎压盒子可以正常使用
     private static final int MSG_COLLECT_DATA = 110; // 采集数据
     private static final int MSG_COLLECT_DATA_FOR_CAR = 120; // 全车数据
-    private static final int MSG_PHYSICAL_STEP_ONE = 130; // 体检第一步
-    private static final int MSG_PHYSICAL_STEP_TWO = 131; // 体检第二步
-    private static final int MSG_PHYSICAL_STEP_THREE = 132; // 体检第三步
-    private static final int MSG_PHYSICAL_STEP_FOUR = 133; // 体检第四步
-    private static final int MSG_PHYSICAL_STEP_FIVE = 134; // 体检第五步
-    private static final int MSG_PHYSICAL_STEP_SEX = 135; // 体检第六步
-    private static final int MSG_PHYSICAL_STEP_SEVEN = 136; // 体检第七步
+    private static final int MSG_PHYSICAL = 130; // 体检
 
 
     private static final int MSG_VERIFY = 2;
@@ -91,7 +85,7 @@ public class BlueManager {
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final int CONNECTED = 1; // 连接成功
     private static final int DISCONNECTED = 0; // 断开连接
-    private static final long COMMAND_TIMEOUT = 5000;
+    private static final long COMMAND_TIMEOUT = 15000;
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
     private BluetoothGatt mBluetoothGatt;
@@ -368,6 +362,9 @@ public class BlueManager {
      * 断开链接
      */
     public synchronized void disconnect() {
+
+        timeOutThread.endCommand();
+
         if (mBluetoothGatt == null) {
             return;
         }
@@ -769,6 +766,15 @@ public class BlueManager {
                     bundle.putByteArray("status", content);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
+                } else if (content[1] == 05) {
+                    if (content[1] == 05) {
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        message.what = MSG_PHYSICAL;
+                        bundle.putByteArray("status", content);
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                    }
                 }
             } else if (content[0] == 9) {
                 if (content[1] == 01) { // 采集数据
@@ -785,10 +791,6 @@ public class BlueManager {
                     bundle.putByteArray("status", content);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
-                }
-            } else if (content[0] == 8) {
-                if (content[1] == 05) {
-
                 }
             }
         }
@@ -1084,6 +1086,38 @@ public class BlueManager {
                         }
                     });
                     break;
+                case MSG_PHYSICAL:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            byte[] result = bundle.getByteArray("status");
+                            byte[] res = new byte[result.length - 4];
+                            System.arraycopy(result, 4, res, 0, res.length);
+                            if (res[0] == 01) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_ONE");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_ONE, res);
+                            } else if (res[0] == 02) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_TWO");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_TWO, res);
+                            } else if (res[0] == 03) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_THREE");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_THREE, res);
+                            } else if (res[0] == 04) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_FOUR");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_FOUR, res);
+                            } else if (res[0] == 05) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_FIVE");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_FIVE, res);
+                            } else if (res[0] == 06) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_SEX");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_SEX, res);
+                            } else if (res[0] == 07) {
+                                Log.d("OBDEvent.PHYSICAL_STEP_SEVEN");
+                                notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_SEVEN, res);
+                            }
+                        }
+                    });
+                    break;
             }
         }
     }
@@ -1125,6 +1159,10 @@ public class BlueManager {
                                         @Override
                                         public void run() {
                                             Log.d("连续2次响应超时，断开连接！");
+//                                            waitForCommand = false;
+//                                            needRewire = false;
+//                                            currentRepeat = 0;
+                                            disconnect();
                                             notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
                                         }
                                     });
@@ -1139,7 +1177,7 @@ public class BlueManager {
                             }
                             Log.d("TimeOutThread notifyAll ");
                             TIMEOUTSYNC.notifyAll();
-                            TIMEOUTSYNC.wait();
+//                            TIMEOUTSYNC.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -1170,11 +1208,11 @@ public class BlueManager {
                     needRewire = false;
                     currentRepeat = 0;
                     TIMEOUTSYNC.notifyAll();
-                    try {
-                        TIMEOUTSYNC.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        TIMEOUTSYNC.wait();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         }
