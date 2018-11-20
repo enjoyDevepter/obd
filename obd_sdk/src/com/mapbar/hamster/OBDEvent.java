@@ -130,6 +130,8 @@ public class OBDEvent {
     public static final int PHYSICAL_STEP_FIVE = 240; // 体检第五步
     public static final int PHYSICAL_STEP_SEX = 250; // 体检第六步
     public static final int PHYSICAL_STEP_SEVEN = 260; // 体检第七步
+    public static final int FAULT_CODE = 270; // 故障码
+    public static final int CLEAN_FAULT_CODE = 280; // 清除故障码
 
 
 }

@@ -46,6 +46,9 @@ public abstract class AppBasePage extends FragmentPage {
     }
 
     private void showGpsDialog() {
+        if (dialog != null && dialog.isVisible()) {
+            return;
+        }
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override

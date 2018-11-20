@@ -16,4 +16,7 @@
             <enum name="bottomLine" value="1" />
         </attr>
     </declare-styleable>
+    <declare-styleable name="Typeface">
+        <attr name="typeface" format="string" />
+    </declare-styleable>
 </resources>

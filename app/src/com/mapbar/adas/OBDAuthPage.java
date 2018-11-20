@@ -109,10 +109,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                         return;
                     }
                     verified = true;
-//                    BlueManager.getInstance().send(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
-                    long time = System.currentTimeMillis();
-                    Log.d("getOBDStatus success " + time);
-                    BlueManager.getInstance().send(ProtocolUtils.getOBDStatus(time));
+                    BlueManager.getInstance().send(ProtocolUtils.getOBDStatus(Long.valueOf(result.optString("server_time"))));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

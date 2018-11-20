@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="layout_marginTop2">-5dip</dimen>
+    <dimen name="layout_marginTop7">53dip</dimen>
+    <dimen name="layout_marginLeft2">200dip</dimen>
+    <dimen name="layout_marginBottom">0dip</dimen>
+    <dimen name="layout_marginTop6">255dip</dimen>
+</resources>

@@ -66,6 +66,7 @@ public class BlueManager {
     private static final int MSG_COLLECT_DATA = 110; // 采集数据
     private static final int MSG_COLLECT_DATA_FOR_CAR = 120; // 全车数据
     private static final int MSG_PHYSICAL = 130; // 体检
+    private static final int MSG_FAULT_CODE = 140; // 故障码
 
 
     private static final int MSG_VERIFY = 2;
@@ -527,13 +528,13 @@ public class BlueManager {
      *
      * @param data
      */
-    synchronized void analyzeProtocol(byte[] data) {
+    public synchronized void analyzeProtocol(byte[] data) {
 
         if (null != data && data.length > 0) {
             if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL && data.length != 1 && unfinish && data.length >= 7) {
                 // 获取包长度
                 byte[] len = new byte[]{data[4], data[3]};
-                count = HexUtils.byteToShort(len);
+                count = byteToShort(len);
                 if (data.length == count + 7) {  //为完整一包
                     full = new byte[count + 5];
                     System.arraycopy(data, 1, full, 0, full.length);
@@ -562,6 +563,15 @@ public class BlueManager {
         }
     }
 
+    public short byteToShort(byte[] b) {
+        short s = 0;
+        short s0 = (short) (b[0] & 0xff);// 最低位
+        short s1 = (short) (b[1] & 0xff);
+        s1 <<= 8;
+        s = (short) (s0 | s1);
+        return s;
+    }
+
     /**
      * @param res
      */
@@ -569,11 +579,11 @@ public class BlueManager {
         if (!(res[0] == (byte) 0x09 && res[1] == 01)) {
             timeOutThread.endCommand();
         }
-        byte[] msg = instructList.pollLast();
-        canGo = true;
-        if (msg != null && queue.size() == 0) {
-            queue.add(msg);
-        }
+//        byte[] msg = instructList.pollLast();
+//        canGo = true;
+//        if (msg != null && queue.size() == 0) {
+//            queue.add(msg);
+//        }
 
         byte[] result = new byte[res.length];
         System.arraycopy(res, 0, result, 0, res.length);
@@ -601,6 +611,7 @@ public class BlueManager {
                     obdStatusInfo.setCurrentMatching(content[7] == 01);
                     obdStatusInfo.setBerforeMatching(content[8] == 01);
                     obdStatusInfo.setOrginal(content);
+                    Log.d(obdStatusInfo.toString());
 
                     if (content[content.length - 1] == 1) {
                         Message message = mHandler.obtainMessage();
@@ -759,11 +770,40 @@ public class BlueManager {
 //                    }
                 }
             } else if (content[0] == 8) {
-                if (content[1] == 3) { // 胎压状态
+                if (content[1] == 1) {
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_FAULT_CODE;
+                    bundle.putByteArray("status", content);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                } else if (content[1] == 3) { // 胎压状态
+                    PressureInfo pressureInfo = new PressureInfo();
+                    byte[] bytes = HexUtils.getBooleanArray(content[4]);
+                    if (bytes[7] == 1) {
+                        pressureInfo.setStatus(1);
+                    } else if (bytes[6] == 1) {
+                        pressureInfo.setStatus(2);
+                    } else if (bytes[5] == 1) {
+                        pressureInfo.setStatus(3);
+                    } else if (bytes[6] == 1) {
+                        pressureInfo.setStatus(4);
+                    } else {
+                        pressureInfo.setStatus(0);
+                    }
+                    pressureInfo.setFaultCount(content[5] & 0xFF);
+                    pressureInfo.setVoltage((float) (HexUtils.byteToShort(new byte[]{content[6], content[7]}) / 1000));
+                    pressureInfo.setTemperature((content[8] & 0xFF) - 40);
+                    pressureInfo.setSpeed(content[9] & 0xFF);
+                    pressureInfo.setRotationRate(HexUtils.byteToShort(new byte[]{content[10], content[11]}));
+                    pressureInfo.setOilConsumption((HexUtils.byteToShort(new byte[]{content[12], content[13]}) * 0.1));
+                    pressureInfo.setConsumption((HexUtils.byteToShort(new byte[]{content[14], content[15]}) * 0.1));
+                    pressureInfo.setSurplusOil(content[16] & 0xFF);
+                    pressureInfo.setUpdate(content[content.length - 1] == 1);
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_TIRE_PRESSURE_STATUS;
-                    bundle.putByteArray("status", content);
+                    bundle.putSerializable("pressureInfo", pressureInfo);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 } else if (content[1] == 05) {
@@ -865,7 +905,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getByteArray("status"));
+                            notifyBleCallBackListener(OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS, bundle.getSerializable("pressureInfo"));
                         }
                     });
                     break;
@@ -1115,6 +1155,17 @@ public class BlueManager {
                                 Log.d("OBDEvent.PHYSICAL_STEP_SEVEN");
                                 notifyBleCallBackListener(OBDEvent.PHYSICAL_STEP_SEVEN, res);
                             }
+                        }
+                    });
+                    break;
+                case MSG_FAULT_CODE:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            byte[] result = bundle.getByteArray("status");
+                            byte[] res = new byte[result.length - 4];
+                            System.arraycopy(result, 4, res, 0, res.length);
+                            notifyBleCallBackListener(OBDEvent.FAULT_CODE, res);
                         }
                     });
                     break;

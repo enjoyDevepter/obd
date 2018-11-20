@@ -232,8 +232,7 @@ public class Physicaltem implements Comparable, Parcelable {
 
     @Override
     public int compareTo(@NonNull Object o) {
-//        this.style > ((Physicaltem) o).style;
-        return 0;
+        return this.style > ((Physicaltem) o).style ? 0 : 1;
     }
 
     @Override

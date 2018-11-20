@@ -3,6 +3,7 @@ package com.mapbar.adas.utils;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.mapbar.adas.FaultCode;
 import com.mapbar.adas.GlobalUtil;
 import com.mapbar.adas.Physicaltem;
 
@@ -10,7 +11,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,6 +99,33 @@ public class DBManager {
         return physicaltemHashMap;
     }
 
+    public List<FaultCode> getInfoForCode(String code) {
+        ArrayList<FaultCode> codes = new ArrayList<>();
+        try {
+            String table = "code";
+            Cursor cursor = sqliteDB.rawQuery("select * from " + table + " where id = ?", new String[]{code});
+            while (cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex("id"));
+                String suit = cursor.getString(cursor.getColumnIndex("suit"));
+                String desc_ch = cursor.getString(cursor.getColumnIndex("desc_ch"));
+                String desc_en = cursor.getString(cursor.getColumnIndex("desc_en"));
+                String detail = cursor.getString(cursor.getColumnIndex("detail"));
+                String system = cursor.getString(cursor.getColumnIndex("system"));
+                FaultCode codeItem = new FaultCode();
+                codeItem.setId(id);
+                codeItem.setSuit(suit);
+                codeItem.setDesc_ch(desc_ch);
+                codeItem.setDesc_en(desc_en);
+                codeItem.setDetail(detail);
+                codeItem.setSystem(system);
+                codes.add(codeItem);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return codes;
+    }
 
     public static class InstanceHolder {
         private static final DBManager INSTANCE = new DBManager();

@@ -67,6 +67,14 @@ public class HexUtils {
         return sb.toString().toUpperCase(Locale.ENGLISH).trim();
     }
 
+    public static String byte2HexStr(byte b) {
+        String stmp = "";
+        StringBuilder sb = new StringBuilder("");
+        stmp = Integer.toHexString(b & 0xFF);
+        sb.append((stmp.length() == 1) ? "0" + stmp : stmp);
+        sb.append(" ");
+        return sb.toString().toUpperCase(Locale.ENGLISH).trim();
+    }
 
     /**
      * bytes字符串转换为Byte值
@@ -155,9 +163,9 @@ public class HexUtils {
 
     public static short byteToShort(byte[] b) {
         short s = 0;
-        short s0 = (short) (b[0] & 0xff);// 最低位
+        short s0 = (short) (b[0] & 0xff);// 最高位
         short s1 = (short) (b[1] & 0xff);
-        s1 <<= 8;
+        s0 <<= 8;
         s = (short) (s0 | s1);
         return s;
     }

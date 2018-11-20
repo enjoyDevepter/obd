@@ -13,6 +13,7 @@
     <dimen name="sensitive_divider">20dp</dimen>
     <dimen name="letter_size">14sp</dimen>
     <dimen name="loading">60dp</dimen>
+    <dimen name="text_size2">34sp</dimen>
 
     <dimen name="textSize30">15sp</dimen>
     <dimen name="textSize36">18sp</dimen>

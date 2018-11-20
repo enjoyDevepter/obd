@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="体检项："
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
         <TextView
@@ -32,7 +32,7 @@
             android:ellipsize="end"
             android:lines="1"
             android:maxLines="1"
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
         <TextView
@@ -58,14 +58,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="所属系统："
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -80,14 +80,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="检测值："
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -103,14 +103,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="正常范围："
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/range"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFA5A5A5"
+            android:textColor="@color/title"
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -132,7 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="原因(供参考)："
-                android:textColor="#FFA5A5A5"
+                android:textColor="@color/title"
                 android:textSize="16sp" />
 
             <TextView
@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="false"
-                android:textColor="#FFA5A5A5"
+                android:textColor="@color/title"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -156,7 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="解决方法(供参考)："
-                android:textColor="#FFA5A5A5"
+                android:textColor="@color/title"
                 android:textSize="16sp" />
 
             <TextView
@@ -164,7 +164,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="false"
-                android:textColor="#FFA5A5A5"
+                android:textColor="@color/title"
                 android:textSize="16sp" />
 
         </LinearLayout>
