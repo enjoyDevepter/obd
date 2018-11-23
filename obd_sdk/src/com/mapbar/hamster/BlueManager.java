@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 
 /**
  * Created by guomin on 2018/3/8.
@@ -167,6 +170,94 @@ public class BlueManager {
     private byte[] full;
     private int currentIndex;
     private int count;
+    private BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            super.onConnectionStateChange(gatt, status, newState);
+            Log.d("getConnectionState " + status + "   " + newState);
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    Log.d("onConnectionStateChange  STATE_CONNECTED");
+                    canGo = true;
+                    connectStatus = CONNECTED;
+                    mBluetoothGatt.discoverServices();
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    Log.d("onConnectionStateChange  STATE_DISCONNECTED");
+                    connectStatus = DISCONNECTED;
+                    Message message = new Message();
+                    message.what = MSG_OBD_DISCONNECTED;
+                    mHandler.sendMessage(message);
+                    disconnect();
+                }
+            } else {
+                connectStatus = DISCONNECTED;
+                Message message = new Message();
+                message.what = MSG_OBD_DISCONNECTED;
+                mHandler.sendMessage(message);
+                disconnect();
+            }
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            super.onServicesDiscovered(gatt, status);
+            Log.d("onServicesDiscovered  " + status);
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+
+                mMainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyBleCallBackListener(OBDEvent.BLUE_CONNECTED, null);
+                    }
+                });
+                //拿到该服务 1,通过UUID拿到指定的服务  2,可以拿到该设备上所有服务的集合
+                List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
+
+                //2.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
+                BluetoothGattService bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
+//
+                //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
+                writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
+                readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(READ_UUID));
+                BluetoothGattDescriptor descriptor = readCharacteristic.getDescriptor(UUID.fromString(NOTIFY_UUID));
+                if (descriptor == null) throw new NullPointerException();
+                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                mBluetoothGatt.writeDescriptor(descriptor);
+                mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
+                mBluetoothGatt.setCharacteristicNotification(writeCharacteristic, true);
+            }
+        }
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            super.onCharacteristicChanged(gatt, characteristic);
+            Log.d("OBD->APP  " + HexUtils.byte2HexStr(characteristic.getValue()));
+            analyzeProtocol(characteristic.getValue());
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicRead(gatt, characteristic, status);
+            Log.d("onCharacteristicRead  ");
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d("onCharacteristicRead  success " + Arrays.toString(characteristic.getValue()));
+            }
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicWrite(gatt, characteristic, status);
+            Log.d("onCharacteristicWrite  ");
+            Message message = new Message();
+            message.what = MSG_SPLIT_WRITE;
+            Bundle bundle = new Bundle();
+            bundle.putInt(KEY_WRITE_BUNDLE_STATUS, status);
+            bundle.putByteArray(KEY_WRITE_BUNDLE_VALUE, characteristic.getValue());
+            message.setData(bundle);
+            mHandler.sendMessage(message);
+        }
+    };
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -273,90 +364,12 @@ public class BlueManager {
         if (bluetoothDevice == null) {
             return;
         }
-
-        mBluetoothGatt = bluetoothDevice.connectGatt(mContext, false, new BluetoothGattCallback() {
-            @Override
-            public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                super.onConnectionStateChange(gatt, status, newState);
-                Log.d("getConnectionState " + status + "   " + newState);
-
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    if (newState == BluetoothProfile.STATE_CONNECTED) {
-                        Log.d("onConnectionStateChange  STATE_CONNECTED");
-                        canGo = true;
-                        connectStatus = CONNECTED;
-                        mBluetoothGatt.discoverServices();
-                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                        Log.d("onConnectionStateChange  STATE_DISCONNECTED");
-                        connectStatus = DISCONNECTED;
-                        Message message = new Message();
-                        message.what = MSG_OBD_DISCONNECTED;
-                        mHandler.sendMessage(message);
-                        disconnect();
-                    }
-                } else {
-                    connectStatus = DISCONNECTED;
-                    Message message = new Message();
-                    message.what = MSG_OBD_DISCONNECTED;
-                    mHandler.sendMessage(message);
-                    disconnect();
-                }
-            }
-
-            @Override
-            public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-                super.onServicesDiscovered(gatt, status);
-                Log.d("onServicesDiscovered  " + status);
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-
-                    mMainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            notifyBleCallBackListener(OBDEvent.BLUE_CONNECTED, null);
-                        }
-                    });
-                    //拿到该服务 1,通过UUID拿到指定的服务  2,可以拿到该设备上所有服务的集合
-                    List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
-
-                    //2.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
-                    BluetoothGattService bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
-//
-                    //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
-                    writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
-                    readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
-
-                    mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
-                }
-            }
-
-            @Override
-            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                super.onCharacteristicChanged(gatt, characteristic);
-                Log.d("OBD->APP  " + HexUtils.byte2HexStr(characteristic.getValue()));
-                analyzeProtocol(characteristic.getValue());
-            }
-
-            @Override
-            public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                super.onCharacteristicRead(gatt, characteristic, status);
-                Log.d("onCharacteristicRead  ");
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    Log.d("onCharacteristicRead  success " + Arrays.toString(characteristic.getValue()));
-                }
-            }
-
-            @Override
-            public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                super.onCharacteristicWrite(gatt, characteristic, status);
-                Message message = new Message();
-                message.what = MSG_SPLIT_WRITE;
-                Bundle bundle = new Bundle();
-                bundle.putInt(KEY_WRITE_BUNDLE_STATUS, status);
-                bundle.putByteArray(KEY_WRITE_BUNDLE_VALUE, characteristic.getValue());
-                message.setData(bundle);
-                mHandler.sendMessage(message);
-            }
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mBluetoothGatt = bluetoothDevice.connectGatt(mContext,
+                    false, bluetoothGattCallback, TRANSPORT_LE);
+        } else {
+            mBluetoothGatt = bluetoothDevice.connectGatt(mContext, false, bluetoothGattCallback);
+        }
     }
 
     /**

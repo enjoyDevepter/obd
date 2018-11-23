@@ -186,10 +186,10 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                 checkColectStauts();
                 break;
             case OBDEvent.ADJUSTING:
-                PageManager.go(new CollectPage());
+                checkOBDVersionForNew();
                 break;
             case OBDEvent.ADJUST_SUCCESS:
-                MainPage mainPage = new MainPage();
+                HomePage mainPage = new HomePage();
                 Bundle mainBundle = new Bundle();
                 mainBundle.putSerializable("obdStatusInfo", (OBDStatusInfo) data);
                 mainPage.setDate(mainBundle);
@@ -262,7 +262,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
                     if ("000".equals(result.optString("status"))) {
                         String state = result.optString("state");
                         if ("1".equals(state)) {
-                            PageManager.go(new CollectPage());
+                            CollectPage collectPage = new CollectPage();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("sn", obdStatusInfo.getSn());
+                            collectPage.setDate(bundle);
+                            PageManager.go(collectPage);
                         } else {
                             CollectGuide collectGuide = new CollectGuide();
                             Bundle collectBundle = new Bundle();
@@ -664,6 +668,72 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Loc
         });
     }
 
+
+    private void checkOBDVersionForNew() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
+            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("checkOBDVersion input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.FIRMWARE_UPDATE)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("checkOBDVersion failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("checkOBDVersion success " + responese);
+                final OBDVersion obdVersion = JSON.parseObject(responese, OBDVersion.class);
+                if ("000".equals(obdVersion.getStatus())) {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (obdVersion.getpUpdateState()) {
+                                case 0:  // 无参数更新
+                                case 2:
+                                case 3:
+                                case 6:
+                                    CollectPage collectPage = new CollectPage();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("sn", obdStatusInfo.getSn());
+                                    collectPage.setDate(bundle);
+                                    PageManager.go(collectPage);
+                                    break;
+                                case 1: // 有更新
+                                    needNotifyParamsSuccess = true;
+                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
+                                    break;
+                            }
+                        }
+                    });
+                } else {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
+    }
 
     private void uploadLog() {
         Log.d("OBDAuthPage uploadLog ");

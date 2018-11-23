@@ -35,7 +35,6 @@ import static com.mapbar.adas.preferences.SettingPreferencesConfig.SN;
 @PageSetting(contentViewId = R.layout.connect_layout, toHistory = false)
 public class ConnectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
 
-    byte[] b = new byte[]{0x7e, 0x00, 0x01, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x50, 0x57, (byte) 0xff, 0x6f, 0x06, (byte) 0x83, 0x66, 0x48, 0x48, 0x49, 0x49, 0x12, (byte) 0x81, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x54, 0x50, 0x4d, 0x53, 0x41, 0x30, 0x31, 0x56, 0x31, 0x30, 0x35, 0x37, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x00, (byte) 0x98, 0x7e};
     @ViewInject(R.id.title)
     private TextView title;
     @ViewInject(R.id.back)
@@ -55,7 +54,6 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
         title.setText("连接盒子");
         retry.setOnClickListener(this);
         reportV.setOnClickListener(this);
-        BlueManager.getInstance().analyzeProtocol(b);
         BlueManager.getInstance().startScan();
         BlueManager.getInstance().addBleCallBackListener(this);
     }
@@ -114,9 +112,9 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
                 break;
             case OBDEvent.BLUE_CONNECTED:
                 Log.d("OBDEvent.BLUE_CONNECTED");
-//                PageManager.go(new OBDAuthPage());
+                PageManager.go(new OBDAuthPage());
 //                PageManager.go(new PhysicalPage());
-                PageManager.go(new DashBoardPage());
+//                PageManager.go(new DashBoardPage());
                 break;
         }
 

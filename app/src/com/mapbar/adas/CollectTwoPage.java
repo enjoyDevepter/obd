@@ -278,7 +278,11 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
     private void updateCollectStauts() {
         boolean matching = getDate().getBoolean("matching");
         if (matching) {
-            PageManager.go(new CollectPage());
+            CollectPage collectPage = new CollectPage();
+            Bundle bundle = new Bundle();
+            bundle.putString("sn", getDate().getString("sn"));
+            collectPage.setDate(bundle);
+            PageManager.go(collectPage);
         } else {
             CollectFinish collectFinish = new CollectFinish();
             Bundle bundle = new Bundle();
