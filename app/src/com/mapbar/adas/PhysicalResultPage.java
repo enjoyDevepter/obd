@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
-import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
 import java.util.List;
@@ -24,6 +23,8 @@ public class PhysicalResultPage extends AppBasePage implements View.OnClickListe
     private TextView titleTV;
     @ViewInject(R.id.report)
     private View reportV;
+    @ViewInject(R.id.home)
+    private View homeV;
     @ViewInject(R.id.content)
     private RecyclerView contentLV;
     private NormalAdapter normalAdapter;
@@ -33,6 +34,7 @@ public class PhysicalResultPage extends AppBasePage implements View.OnClickListe
         super.onResume();
         titleTV.setText("体检结果");
         back.setOnClickListener(this);
+        homeV.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
         contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
         normalAdapter = new NormalAdapter(getDate().<Physicaltem>getParcelableArrayList("result"));
@@ -49,6 +51,9 @@ public class PhysicalResultPage extends AppBasePage implements View.OnClickListe
         switch (v.getId()) {
             case R.id.back:
                 PageManager.back();
+                break;
+            case R.id.home:
+                PageManager.go(new HomePage());
                 break;
         }
     }
@@ -86,7 +91,6 @@ public class PhysicalResultPage extends AppBasePage implements View.OnClickListe
 
         @Override
         public void onBindViewHolder(final VH holder, int position) {
-            Log.d("onServicesDiscovered  " + position);
             Physicaltem physical = mDatas.get(position);
             holder.type.setText(physical.getType());
             holder.name.setText(physical.getName());

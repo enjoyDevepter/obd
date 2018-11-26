@@ -5,7 +5,8 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <include layout="@layout/tittle_layout_spec" />
+    <include layout="@layout/tittle_layout" />
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/content"
@@ -15,4 +16,5 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:scrollbars="none" />
+
 </LinearLayout>

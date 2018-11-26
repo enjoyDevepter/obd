@@ -1,6 +1,7 @@
 package com.mapbar.hamster;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by guomin on 2018/6/3.
@@ -20,6 +21,7 @@ public class PressureInfo implements Serializable {
     private double consumption;
     private int surplusOil;
     private boolean update;
+    private byte[] origin;
 
     public int getStatus() {
         return status;
@@ -101,6 +103,14 @@ public class PressureInfo implements Serializable {
         this.update = update;
     }
 
+    public byte[] getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(byte[] origin) {
+        this.origin = origin;
+    }
+
     @Override
     public String toString() {
         return "PressureInfo{" +
@@ -114,6 +124,7 @@ public class PressureInfo implements Serializable {
                 ", consumption=" + consumption +
                 ", surplusOil=" + surplusOil +
                 ", update=" + update +
+                ", origin=" + Arrays.toString(origin) +
                 '}';
     }
 }

@@ -27,6 +27,7 @@ import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.OBDStatusInfo;
+import com.mapbar.hamster.PressureInfo;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
@@ -147,8 +148,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onResume() {
         super.onResume();
-        back.setVisibility(View.GONE);
         title.setText("汽车卫士");
+        back.setOnClickListener(this);
         warm.setOnClickListener(this);
         reset.setOnClickListener(this);
         reportV.setOnClickListener(this);
@@ -176,13 +177,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onStop() {
         super.onStop();
+        BlueManager.getInstance().send(ProtocolUtils.stopGetNewTirePressureStatus());
         BlueManager.getInstance().removeCallBackListener(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BlueManager.getInstance().send(ProtocolUtils.stopGetTirePressureStatusUpdateSucess());
+
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -199,8 +201,10 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
+            case R.id.back:
+                PageManager.back();
+                break;
             case R.id.warm:
                 showWarm();
                 break;
@@ -328,8 +332,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         if (ADJUST_SUCCESS.get()) {
             ADJUST_SUCCESS.set(false);
         }
-        PageManager.finishActivity(MainActivity.getInstance());
-        return true;
+        return super.onBackPressed();
     }
 
     private void showReset() {
@@ -472,7 +475,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
-                parseStatus((byte[]) data);
+                parseStatus((PressureInfo) data);
                 break;
             case OBDEvent.OBD_ERROR:
                 switch ((Integer) data) {
@@ -538,72 +541,71 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
      *
      * @param status
      */
-    private void parseStatus(byte[] status) {
-        if (null != status && status.length > 2) {
+    private void parseStatus(PressureInfo status) {
 
-            byte[] bytes = HexUtils.getBooleanArray(status[4]);
-            if (bytes[7] == 1 || bytes[6] == 1 || bytes[5] == 1 || bytes[4] == 1) {
-                if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
-                    return;
-                }
-                if (bytes[7] == 1) {
+        if (status.getStatus() != 0) {
+            if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
+                return;
+            }
+            switch (status.getStatus()) {
+                case 1:
                     leftTop.setBackgroundResource(R.drawable.high_bg);
                     highAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
                     rightButtom.setBackgroundResource(R.drawable.low_bg);
                     lowAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
-                } else if (bytes[6] == 1) {
+                    break;
+                case 2:
                     rightTop.setBackgroundResource(R.drawable.high_bg);
                     highAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
                     leftButtom.setBackgroundResource(R.drawable.low_bg);
                     lowAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
-                } else if (bytes[5] == 1) {
+                    break;
+                case 3:
                     leftButtom.setBackgroundResource(R.drawable.high_bg);
                     highAnimationDrawable = (AnimationDrawable) leftButtom.getBackground();
                     rightTop.setBackgroundResource(R.drawable.low_bg);
                     lowAnimationDrawable = (AnimationDrawable) rightTop.getBackground();
-                } else if (bytes[4] == 1) {
+                    break;
+                case 4:
                     rightButtom.setBackgroundResource(R.drawable.high_bg);
                     highAnimationDrawable = (AnimationDrawable) rightButtom.getBackground();
                     leftTop.setBackgroundResource(R.drawable.low_bg);
                     lowAnimationDrawable = (AnimationDrawable) leftTop.getBackground();
-                }
-                if (highAnimationDrawable != null && !highAnimationDrawable.isRunning()) {
-                    highAnimationDrawable.start();
-                }
+                    break;
+            }
+            if (highAnimationDrawable != null && !highAnimationDrawable.isRunning()) {
+                highAnimationDrawable.start();
+            }
 
-                if (lowAnimationDrawable != null && !lowAnimationDrawable.isRunning()) {
-                    lowAnimationDrawable.start();
-                }
+            if (lowAnimationDrawable != null && !lowAnimationDrawable.isRunning()) {
+                lowAnimationDrawable.start();
+            }
 
-                if (TIRE_WARM.get()) {
-                    AlarmManager.getInstance().play(R.raw.warm);
-                    TIRE_WARM.set(false);
-                }
+            if (TIRE_WARM.get()) {
+                AlarmManager.getInstance().play(R.raw.warm);
+                TIRE_WARM.set(false);
+            }
 
-                if (status[17] == 1) { // 上传标示
-                    // 上传胎压信息
-                    updateTireInfo(status);
-                }
+            if (status.isUpdate()) {
+                // 上传胎压信息
+                updateTireInfo(status.getOrigin());
 
-            } else {
-                TIRE_WARM.set(true);
-                if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
-                    highAnimationDrawable.stop();
-                    highAnimationDrawable = null;
-                }
-                if (lowAnimationDrawable != null && lowAnimationDrawable.isRunning()) {
-                    lowAnimationDrawable.stop();
-                    lowAnimationDrawable = null;
-                }
-                leftTop.setBackgroundResource(R.drawable.t_nromal);
-                leftButtom.setBackgroundResource(R.drawable.t_nromal);
-                rightTop.setBackgroundResource(R.drawable.t_nromal);
-                rightButtom.setBackgroundResource(R.drawable.t_nromal);
             }
         } else {
-            Log.d(" status error " + status.length);
+            TIRE_WARM.set(true);
+            if (highAnimationDrawable != null && highAnimationDrawable.isRunning()) {
+                highAnimationDrawable.stop();
+                highAnimationDrawable = null;
+            }
+            if (lowAnimationDrawable != null && lowAnimationDrawable.isRunning()) {
+                lowAnimationDrawable.stop();
+                lowAnimationDrawable = null;
+            }
+            leftTop.setBackgroundResource(R.drawable.t_nromal);
+            leftButtom.setBackgroundResource(R.drawable.t_nromal);
+            rightTop.setBackgroundResource(R.drawable.t_nromal);
+            rightButtom.setBackgroundResource(R.drawable.t_nromal);
         }
-
     }
 
     /**

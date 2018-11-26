@@ -98,25 +98,26 @@ public class ProtocolUtils {
         return result;
     }
 
-    public static byte[] getTirePressureStatus() {
-        Log.d("Protocol getTirePressureStatus ===");
-        byte[] result = new byte[6];
-        result[0] = PROTOCOL_HEAD_TAIL;
-        result[1] = (byte) PROTOCAL_COMMON_02;
-        result[2] = 03;
-        result[3] = 0;
-        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
-        result[5] = PROTOCOL_HEAD_TAIL;
-        return result;
-    }
-
     public static byte[] getNewTirePressureStatus() {
         Log.d("Protocol getNewTirePressureStatus ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_08;
         result[2] = 03;
-        result[3] = 1;
+        result[3] = 2;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
+    public static byte[] stopGetNewTirePressureStatus() {
+        Log.d("Protocol stopGetNewTirePressureStatus ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_08;
+        result[2] = 03;
+        result[3] = 0;
         result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
         result[5] = PROTOCOL_HEAD_TAIL;
         return result;
@@ -133,19 +134,6 @@ public class ProtocolUtils {
         result[5] = PROTOCOL_HEAD_TAIL;
         return result;
     }
-
-    public static byte[] stopGetTirePressureStatusUpdateSucess() {
-        Log.d("Protocol stopGetTirePressureStatusUpdateSucess ===");
-        byte[] result = new byte[6];
-        result[0] = PROTOCOL_HEAD_TAIL;
-        result[1] = (byte) PROTOCAL_COMMON_08;
-        result[2] = 03;
-        result[3] = 0;
-        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
-        result[5] = PROTOCOL_HEAD_TAIL;
-        return result;
-    }
-
 
     /**
      * 怠速
@@ -246,12 +234,24 @@ public class ProtocolUtils {
         return result;
     }
 
-    public static byte[] sendFaultCode() {
-        Log.d("Protocol sendFaultCode ===");
+    public static byte[] getFaultCode() {
+        Log.d("Protocol getFaultCode ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_08;
         result[2] = 01;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    public static byte[] clearFaultCode() {
+        Log.d("Protocol clearFaultCode ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_08;
+        result[2] = 02;
         result[3] = 0;
         result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
         result[5] = PROTOCOL_HEAD_TAIL;

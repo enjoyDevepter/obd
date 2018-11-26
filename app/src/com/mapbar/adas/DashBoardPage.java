@@ -64,6 +64,7 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
     @Override
     public void onStop() {
         super.onStop();
+        BlueManager.getInstance().send(ProtocolUtils.stopGetNewTirePressureStatus());
         BlueManager.getInstance().removeCallBackListener(this);
     }
 

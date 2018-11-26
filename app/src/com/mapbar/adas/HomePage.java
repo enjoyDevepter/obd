@@ -1,5 +1,6 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +35,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         trieV.setOnClickListener(this);
@@ -61,15 +63,18 @@ public class HomePage extends AppBasePage implements View.OnClickListener {
                 PageManager.go(mainPage);
                 break;
             case R.id.fault:
+                PageManager.go(new FaultReadyPage());
                 break;
             case R.id.physical:
-                PageManager.go(new PhysicalPage());
+                PageManager.go(new PhysicalReadyPage());
                 break;
             case R.id.dash:
+                PageManager.go(new DashBoardPage());
                 break;
             case R.id.message:
                 break;
             case R.id.hud:
+                PageManager.go(new HUDPage());
                 break;
         }
     }

@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
@@ -70,6 +69,7 @@ public class BlueManager {
     private static final int MSG_COLLECT_DATA_FOR_CAR = 120; // 全车数据
     private static final int MSG_PHYSICAL = 130; // 体检
     private static final int MSG_FAULT_CODE = 140; // 故障码
+    private static final int MSG_CLEAR_FAULT_CODE = 150; // 清除故障码
 
 
     private static final int MSG_VERIFY = 2;
@@ -219,13 +219,9 @@ public class BlueManager {
 //
                 //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
                 writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
-                readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(READ_UUID));
-                BluetoothGattDescriptor descriptor = readCharacteristic.getDescriptor(UUID.fromString(NOTIFY_UUID));
-                if (descriptor == null) throw new NullPointerException();
-                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                mBluetoothGatt.writeDescriptor(descriptor);
+                readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
+
                 mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
-                mBluetoothGatt.setCharacteristicNotification(writeCharacteristic, true);
             }
         }
 
@@ -592,11 +588,11 @@ public class BlueManager {
         if (!(res[0] == (byte) 0x09 && res[1] == 01)) {
             timeOutThread.endCommand();
         }
-//        byte[] msg = instructList.pollLast();
-//        canGo = true;
-//        if (msg != null && queue.size() == 0) {
-//            queue.add(msg);
-//        }
+        byte[] msg = instructList.pollLast();
+        canGo = true;
+        if (msg != null && queue.size() == 0) {
+            queue.add(msg);
+        }
 
         byte[] result = new byte[res.length];
         System.arraycopy(res, 0, result, 0, res.length);
@@ -790,6 +786,13 @@ public class BlueManager {
                     bundle.putByteArray("status", content);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
+                } else if (content[1] == 2) { // 清除故障码
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_CLEAR_FAULT_CODE;
+                    bundle.putByteArray("status", content);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 } else if (content[1] == 3) { // 胎压状态
                     PressureInfo pressureInfo = new PressureInfo();
                     byte[] bytes = HexUtils.getBooleanArray(content[4]);
@@ -813,6 +816,7 @@ public class BlueManager {
                     pressureInfo.setConsumption((HexUtils.byteToShort(new byte[]{content[14], content[15]}) * 0.1));
                     pressureInfo.setSurplusOil(content[16] & 0xFF);
                     pressureInfo.setUpdate(content[content.length - 1] == 1);
+                    pressureInfo.setOrigin(content);
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_TIRE_PRESSURE_STATUS;
@@ -1179,6 +1183,15 @@ public class BlueManager {
                             byte[] res = new byte[result.length - 4];
                             System.arraycopy(result, 4, res, 0, res.length);
                             notifyBleCallBackListener(OBDEvent.FAULT_CODE, res);
+                        }
+                    });
+                    break;
+                case MSG_CLEAR_FAULT_CODE:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            byte[] result = bundle.getByteArray("status");
+                            notifyBleCallBackListener(OBDEvent.CLEAN_FAULT_CODE, result[4] & 0xFF);
                         }
                     });
                     break;

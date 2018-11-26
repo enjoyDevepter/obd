@@ -1,5 +1,7 @@
 package com.mapbar.adas;
 
+import android.content.pm.ActivityInfo;
+import android.graphics.drawable.AnimationDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,8 +26,16 @@ import static com.mapbar.hamster.OBDEvent.FAULT_CODE;
 
 @PageSetting(contentViewId = R.layout.fault_code_layout)
 public class FaultCodePage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+    @ViewInject(R.id.checking)
+    View checkingV;
+    @ViewInject(R.id.error)
+    View errorV;
+    @ViewInject(R.id.normal)
+    View normalV;
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.home)
+    private View homeV;
     @ViewInject(R.id.title)
     private TextView titleTV;
     @ViewInject(R.id.report)
@@ -34,18 +44,31 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
     private TextView confirmV;
     @ViewInject(R.id.content)
     private RecyclerView contentLV;
+    @ViewInject(R.id.status)
+    private View statusV;
     private List<FaultCode> codeList = new ArrayList<>();
     private NormalAdapter normalAdapter;
+
+    private AnimationDrawable animationDrawable;
+
+    private boolean checked;
 
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         BlueManager.getInstance().addBleCallBackListener(this);
-        titleTV.setText("爱车体检");
-        confirmV.setText("一键体检");
+        titleTV.setText("故障码解析");
         back.setOnClickListener(this);
+        homeV.setOnClickListener(this);
         confirmV.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
+        if (!checked) {
+            statusV.setBackgroundResource(R.drawable.check_status_bg);
+            animationDrawable = (AnimationDrawable) statusV.getBackground();
+            animationDrawable.start();
+            BlueManager.getInstance().send(ProtocolUtils.getFaultCode());
+        }
     }
 
     @Override
@@ -61,8 +84,10 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             case R.id.confirm:
-                codeList.clear();
-                BlueManager.getInstance().send(ProtocolUtils.sendFaultCode());
+                PageManager.go(new ClearFaultPage());
+                break;
+            case R.id.home:
+                PageManager.go(new HomePage());
                 break;
         }
     }
@@ -77,7 +102,16 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
     }
 
     private void paraseFaultResult(byte[] result) {
+        checked = true;
         int count = HexUtils.byteToInt(result[0]);
+        animationDrawable.stop();
+        checkingV.setVisibility(View.GONE);
+        if (count > 0) {
+            errorV.setVisibility(View.VISIBLE);
+        } else {
+            normalV.setVisibility(View.VISIBLE);
+            return;
+        }
         for (int i = 0; i < count; i++) {
             byte[] item = new byte[3];
             System.arraycopy(result, 1 + i * 3, item, 0, item.length);
@@ -100,9 +134,15 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
             Log.d("type " + type);
             codeList.addAll(DBManager.getInstance().getInfoForCode(type));
         }
-        normalAdapter = new NormalAdapter(codeList);
-        contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
-        contentLV.setAdapter(normalAdapter);
+
+        if (codeList.size() > 0) {
+
+        } else {
+            normalAdapter = new NormalAdapter(codeList);
+            contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
+            contentLV.setAdapter(normalAdapter);
+            confirmV.setVisibility(View.VISIBLE);
+        }
     }
 
     public static class VH extends RecyclerView.ViewHolder {

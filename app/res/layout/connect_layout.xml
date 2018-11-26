@@ -15,8 +15,7 @@
         android:lineSpacingExtra="4dp"
         android:text="请您确认:\n1、已将盒子插入车辆OBD插口上\n2、已打开手机蓝牙"
         android:textColor="@color/text_color"
-        android:textSize="@dimen/text_size"
-        android:visibility="gone" />
+        android:textSize="@dimen/text_size" />
 
     <LinearLayout
         android:id="@+id/connect"

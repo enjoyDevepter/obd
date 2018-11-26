@@ -1,6 +1,9 @@
 package com.mapbar.adas;
 
-import android.animation.ValueAnimator;
+import android.content.pm.ActivityInfo;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +22,6 @@ import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,48 +40,81 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
     boolean[] status = new boolean[]{true, true, true, true, true, true, true};
     @ViewInject(R.id.back)
     private View back;
+    @ViewInject(R.id.home)
+    private View homeV;
     @ViewInject(R.id.title)
     private TextView titleTV;
     @ViewInject(R.id.report)
     private View reportV;
+    @ViewInject(R.id.connect)
+    private View connect;
     @ViewInject(R.id.confirm)
     private TextView confirmV;
     @ViewInject(R.id.content)
     private RecyclerView contentLV;
-    private List<Physical> physicalList = new ArrayList<>();
-    private Map<Integer, Physicaltem> allList = new HashMap<>();
+    private List<Physical> physicalList;
+    private Map<Integer, Physicaltem> allList;
     private List<Physicaltem> normalList = new ArrayList<>();
     private NormalAdapter normalAdapter;
+
+    private boolean checked;
+
+    private AnimationDrawable animationDrawable;
 
     @Override
     public void onResume() {
         super.onResume();
+        MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         BlueManager.getInstance().addBleCallBackListener(this);
-        titleTV.setText("爱车体检");
-        confirmV.setText("一键体检");
+        titleTV.setText("正在体检");
         back.setOnClickListener(this);
-        confirmV.setOnClickListener(this);
+        homeV.setOnClickListener(this);
         reportV.setVisibility(View.GONE);
-        initPhysical();
+        confirmV.setVisibility(checked ? View.VISIBLE : View.INVISIBLE);
+        confirmV.setOnClickListener(checked ? this : null);
+        if (!checked) {
+            initPhysical();
+
+            back.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    BlueManager.getInstance().send(ProtocolUtils.sendPhysical(01));
+                }
+            }, 4000);
+        }
         normalAdapter = new NormalAdapter(physicalList);
         contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
         contentLV.setAdapter(normalAdapter);
     }
 
     private void initPhysical() {
-        physicalList.clear();
+        physicalList = new ArrayList<>();
         for (int i = 0; i < types.length; i++) {
             Physical physical = new Physical();
             physical.setName(types[i]);
             physicalList.add(physical);
         }
+        physicalList.get(0).setStatus("0");
         // getPhysical from bd
         allList = DBManager.getInstance().getAll();
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (!checked) {
+            connect.setBackgroundResource(R.drawable.physical_scan_bg);
+            animationDrawable = (AnimationDrawable) connect.getBackground();
+            animationDrawable.start();
+        }
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
+        if (animationDrawable.isRunning()) {
+            animationDrawable.stop();
+        }
         BlueManager.getInstance().removeCallBackListener(this);
     }
 
@@ -90,21 +125,14 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                 PageManager.back();
                 break;
             case R.id.confirm:
-                BlueManager.getInstance().send(ProtocolUtils.sendFaultCode());
-//                List<FaultCode> codes = DBManager.getInstance().getInfoForCode("P0227");
-//                if ("一键体检".equals(confirmV.getText().toString())) {
-//                    confirmV.setEnabled(false);
-//                    physicalList.get(0).setStatus("0");
-//                    normalAdapter.notifyDataSetChanged();
-//                    BlueManager.getInstance().send(ProtocolUtils.sendPhysical(01));
-//                } else {
-//                    PhysicalResultPage page = new PhysicalResultPage();
-//                    Bundle bundle = new Bundle();
-//                    Collections.sort(normalList);
-//                    bundle.putParcelableArrayList("result", (ArrayList<? extends Parcelable>) normalList);
-//                    page.setDate(bundle);
-//                    PageManager.go(page);
-//                }
+                PhysicalResultPage page = new PhysicalResultPage();
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("result", (ArrayList<? extends Parcelable>) normalList);
+                page.setDate(bundle);
+                PageManager.go(page);
+                break;
+            case R.id.home:
+                PageManager.go(new HomePage());
                 break;
         }
     }
@@ -138,8 +166,12 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                 break;
             case PHYSICAL_STEP_SEVEN:
                 parasePhysicalResult((byte[]) data);
-                confirmV.setEnabled(true);
-                confirmV.setText("查看体检报告");
+                confirmV.setVisibility(View.VISIBLE);
+                confirmV.setOnClickListener(this);
+                if (animationDrawable.isRunning()) {
+                    animationDrawable.stop();
+                }
+                checked = true;
                 Toast.makeText(getContext(), "体检完成！", Toast.LENGTH_LONG).show();
                 break;
         }
@@ -883,7 +915,6 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
 
     public static class VH extends RecyclerView.ViewHolder {
         public final TextView type;
-        public final TextView count;
         public final TextView checking;
         public final TextView normal;
         public final TextView error;
@@ -891,7 +922,6 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
         public VH(View v) {
             super(v);
             type = v.findViewById(R.id.type);
-            count = v.findViewById(R.id.count);
             checking = v.findViewById(R.id.checking);
             normal = v.findViewById(R.id.normal);
             error = v.findViewById(R.id.error);
@@ -899,8 +929,6 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
     }
 
     public class NormalAdapter extends RecyclerView.Adapter<VH> {
-
-        private String[] dotText = {".", "..", "..."};
 
         private List<Physical> mDatas;
 
@@ -912,23 +940,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
         public void onBindViewHolder(final VH holder, int position) {
             Physical physical = mDatas.get(position);
             holder.type.setText(physical.getName());
-            if (physical.getCount() > 0) {
-                holder.count.setVisibility(View.VISIBLE);
-                holder.count.setText("共" + physical.getCount() + "项");
-            } else {
-                holder.count.setVisibility(View.GONE);
-            }
             if ("0".equals(physical.getStatus())) {
-                ValueAnimator valueAnimator = ValueAnimator.ofInt(0, 3).setDuration(1000);
-                valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        int i = (int) animation.getAnimatedValue();
-                        holder.checking.setText("检查中" + dotText[i % dotText.length]);
-                    }
-                });
-                valueAnimator.start();
                 holder.checking.setVisibility(View.VISIBLE);
                 holder.normal.setVisibility(View.GONE);
                 holder.error.setVisibility(View.GONE);

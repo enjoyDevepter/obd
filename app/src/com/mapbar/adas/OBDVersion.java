@@ -11,6 +11,8 @@ public class OBDVersion {
     private int updateState;
     private int bUpdateState;
     private int pUpdateState;
+    private String bVersion;
+    private String pVersion;
     private double version;
     private int size;
     private String params;
@@ -97,6 +99,22 @@ public class OBDVersion {
         this.create_time = create_time;
     }
 
+    public String getbVersion() {
+        return bVersion;
+    }
+
+    public void setbVersion(String bVersion) {
+        this.bVersion = bVersion;
+    }
+
+    public String getpVersion() {
+        return pVersion;
+    }
+
+    public void setpVersion(String pVersion) {
+        this.pVersion = pVersion;
+    }
+
     @Override
     public String toString() {
         return "OBDVersion{" +
@@ -105,10 +123,13 @@ public class OBDVersion {
                 ", updateState=" + updateState +
                 ", bUpdateState=" + bUpdateState +
                 ", pUpdateState=" + pUpdateState +
+                ", bVersion='" + bVersion + '\'' +
+                ", pVersion='" + pVersion + '\'' +
                 ", version=" + version +
                 ", size=" + size +
                 ", params='" + params + '\'' +
                 ", create_time='" + create_time + '\'' +
+                ", upload=" + upload +
                 '}';
     }
 }
