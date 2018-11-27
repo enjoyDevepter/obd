@@ -7,12 +7,48 @@
 
     <include layout="@layout/tittle_layout_spec" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/content"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:scrollbars="none" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.mapbar.adas.view.CustomExpandableListView
+                android:id="@+id/errorlistView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:cacheColorHint="#00000000"
+                android:groupIndicator="@null"
+                android:scrollbars="none" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="35dp"
+                    android:text="更多体检结果（正常范围）："
+                    android:textColor="#FF4A4A4A"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <com.mapbar.adas.view.CustomExpandableListView
+                android:id="@+id/normallistView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:cacheColorHint="#00000000"
+                android:groupIndicator="@null"
+                android:scrollbars="none" />
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
 </LinearLayout>

@@ -221,7 +221,7 @@ public class ProtocolUtils {
     }
 
     public static byte[] sendPhysical(int step) {
-        Log.d("Protocol sendPhysical ===");
+        Log.d("Protocol sendPhysical === " + step);
         byte[] result = new byte[8];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 136;

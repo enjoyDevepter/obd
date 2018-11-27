@@ -47,7 +47,6 @@
                 android:id="@+id/speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100"
                 android:textColor="#02fff6"
                 android:textSize="180sp"
                 berdy:typeface="LcdD.ttf" />

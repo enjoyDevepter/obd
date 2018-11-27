@@ -35,7 +35,7 @@ public class Physicaltem implements Comparable, Parcelable {
     private String low_resolvent;
     private int socre;
     private boolean high;
-    private int style;  // 0 正常、1 异常、2
+    private int style;  // 0 正常、1 异常
     private String current;
 
     public Physicaltem(Parcel in) {
