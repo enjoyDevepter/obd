@@ -368,6 +368,9 @@ public class BlueManager {
      * 断开链接
      */
     public synchronized void disconnect() {
+
+        timeOutThread.endCommand();
+
         if (mBluetoothGatt == null) {
             return;
         }
@@ -1125,6 +1128,7 @@ public class BlueManager {
                                         @Override
                                         public void run() {
                                             Log.d("连续2次响应超时，断开连接！");
+                                            disconnect();
                                             notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
                                         }
                                     });
@@ -1139,7 +1143,7 @@ public class BlueManager {
                             }
                             Log.d("TimeOutThread notifyAll ");
                             TIMEOUTSYNC.notifyAll();
-                            TIMEOUTSYNC.wait();
+//                            TIMEOUTSYNC.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -1170,11 +1174,11 @@ public class BlueManager {
                     needRewire = false;
                     currentRepeat = 0;
                     TIMEOUTSYNC.notifyAll();
-                    try {
-                        TIMEOUTSYNC.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        TIMEOUTSYNC.wait();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         }
