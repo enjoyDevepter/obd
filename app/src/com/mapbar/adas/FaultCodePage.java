@@ -136,8 +136,6 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
         }
 
         if (codeList.size() > 0) {
-
-        } else {
             normalAdapter = new NormalAdapter(codeList);
             contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
             contentLV.setAdapter(normalAdapter);

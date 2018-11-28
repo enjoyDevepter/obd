@@ -34,6 +34,8 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
     TextViewFontLcdEx oilConsumptionTVFLE;
     @ViewInject(R.id.tv_cost2)
     TextViewFontLcdEx consumptionTVFLE;
+    @ViewInject(R.id.surplusOil)
+    TextViewFontLcdEx surplusOilTVFLE;
     @ViewInject(R.id.dazhen)
     View dazhenV;
     @ViewInject(R.id.xiaozhen)
@@ -96,6 +98,7 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
         speedTVFL.setTextFormat000(pressureInfo.getSpeed());
         oilConsumptionTVFLE.setTextFormat00dot0((float) pressureInfo.getOilConsumption());
         consumptionTVFLE.setTextFormat00dot0((float) pressureInfo.getConsumption());
+        surplusOilTVFLE.setTextFormat000(pressureInfo.getSurplusOil());
         // 速度指针
         float speed = pressureInfo.getSpeed();
         float speedRotation = 0.0f;

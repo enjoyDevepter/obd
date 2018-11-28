@@ -124,7 +124,7 @@
                 android:background="@drawable/dashboard2_bg"
                 android:gravity="center_vertical">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -133,59 +133,25 @@
                     android:background="@drawable/bgjianpian"
                     android:gravity="center">
 
-                    <ImageView
-                        android:id="@+id/tv_icon_mileage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/mileage_icon" />
-
-                    <com.mapbar.adas.view.TextViewFontLcdEx
-                        android:id="@+id/tv_tripLength"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="5dip"
-                        android:layout_toRightOf="@id/tv_icon_mileage"
-                        android:gravity="center"
-                        android:text="@string/txt_str_0"
-                        android:textColor="#02fff6"
-                        android:textSize="@dimen/text_size2"
-                        berdy:typeface="LcdD.ttf" />
-
                     <TextView
-                        android:id="@+id/tv_danwei"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/tv_tripLength"
                         android:layout_marginLeft="5dip"
-                        android:layout_toRightOf="@id/tv_tripLength"
-                        android:paddingBottom="3dip"
-                        android:text="km"
+                        android:text="剩余油量（L）:"
                         android:textColor="#02fff6"
                         android:textSize="12sp" />
 
-                    <ImageView
-                        android:id="@+id/time_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="20dip"
-                        android:layout_toRightOf="@id/tv_danwei"
-                        android:src="@drawable/time_icon" />
-
                     <com.mapbar.adas.view.TextViewFontLcdEx
-                        android:id="@+id/tv_time"
+                        android:id="@+id/surplusOil"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="5dp"
-                        android:layout_toRightOf="@id/time_icon"
-                        android:text="@string/txt_str_0000"
+                        android:text="00"
                         android:textColor="#02fff6"
                         android:textSize="@dimen/text_size2"
                         berdy:typeface="LcdD.ttf" />
-                </RelativeLayout>
+                </LinearLayout>
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
