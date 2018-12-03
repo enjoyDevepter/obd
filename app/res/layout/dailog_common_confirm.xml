@@ -39,7 +39,7 @@
         android:background="@drawable/btn_bg"
         android:gravity="center"
         android:text="确定"
-        android:textColor="#ff3D424C"
+        android:textColor="@color/title_color"
         android:textSize="18sp" />
 
 </LinearLayout>

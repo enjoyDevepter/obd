@@ -34,7 +34,7 @@
             android:layout_width="25dp"
             android:layout_height="24dp"
             android:layout_marginRight="30dp"
-            android:background="@drawable/warm" />
+            android:background="@drawable/misinformation" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -57,7 +57,7 @@
             android:layout_width="25dp"
             android:layout_height="24dp"
             android:layout_marginRight="30dp"
-            android:background="@drawable/warm" />
+            android:background="@drawable/under" />
 
         <TextView
             android:layout_width="wrap_content"

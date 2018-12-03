@@ -46,7 +46,7 @@
             android:background="@drawable/btn_bg"
             android:gravity="center"
             android:text="确认修正"
-            android:textColor="#ff3D424C"
+            android:textColor="@color/title_color"
             android:textSize="18sp" />
 
         <TextView
@@ -59,7 +59,7 @@
             android:background="@drawable/btn_bg"
             android:gravity="center"
             android:text="取消"
-            android:textColor="#ff3D424C"
+            android:textColor="@color/title_color"
             android:textSize="18sp" />
 
     </LinearLayout>

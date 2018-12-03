@@ -2,10 +2,13 @@ package com.mapbar.adas;
 
 import android.content.pm.ActivityInfo;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.widget.TextView;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.view.Rotate3dAnimation;
 import com.mapbar.adas.view.TextViewFontLcdEx;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
@@ -19,6 +22,8 @@ import java.util.TimerTask;
 
 @PageSetting(contentViewId = R.layout.hud_layout)
 public class HUDPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+    @ViewInject(R.id.parent)
+    View parentV;
     @ViewInject(R.id.bt_stop)
     View stopV;
     @ViewInject(R.id.speed)
@@ -30,7 +35,7 @@ public class HUDPage extends AppBasePage implements View.OnClickListener, BleCal
     @ViewInject(R.id.consumption)
     TextViewFontLcdEx consumptionTV;
     @ViewInject(R.id.mirror)
-    View mirrorV;
+    TextView mirrorTV;
     @ViewInject(R.id.trie)
     View trieV;
     private Timer heartTimer;
@@ -55,7 +60,7 @@ public class HUDPage extends AppBasePage implements View.OnClickListener, BleCal
             }
         }, 1000 * 30, 1000 * 60);
         stopV.setOnClickListener(this);
-        mirrorV.setOnClickListener(this);
+        mirrorTV.setOnClickListener(this);
     }
 
     @Override
@@ -72,6 +77,20 @@ public class HUDPage extends AppBasePage implements View.OnClickListener, BleCal
                 PageManager.back();
                 break;
             case R.id.mirror:
+                float centerX = parentV.getWidth() / 2f;
+                float centerY = parentV.getHeight() / 2f;
+                Rotate3dAnimation rotateAnimation = null;
+                if ("镜像".equals(mirrorTV.getText().toString())) {
+                    mirrorTV.setText("正面");
+                    rotateAnimation = new Rotate3dAnimation(0, 180, centerX, centerY, 0.0f, false);
+                } else {
+                    mirrorTV.setText("镜像");
+                    rotateAnimation = new Rotate3dAnimation(180, 0, centerX, centerY, 0.0f, false);
+                }
+                rotateAnimation.setDuration(0);
+                rotateAnimation.setInterpolator(new AccelerateInterpolator());
+                rotateAnimation.setFillAfter(true);
+                parentV.startAnimation(rotateAnimation);
                 break;
         }
     }

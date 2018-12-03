@@ -783,7 +783,10 @@ public class BlueManager {
             } else if (content[0] == 2) {
                 if (content[1] == 5) {
                     Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
                     message.what = MSG_SENSITIVE_CODE;
+                    bundle.putByteArray("status", content);
+                    message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
             } else if (content[0] == 8) {
@@ -1208,7 +1211,8 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.SENSITIVE_CHANGE, null);
+                            byte[] result = bundle.getByteArray("status");
+                            notifyBleCallBackListener(OBDEvent.SENSITIVE_CHANGE, result);
                         }
                     });
                     break;

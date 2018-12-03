@@ -163,9 +163,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
         carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
-//        obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
-//        getUserInfo();
-//        checkOBDVersion(obdStatusInfo);
+        obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
+        getUserInfo();
+        checkOBDVersion(obdStatusInfo);
         heartTimer = new Timer();
         heartTimer.schedule(new TimerTask() {
             @Override
@@ -275,9 +275,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     @Override
                     public void bindView(View view) {
                         TextView infoTV = view.findViewById(R.id.info);
-
-                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>导致误报的常见原因:<br><br>1、车辆跑偏：<br>解决办法：优先做四轮定位；也可以点击\"下一步\"l来修正误报<br>2、校准路况不好，有明显颠簸或未直线行驶。<br>解决办法：重新校准。<br>3、当前路况路况不好：例如路面打滑，或者单边长时间偏高，单边长期压隔离带行驶等。<br>解决方法：重新插拔盒子，消除蜂鸣声，保持原有灵敏度。<br><br>上述\"2\"和\"3\"的情况，则点击\"取消\"，上述情况\"1\"或者其他未知原有请点击\"下一步\"</font>"));
-
+                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>导致误报的常见原因:<br><br>1、车辆跑偏：<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>优先做四轮定位；也可以点击\"下一步\"来修正误报。<br>2、校准路况不好，有明显颠簸或未直线行驶。<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>重新校准。<br>3、当前路况路况不好：例如路面打滑，或者单边长时间偏高，单边长期压隔离带行驶等。<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>重新插拔盒子，消除蜂鸣声，保持原有灵敏度。<br><br>上述\"2\"和\"3\"的情况，则点击\"取消\"，上述情况\"1\"或者其他未知原因请点击\"下一步\"</font>"));
                         view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -309,7 +307,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     public void bindView(View view) {
                         TextView infoTV = view.findViewById(R.id.info);
 
-                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>在您修正误报之前，请您确认：<br><br>1、误报后未重新校准或插拔盒子。<br>2、当前胎压正常(胎压变化在10%以内)。<br>由于我司胎压检测非常灵敏，所以有时候肉眼观察不到额亏气，也会报警。<br><br>确认以上情况后，请继续修正，否则取消。</font>"));
+                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>在您修正误报之前，请您确认：<br><br>1、误报后未重新校准或插拔盒子。<br>2、当前胎压正常(胎压变化在10%以内)。<br>由于我司胎压检测非常灵敏，所以有时候肉眼观察不到亏气，也会报警。<br><br>确认以上情况后，请继续修正，否则取消。</font>"));
 
                         view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -371,7 +369,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             @Override
                             public void onClick(View v) {
                                 dialog.dismiss();
-                                BlueManager.getInstance().send(ProtocolUtils.misinformation());
+                                BlueManager.getInstance().send(ProtocolUtils.resetSens());
                             }
                         });
                         view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
@@ -731,6 +729,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case OBDEvent.SENSITIVE_CHANGE:
+                updateBlmdInfo((byte[]) data);
                 if (misinformation) {
                     showConFirm("修正成功", Html.fromHtml("<font color='#4A4A4A'>四轮定位之后，请您按以下步骤重新设置：<br>1、恢复出厂灵敏度。<br>2、重新校准。<br><br>如果车辆仍然误报，则需要继续修正误报！一般2-3次修复，可以彻底解决误报！</font>").toString());
                 } else {
@@ -742,6 +741,45 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
         }
+    }
+
+    /**
+     * 上传状态信息
+     */
+    private void updateBlmdInfo(byte[] status) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("blmd", HexUtils.formatHexString(status));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("updateBlmdInfo input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_SEN_STATUS)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("updateBlmdInfo failure " + e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("updateBlmdInfo success " + responese);
+            }
+        });
+
     }
 
     /**
