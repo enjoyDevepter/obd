@@ -74,6 +74,7 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_stop:
+                PageManager.back();
                 break;
         }
     }

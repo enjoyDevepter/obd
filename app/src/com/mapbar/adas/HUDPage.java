@@ -86,7 +86,7 @@ public class HUDPage extends AppBasePage implements View.OnClickListener, BleCal
 
                 speedTVFL.setTextFormat000(pressureInfo.getSpeed());
 
-                voltageTV.setTextFormat00dot0(pressureInfo.getVoltage());
+                voltageTV.setTextFormat00dot0(Float.valueOf(pressureInfo.getVoltage()));
 
                 consumptionTV.setTextFormat00dot0((float) pressureInfo.getOilConsumption());
 

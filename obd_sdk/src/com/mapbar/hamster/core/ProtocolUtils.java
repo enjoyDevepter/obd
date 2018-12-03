@@ -378,5 +378,57 @@ public class ProtocolUtils {
     }
 
 
+    /**
+     * 误报
+     *
+     * @return
+     */
+    public static byte[] misinformation() {
+        Log.d("Protocol misinformation ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x82;
+        result[2] = 05;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 漏报
+     *
+     * @return
+     */
+    public static byte[] disclose() {
+        Log.d("Protocol disclose ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x82;
+        result[2] = 05;
+        result[3] = 1;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
+    /**
+     * 漏报
+     *
+     * @return
+     */
+    public static byte[] resetSens() {
+        Log.d("Protocol resetSens ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x82;
+        result[2] = 05;
+        result[3] = 2;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
 }
 

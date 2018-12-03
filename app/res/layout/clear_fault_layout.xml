@@ -6,7 +6,7 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <include layout="@layout/tittle_layout" />
+    <include layout="@layout/tittle_layout_spec" />
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"

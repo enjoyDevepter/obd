@@ -27,6 +27,7 @@ import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -70,6 +71,7 @@ public class BlueManager {
     private static final int MSG_PHYSICAL = 130; // 体检
     private static final int MSG_FAULT_CODE = 140; // 故障码
     private static final int MSG_CLEAR_FAULT_CODE = 150; // 清除故障码
+    private static final int MSG_SENSITIVE_CODE = 160; // 清除故障码
 
 
     private static final int MSG_VERIFY = 2;
@@ -778,6 +780,12 @@ public class BlueManager {
 //                        return;
 //                    }
                 }
+            } else if (content[0] == 2) {
+                if (content[1] == 5) {
+                    Message message = mHandler.obtainMessage();
+                    message.what = MSG_SENSITIVE_CODE;
+                    mHandler.sendMessage(message);
+                }
             } else if (content[0] == 8) {
                 if (content[1] == 1) {
                     Message message = mHandler.obtainMessage();
@@ -808,7 +816,8 @@ public class BlueManager {
                         pressureInfo.setStatus(0);
                     }
                     pressureInfo.setFaultCount(content[5] & 0xFF);
-                    pressureInfo.setVoltage((float) (HexUtils.byteToShort(new byte[]{content[6], content[7]}) / 1000));
+                    DecimalFormat decimalFormat = new DecimalFormat(".0");//构造方法的字符格式这里如果小数不足2位,会以0补足.
+                    pressureInfo.setVoltage((decimalFormat.format(HexUtils.byteToShort(new byte[]{content[6], content[7]}) / 1000f)));
                     pressureInfo.setTemperature((content[8] & 0xFF) - 40);
                     pressureInfo.setSpeed(content[9] & 0xFF);
                     pressureInfo.setRotationRate(HexUtils.byteToShort(new byte[]{content[10], content[11]}));
@@ -1192,6 +1201,14 @@ public class BlueManager {
                         public void run() {
                             byte[] result = bundle.getByteArray("status");
                             notifyBleCallBackListener(OBDEvent.CLEAN_FAULT_CODE, result[4] & 0xFF);
+                        }
+                    });
+                    break;
+                case MSG_SENSITIVE_CODE:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.SENSITIVE_CHANGE, null);
                         }
                     });
                     break;

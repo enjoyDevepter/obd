@@ -182,7 +182,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="@string/txt_str_0"
+                            android:text="0 "
                             android:textColor="#02fff6"
                             android:textSize="28sp"
                             berdy:typeface="LcdD.ttf" />
@@ -216,7 +216,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="@dimen/layout_marginTop7"
-                        android:src="@drawable/changzhen" />
+                        android:src="@drawable/changzhen_v" />
 
                     <LinearLayout
                         android:id="@+id/line_speed"
@@ -238,7 +238,7 @@
                                 android:id="@+id/tve_speed"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/txt_str_0"
+                                android:text="0 "
                                 android:textColor="#02fff6"
                                 android:textSize="56sp"
                                 berdy:typeface="LcdD.ttf" />
@@ -340,7 +340,7 @@
                                     android:id="@+id/tv_shunshi_consumption"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="@string/txt_str_0"
+                                    android:text="0 "
                                     android:textColor="#02fff6"
                                     android:textSize="75sp"
                                     berdy:typeface="LcdD.ttf" />
@@ -354,7 +354,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
                                 android:layout_marginTop="90dp"
-                                android:text="@string/txt_str_0"
+                                android:text="0 "
                                 android:textColor="#02fff6"
                                 android:textSize="26sp"
                                 berdy:typeface="LcdD.ttf" />

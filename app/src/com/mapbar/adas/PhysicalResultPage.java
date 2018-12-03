@@ -43,14 +43,6 @@ public class PhysicalResultPage extends AppBasePage implements View.OnClickListe
         errorlistView.setDividerHeight(8);
         errorlistView.setAdapter(physicalErrorAdapter);
 
-//        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) errorlistView.getLayoutParams();
-//        if (errorLists.size() > 0) {
-//            params.height = OBDUtils.getDimens(this.getContext(), R.dimen.physical_error_item_height) * errorLists.size();
-//            errorlistView.setLayoutParams(params);
-//        } else {
-//            errorlistView.setVisibility(View.GONE);
-//        }
-
         HashMap<String, List<Physicaltem>> physicaltemHashMap = new HashMap<>();
         List<Physicaltem> normalListItems = getDate().<Physicaltem>getParcelableArrayList("normal");
         for (Physicaltem physicaltem : normalListItems) {

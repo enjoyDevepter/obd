@@ -14,7 +14,7 @@ public class PressureInfo implements Serializable {
     private int status;
     private int faultCount;
     private int speed;
-    private float voltage;
+    private String voltage;
     private int temperature;
     private int rotationRate;
     private double oilConsumption;
@@ -47,11 +47,11 @@ public class PressureInfo implements Serializable {
         this.speed = speed;
     }
 
-    public float getVoltage() {
+    public String getVoltage() {
         return voltage;
     }
 
-    public void setVoltage(float voltage) {
+    public void setVoltage(String voltage) {
         this.voltage = voltage;
     }
 

@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
+import android.text.Html;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -67,12 +68,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private TextView title;
     @ViewInject(R.id.report)
     private View reportV;
-    @ViewInject(R.id.sensitive)
-    private View sensitive;
+    //    @ViewInject(R.id.sensitive)
+//    private View sensitive;
     @ViewInject(R.id.warm)
     private View warm;
     @ViewInject(R.id.reset)
     private View reset;
+    @ViewInject(R.id.misinformation)
+    private View misinformationV;
     @ViewInject(R.id.phone)
     private TextView phoneTV;
     @ViewInject(R.id.car_name)
@@ -144,6 +147,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
     private Timer heartTimer;
     private NumberSeekBar sensitiveView;
+    private boolean misinformation;
+    private boolean under;
 
     @Override
     public void onResume() {
@@ -153,13 +158,14 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         warm.setOnClickListener(this);
         reset.setOnClickListener(this);
         reportV.setOnClickListener(this);
-        sensitive.setOnClickListener(this);
+//        sensitive.setOnClickListener(this);
+        misinformationV.setOnClickListener(this);
         phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
         carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
-        obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
-        getUserInfo();
-        checkOBDVersion(obdStatusInfo);
+//        obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
+//        getUserInfo();
+//        checkOBDVersion(obdStatusInfo);
         heartTimer = new Timer();
         heartTimer.schedule(new TimerTask() {
             @Override
@@ -217,7 +223,198 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.report:
                 uploadLog();
                 break;
+            case R.id.misinformation:
+                showMisinformation();
+                break;
         }
+    }
+
+    private void showMisinformation() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        view.findViewById(R.id.change).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                misinformation = true;
+                                showMisinformationStepOne();
+                            }
+                        });
+
+                        view.findViewById(R.id.auth).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                under = true;
+                                showUnder();
+                            }
+                        });
+                        view.findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                showResetOne();
+                            }
+                        });
+
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_misinformation)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
+    }
+
+    private void showMisinformationStepOne() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        TextView infoTV = view.findViewById(R.id.info);
+
+                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>导致误报的常见原因:<br><br>1、车辆跑偏：<br>解决办法：优先做四轮定位；也可以点击\"下一步\"l来修正误报<br>2、校准路况不好，有明显颠簸或未直线行驶。<br>解决办法：重新校准。<br>3、当前路况路况不好：例如路面打滑，或者单边长时间偏高，单边长期压隔离带行驶等。<br>解决方法：重新插拔盒子，消除蜂鸣声，保持原有灵敏度。<br><br>上述\"2\"和\"3\"的情况，则点击\"取消\"，上述情况\"1\"或者其他未知原有请点击\"下一步\"</font>"));
+
+                        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                showMisinformationStepTwo();
+                            }
+                        });
+                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_misinformation_step_one)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
+    }
+
+    private void showMisinformationStepTwo() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        TextView infoTV = view.findViewById(R.id.info);
+
+                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>在您修正误报之前，请您确认：<br><br>1、误报后未重新校准或插拔盒子。<br>2、当前胎压正常(胎压变化在10%以内)。<br>由于我司胎压检测非常灵敏，所以有时候肉眼观察不到额亏气，也会报警。<br><br>确认以上情况后，请继续修正，否则取消。</font>"));
+
+                        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.misinformation());
+                                dialog.dismiss();
+                            }
+                        });
+                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_misinformation_step_two)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+    }
+
+    private void showUnder() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.disclose());
+                                dialog.dismiss();
+                            }
+                        });
+                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_under_speak)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+    }
+
+    private void showResetOne() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                BlueManager.getInstance().send(ProtocolUtils.misinformation());
+                            }
+                        });
+                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_reset)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+    }
+
+    private void showConFirm(final String title, final String conent) {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        TextView titleTV = view.findViewById(R.id.title);
+                        titleTV.setText(title);
+                        TextView infoTV = view.findViewById(R.id.info);
+                        infoTV.setText(conent);
+
+                        view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_common_confirm)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
     }
 
     private void uploadLog() {
@@ -531,6 +728,17 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 obdStatusInfo = (OBDStatusInfo) data;
                 if (null != sensitiveView) {
                     sensitiveView.setCurProgress(obdStatusInfo.getSensitive());
+                }
+                break;
+            case OBDEvent.SENSITIVE_CHANGE:
+                if (misinformation) {
+                    showConFirm("修正成功", Html.fromHtml("<font color='#4A4A4A'>四轮定位之后，请您按以下步骤重新设置：<br>1、恢复出厂灵敏度。<br>2、重新校准。<br><br>如果车辆仍然误报，则需要继续修正误报！一般2-3次修复，可以彻底解决误报！</font>").toString());
+                } else {
+                    if (under) {
+                        showConFirm("修正成功", Html.fromHtml("<font color='#4A4A4A'>当车辆亏气时，盒子可以正常报警了！</font>").toString());
+                    } else {
+                        showConFirm("恢复成功", Html.fromHtml("<font color='#4A4A4A'>恭喜您，恢复成功！</font>").toString());
+                    }
                 }
                 break;
         }

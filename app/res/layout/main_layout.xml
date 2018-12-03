@@ -148,7 +148,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/sensitive"
+            android:id="@+id/misinformation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -160,17 +160,42 @@
 
             <View
                 android:layout_width="35dp"
-                android:layout_height="32dp"
+                android:layout_height="29dp"
                 android:background="@drawable/setting" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="灵敏度"
-                android:textColor="#555555"
+                android:layout_marginTop="13dp"
+                android:text="修正灵敏度"
+                android:textColor="#FF555555"
                 android:textSize="16sp" />
         </LinearLayout>
+
+        <!-- <LinearLayout
+             android:id="@+id/sensitive"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             android:background="@drawable/menu_bg"
+             android:gravity="center_horizontal"
+             android:orientation="vertical"
+             android:paddingBottom="10dp"
+             android:paddingTop="10dp">
+
+             <View
+                 android:layout_width="35dp"
+                 android:layout_height="32dp"
+                 android:background="@drawable/setting" />
+
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="10dp"
+                 android:text="灵敏度"
+                 android:textColor="#555555"
+                 android:textSize="16sp" />
+         </LinearLayout>-->
 
         <LinearLayout
             android:id="@+id/reset"
@@ -192,9 +217,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="13dp"
-                android:text="胎压校准"
+                android:text="重新校准"
                 android:textColor="#FF555555"
                 android:textSize="16sp" />
         </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>
