@@ -87,7 +87,7 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
             case OBDEvent.CLEAN_FAULT_CODE:
                 int status = (int) data;
                 if (status == 0) {
-                    showGpsDialog();
+                    showSuccessDialog();
                 } else {
 
                 }
@@ -95,7 +95,7 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
         }
     }
 
-    private void showGpsDialog() {
+    private void showSuccessDialog() {
         if (dialog != null && dialog.isVisible()) {
             return;
         }
@@ -107,6 +107,7 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
                         confirm.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                PageManager.go(new HomePage());
                                 dialog.dismiss();
                             }
                         });

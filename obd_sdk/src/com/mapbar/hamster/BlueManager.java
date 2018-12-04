@@ -483,7 +483,9 @@ public class BlueManager {
         if (mBluetoothGatt == null) {
             return;
         }
-        if (!split) { // 未拆封包 或者 心跳包
+
+        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x88 && data[2] == 03)) { // 未拆封包 或者 心跳包
+        } else {
             timeOutThread.startCommand(true);
         }
         writeCharacteristic.setValue(data);
@@ -587,13 +589,13 @@ public class BlueManager {
      * @param res
      */
     private synchronized void validateAndNotify(byte[] res) {
-        if (!(res[0] == (byte) 0x09 && res[1] == 01)) {
+        if (!(res[0] == (byte) 0x09 && res[1] == 01 || res[0] == (byte) 0x08 && res[1] == 03)) {
             timeOutThread.endCommand();
-        }
-        byte[] msg = instructList.pollLast();
-        canGo = true;
-        if (msg != null && queue.size() == 0) {
-            queue.add(msg);
+            byte[] msg = instructList.pollLast();
+            canGo = true;
+            if (msg != null && queue.size() == 0) {
+                queue.add(msg);
+            }
         }
 
         byte[] result = new byte[res.length];

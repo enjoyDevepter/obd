@@ -23,8 +23,8 @@ public class Physicaltem implements Comparable, Parcelable {
     private int index;
     private String type;
     private String name;
-    private int min;
-    private int max;
+    private double min;
+    private double max;
     private boolean compare;
     private String desc;
     private String high_appearance;
@@ -43,8 +43,8 @@ public class Physicaltem implements Comparable, Parcelable {
         index = in.readInt();
         type = in.readString();
         name = in.readString();
-        min = in.readInt();
-        max = in.readInt();
+        min = in.readDouble();
+        max = in.readDouble();
         compare = in.readByte() != 0;
         desc = in.readString();
         high_appearance = in.readString();
@@ -94,19 +94,19 @@ public class Physicaltem implements Comparable, Parcelable {
         this.name = name;
     }
 
-    public int getMin() {
+    public double getMin() {
         return min;
     }
 
-    public void setMin(int min) {
+    public void setMin(double min) {
         this.min = min;
     }
 
-    public int getMax() {
+    public double getMax() {
         return max;
     }
 
-    public void setMax(int max) {
+    public void setMax(double max) {
         this.max = max;
     }
 
@@ -246,8 +246,8 @@ public class Physicaltem implements Comparable, Parcelable {
         dest.writeInt(index);
         dest.writeString(type);
         dest.writeString(name);
-        dest.writeInt(min);
-        dest.writeInt(max);
+        dest.writeDouble(min);
+        dest.writeDouble(max);
         dest.writeByte((byte) (compare ? 1 : 0));
         dest.writeString(desc);
         dest.writeString(high_appearance);

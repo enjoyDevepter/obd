@@ -71,7 +71,7 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
         groupViewHolder.name.setText(physicaltems.get(groupPosition).getName());
-        groupViewHolder.status.setText(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? "偏高" : "偏低");
+//        groupViewHolder.status.setText(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? "偏高" : "偏低");
         return convertView;
 
     }
