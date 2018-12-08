@@ -71,7 +71,7 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
         groupViewHolder.name.setText(physicaltems.get(groupPosition).getName());
-//        groupViewHolder.status.setText(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? "偏高" : "偏低");
+        groupViewHolder.status.setText(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? "偏高" : "偏低");
         return convertView;
 
     }
@@ -83,17 +83,20 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(GlobalUtil.getContext()).inflate(R.layout.physical_result_error_item, parent, false);
             childViewHolder = new ChildViewHolder();
             childViewHolder.type = convertView.findViewById(R.id.type);
+            childViewHolder.name = convertView.findViewById(R.id.name);
             childViewHolder.current = convertView.findViewById(R.id.current);
             childViewHolder.range = convertView.findViewById(R.id.range);
             childViewHolder.reason = convertView.findViewById(R.id.reason);
             childViewHolder.resolvent = convertView.findViewById(R.id.resolvent);
-            childViewHolder.type = convertView.findViewById(R.id.type);
+            childViewHolder.up = convertView.findViewById(R.id.up);
             convertView.setTag(childViewHolder);
         } else {
             childViewHolder = (ChildViewHolder) convertView.getTag();
         }
+        childViewHolder.name.setText(physicaltems.get(groupPosition).getName());
         childViewHolder.type.setText(physicaltems.get(groupPosition).getType());
         childViewHolder.current.setText(physicaltems.get(groupPosition).getCurrent());
+        childViewHolder.up.setBackgroundResource(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? R.drawable.high : R.drawable.low);
         childViewHolder.range.setText(physicaltems.get(groupPosition).getMin() + "-" + physicaltems.get(groupPosition).getMax());
         if (physicaltems.get(groupPosition).isHigh()) {
             childViewHolder.reason.setText(Html.fromHtml(physicaltems.get(groupPosition).getHigt_reason()));
@@ -117,9 +120,11 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
 
     static class ChildViewHolder {
         TextView type;
+        TextView name;
         TextView current;
         TextView range;
         TextView reason;
         TextView resolvent;
+        View up;
     }
 }

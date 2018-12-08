@@ -210,7 +210,23 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     normalList.add(physicaltem);
                     break;
                 case 2: // 冻结故障码 1
-                    physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + */String.valueOf((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF)));
+                    String type = "";
+                    switch ((item[1] & 0xFF) >> 6) {
+                        case 0:
+                            type = "P";
+                            break;
+                        case 1:
+                            type = "C";
+                            break;
+                        case 2:
+                            type = "B";
+                            break;
+                        case 3:
+                            type = "U";
+                            break;
+                    }
+                    type += HexUtils.byte2HexStr(new byte[]{(byte) (item[1] & 0x3F), item[2]}).replace(" ", "");
+                    physicaltem.setCurrent(type);
                     normalList.add(physicaltem);
                     break;
                 case 3: // 燃油系统1状态  6
@@ -623,7 +639,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(361);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -634,7 +650,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(362);
                     physicaltem.setCurrent(decimalFormat.format(((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f)));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format(((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f)));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format(((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f)));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -647,7 +663,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(371);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -658,7 +674,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(372);
                     physicaltem.setCurrent(decimalFormat.format((((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8) / 65536f)));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format(((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f)));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format(((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f)));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -671,7 +687,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(381);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -682,7 +698,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(382);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -695,7 +711,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(391);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -706,7 +722,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(392);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -719,7 +735,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(401);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -730,7 +746,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(402);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -743,7 +759,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(411);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -754,7 +770,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(412);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -767,7 +783,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(421);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -778,7 +794,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(422);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -791,7 +807,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(431);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) * 2 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);
@@ -802,7 +818,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     physicaltem = allList.get(432);
                     physicaltem.setCurrent(decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
+//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[3]) + HexUtils.byte2HexStr(item[4]) + "  " + decimalFormat.format((HexUtils.byteToShort(new byte[]{item[3], item[4]}) & 0xFFFF) * 8 / 65536f));
                     status[5] = physicaltem.getStyle() != 1 ? status[5] : false;
                     if (physicaltem.getStyle() == 1) {
                         errorPhysicalList.add(physicaltem);

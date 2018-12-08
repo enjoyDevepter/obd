@@ -122,7 +122,7 @@ public class BlueManager {
                 return;
             }
             scanResult.add(name);
-            if (name != null && name.startsWith("Guardian")) {
+            if (name != null && name.startsWith("MapBar")) {
                 Log.d("device.getName()=    " + device.getName() + " device.getAddress()=" + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
@@ -237,7 +237,6 @@ public class BlueManager {
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
-            Log.d("onCharacteristicRead  ");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d("onCharacteristicRead  success " + Arrays.toString(characteristic.getValue()));
             }
@@ -246,7 +245,6 @@ public class BlueManager {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
-            Log.d("onCharacteristicWrite  ");
             Message message = new Message();
             message.what = MSG_SPLIT_WRITE;
             Bundle bundle = new Bundle();
@@ -542,7 +540,7 @@ public class BlueManager {
      * @param data
      */
     public synchronized void analyzeProtocol(byte[] data) {
-
+        Log.d(" analyzeProtocol");
         if (null != data && data.length > 0) {
             if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL && data.length != 1 && unfinish && data.length >= 7) {
                 // 获取包长度
@@ -558,6 +556,10 @@ public class BlueManager {
                     currentIndex = data.length - 1;
                     System.arraycopy(data, 1, full, 0, data.length - 1);
                 } else if (data.length > count + 7) {
+                    Log.d(" analyzeProtocol error one ");
+                    currentIndex = 0;
+                    unfinish = true;
+                    full = new byte[]{};
                     return;
                 }
             } else {
@@ -570,6 +572,10 @@ public class BlueManager {
                     System.arraycopy(data, 0, full, currentIndex, data.length);
                     currentIndex += data.length;
                 } else {
+                    Log.d(" analyzeProtocol error two ");
+                    currentIndex = 0;
+                    unfinish = true;
+                    full = new byte[]{};
                     return;
                 }
             }
@@ -588,7 +594,8 @@ public class BlueManager {
     /**
      * @param res
      */
-    private synchronized void validateAndNotify(byte[] res) {
+    private void validateAndNotify(byte[] res) {
+        Log.d(" analyzeProtocol");
         if (!(res[0] == (byte) 0x09 && res[1] == 01 || res[0] == (byte) 0x08 && res[1] == 03)) {
             timeOutThread.endCommand();
             byte[] msg = instructList.pollLast();

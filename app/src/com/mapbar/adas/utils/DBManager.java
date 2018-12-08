@@ -62,8 +62,8 @@ public class DBManager {
                 int index = cursor.getInt(cursor.getColumnIndex("index"));
                 String type = cursor.getString(cursor.getColumnIndex("type"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
-                int min = cursor.getInt(cursor.getColumnIndex("min"));
-                int max = cursor.getInt(cursor.getColumnIndex("max"));
+                double min = cursor.getDouble(cursor.getColumnIndex("min"));
+                double max = cursor.getDouble(cursor.getColumnIndex("max"));
                 boolean compare = cursor.getInt(cursor.getColumnIndex("compare")) == 0 ? false : true;
                 String desc = cursor.getString(cursor.getColumnIndex("desc"));
                 String high_appearance = cursor.getString(cursor.getColumnIndex("high_appearance"));

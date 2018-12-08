@@ -74,28 +74,28 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
         int iconId = R.drawable.checker_icon;
         switch (groupPosition) {
             case 0:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon1;
                 break;
             case 1:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon2;
                 break;
             case 2:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon3;
                 break;
             case 3:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon4;
                 break;
             case 4:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon5;
                 break;
             case 5:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon6;
                 break;
             case 6:
-                iconId = R.drawable.checker_icon;
+                iconId = R.drawable.icon7;
                 break;
         }
-//        groupViewHolder.icon.setBackgroundResource(iconId);
+        groupViewHolder.icon.setBackgroundResource(iconId);
         groupViewHolder.type.setText(name);
         return convertView;
 
@@ -117,7 +117,11 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
         }
         childViewHolder.name.setText(physicaltem.getName());
         childViewHolder.current.setText(physicaltem.getCurrent());
-        childViewHolder.range.setText(physicaltem.getMin() + "-" + physicaltem.getMax());
+        if (physicaltem.getMin() == 0 && physicaltem.getMax() == 0) {
+            childViewHolder.range.setText("--");
+        } else {
+            childViewHolder.range.setText(physicaltem.getMin() + "-" + physicaltem.getMax());
+        }
         return convertView;
     }
 

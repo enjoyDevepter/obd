@@ -20,6 +20,8 @@ import java.util.TimerTask;
 
 @PageSetting(contentViewId = R.layout.dash_board_layout)
 public class DashBoardPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+    @ViewInject(R.id.iv_physical_icon)
+    View faultV;
     @ViewInject(R.id.tv_check_result)
     TextView faultTV;
     @ViewInject(R.id.tv_voltage)
@@ -92,9 +94,12 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
 
     private void parseStatus(PressureInfo pressureInfo) {
 
-        faultTV.setText(String.valueOf(pressureInfo.getFaultCount()));
-        voltageTV.setText(String.valueOf(pressureInfo.getVoltage()));
-        temperatureTV.setText(String.valueOf(pressureInfo.getTemperature()));
+        if (pressureInfo.getFaultCount() > 0) {
+            faultV.setBackgroundResource(R.drawable.fault_code_error);
+            faultTV.setText(String.valueOf(pressureInfo.getFaultCount()));
+        }
+        voltageTV.setText(String.valueOf(pressureInfo.getVoltage()) + "v");
+        temperatureTV.setText(String.valueOf(pressureInfo.getTemperature()) + "C");
         rpmTVFL.setTextFormat000(pressureInfo.getRotationRate());
         speedTVFL.setTextFormat000(pressureInfo.getSpeed());
         oilConsumptionTVFLE.setTextFormat00dot0((float) pressureInfo.getOilConsumption());

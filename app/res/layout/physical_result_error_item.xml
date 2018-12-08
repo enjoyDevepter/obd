@@ -20,6 +20,28 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="体检项："
+            android:textColor="@color/title"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/title"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="所属系统："
             android:textColor="@color/title"
             android:textSize="16sp" />
@@ -57,6 +79,7 @@
             android:textSize="16sp" />
 
         <View
+            android:id="@+id/up"
             android:layout_width="9dp"
             android:layout_height="11dp"
             android:layout_marginLeft="15dp"
