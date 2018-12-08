@@ -122,7 +122,7 @@ public class BlueManager {
                 return;
             }
             scanResult.add(name);
-            if (name != null && name.startsWith("MapBar")) {
+            if (name != null && name.startsWith("Guardian")) {
                 Log.d("device.getName()=    " + device.getName() + " device.getAddress()=" + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
@@ -595,7 +595,7 @@ public class BlueManager {
      * @param res
      */
     private void validateAndNotify(byte[] res) {
-        Log.d(" analyzeProtocol");
+        Log.d(" validateAndNotify");
         if (!(res[0] == (byte) 0x09 && res[1] == 01 || res[0] == (byte) 0x08 && res[1] == 03)) {
             timeOutThread.endCommand();
             byte[] msg = instructList.pollLast();

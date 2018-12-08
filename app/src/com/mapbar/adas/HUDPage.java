@@ -1,6 +1,7 @@
 package com.mapbar.adas;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.TextView;
@@ -38,6 +39,8 @@ public class HUDPage extends AppBasePage implements View.OnClickListener, BleCal
     TextView mirrorTV;
     @ViewInject(R.id.trie)
     View trieV;
+    @ViewInject(R.id.trie_info)
+    TextView trieTV;
     private Timer heartTimer;
 
 
@@ -102,7 +105,8 @@ public class HUDPage extends AppBasePage implements View.OnClickListener, BleCal
                 PressureInfo pressureInfo = (PressureInfo) data;
 
                 trieV.setBackgroundResource(pressureInfo.getStatus() == 0 ? R.drawable.trie_nor : R.drawable.trie_error);
-
+                trieTV.setTextColor(pressureInfo.getStatus() == 0 ? Color.parseColor("#ff00fff6") : Color.parseColor("#fff7a65a"));
+                trieTV.setText(pressureInfo.getStatus() == 0 ? "胎压正常" : "胎压异常");
                 speedTVFL.setTextFormat000(pressureInfo.getSpeed());
 
                 voltageTV.setTextFormat00dot0(Float.valueOf(pressureInfo.getVoltage()));

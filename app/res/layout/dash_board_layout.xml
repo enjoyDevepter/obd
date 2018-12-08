@@ -356,7 +356,7 @@
                                 android:layout_marginTop="90dp"
                                 android:text="0 "
                                 android:textColor="#02fff6"
-                                android:textSize="26sp"
+                                android:textSize="30sp"
                                 berdy:typeface="LcdD.ttf" />
                         </RelativeLayout>
                     </LinearLayout>

@@ -238,6 +238,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             @Override
                             public void onClick(View v) {
                                 dialog.dismiss();
+                                under = false;
                                 misinformation = true;
                                 showMisinformationStepOne();
                             }
@@ -248,6 +249,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             public void onClick(View v) {
                                 dialog.dismiss();
                                 under = true;
+                                misinformation = false;
                                 showUnder();
                             }
                         });
