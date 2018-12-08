@@ -30,7 +30,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="6dp"
-                android:background="#F4F4F4" />
+                android:background="#FFF4F4F4" />
 
             <com.mapbar.adas.view.CustomExpandableListView
                 android:id="@+id/errorlistView"
@@ -43,7 +43,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="10dp"
-                android:background="#F4F4F4" />
+                android:background="#FFF4F4F4" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -51,13 +51,13 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="体检正常项"
-                android:textColor="#FF4A4A4A"
+                android:textColor="#FF35bdb2"
                 android:textSize="18sp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="6dp"
-                android:background="#F4F4F4" />
+                android:background="#FFF4F4F4" />
 
             <com.mapbar.adas.view.CustomExpandableListView
                 android:id="@+id/normallistView"
