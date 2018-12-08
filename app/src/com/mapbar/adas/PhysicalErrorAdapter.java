@@ -83,7 +83,6 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(GlobalUtil.getContext()).inflate(R.layout.physical_result_error_item, parent, false);
             childViewHolder = new ChildViewHolder();
             childViewHolder.type = convertView.findViewById(R.id.type);
-            childViewHolder.name = convertView.findViewById(R.id.name);
             childViewHolder.current = convertView.findViewById(R.id.current);
             childViewHolder.range = convertView.findViewById(R.id.range);
             childViewHolder.reason = convertView.findViewById(R.id.reason);
@@ -93,9 +92,12 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
         } else {
             childViewHolder = (ChildViewHolder) convertView.getTag();
         }
-        childViewHolder.name.setText(physicaltems.get(groupPosition).getName());
         childViewHolder.type.setText(physicaltems.get(groupPosition).getType());
-        childViewHolder.current.setText(physicaltems.get(groupPosition).getCurrent());
+        if (null != physicaltems.get(groupPosition).getCurrent() && !"".equals(physicaltems.get(groupPosition).getCurrent()) && !"null".equals(physicaltems.get(groupPosition).getCurrent())) {
+            childViewHolder.current.setText(physicaltems.get(groupPosition).getCurrent() + " " + physicaltems.get(groupPosition).getUnit());
+        } else {
+            childViewHolder.current.setText("");
+        }
         childViewHolder.up.setBackgroundResource(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? R.drawable.high : R.drawable.low);
         childViewHolder.range.setText(physicaltems.get(groupPosition).getMin() + "-" + physicaltems.get(groupPosition).getMax());
         if (physicaltems.get(groupPosition).isHigh()) {
@@ -120,7 +122,6 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
 
     static class ChildViewHolder {
         TextView type;
-        TextView name;
         TextView current;
         TextView range;
         TextView reason;

@@ -2,6 +2,7 @@ package com.mapbar.adas.utils;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import com.mapbar.adas.FaultCode;
 import com.mapbar.adas.GlobalUtil;
@@ -72,6 +73,10 @@ public class DBManager {
                 String low_appearance = cursor.getString(cursor.getColumnIndex("low_appearance"));
                 String low_reason = cursor.getString(cursor.getColumnIndex("low_reason"));
                 String low_resolvent = cursor.getString(cursor.getColumnIndex("low_resolvent"));
+                String unit = cursor.getString(cursor.getColumnIndex("unit"));
+                if (TextUtils.isEmpty(unit) || "null".equals(unit)) {
+                    unit = "";
+                }
                 int socre = cursor.getInt(cursor.getColumnIndex("socre"));
                 Physicaltem physicaltem = new Physicaltem();
                 physicaltem.setId(id);
@@ -90,6 +95,7 @@ public class DBManager {
                 physicaltem.setLow_resolvent(low_resolvent);
                 physicaltem.setSocre(socre);
                 physicaltem.setStyle(0);
+                physicaltem.setUnit(unit);
                 physicaltemHashMap.put(physicaltem.getIndex(), physicaltem);
             }
             cursor.close();

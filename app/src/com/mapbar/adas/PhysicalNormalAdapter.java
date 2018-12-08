@@ -116,7 +116,11 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
             childViewHolder = (ChildViewHolder) convertView.getTag();
         }
         childViewHolder.name.setText(physicaltem.getName());
-        childViewHolder.current.setText(physicaltem.getCurrent());
+        if (null != physicaltem.getCurrent() && !"".equals(physicaltem.getCurrent()) && !"null".equals(physicaltem.getCurrent())) {
+            childViewHolder.current.setText(physicaltem.getCurrent() + " " + physicaltem.getUnit());
+        } else {
+            childViewHolder.current.setText("");
+        }
         if (physicaltem.getMin() == 0 && physicaltem.getMax() == 0) {
             childViewHolder.range.setText("--");
         } else {

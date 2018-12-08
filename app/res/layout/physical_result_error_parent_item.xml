@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="32dp"
+    android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
+    android:paddingBottom="5dp"
     android:paddingLeft="15dp"
-    android:paddingRight="15dp">
+    android:paddingRight="15dp"
+    android:paddingTop="5dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -31,9 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:ellipsize="end"
-        android:lines="1"
-        android:text="点火提前交"
+        android:maxLines="2"
         android:textColor="@color/title"
         android:textSize="16sp" />
 
@@ -43,7 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="5dp"
-        android:text="偏高"
         android:textColor="@android:color/holo_red_light"
         android:textSize="16sp" />
 
