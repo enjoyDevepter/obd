@@ -313,7 +313,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Log.d("updateStatusInfo success " + responese);
             }
         });
-
     }
 
     private void uploadCarData(String filePath) {

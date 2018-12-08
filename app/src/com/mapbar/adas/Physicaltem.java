@@ -37,6 +37,7 @@ public class Physicaltem implements Comparable, Parcelable {
     private boolean high;
     private int style;  // 0 正常、1 异常
     private String current;
+    private String unit;
 
     public Physicaltem(Parcel in) {
         id = in.readInt();
@@ -57,6 +58,7 @@ public class Physicaltem implements Comparable, Parcelable {
         high = in.readByte() != 0;
         style = in.readInt();
         current = in.readString();
+        unit = in.readString();
     }
 
     public Physicaltem() {
@@ -207,6 +209,14 @@ public class Physicaltem implements Comparable, Parcelable {
         this.current = current;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     @Override
     public String toString() {
         return "Physicaltem{" +
@@ -227,6 +237,7 @@ public class Physicaltem implements Comparable, Parcelable {
                 ", socre=" + socre +
                 ", high=" + high +
                 ", current='" + current + '\'' +
+                ", unit='" + unit + '\'' +
                 '}';
     }
 
@@ -260,6 +271,7 @@ public class Physicaltem implements Comparable, Parcelable {
         dest.writeByte((byte) (high ? 1 : 0));
         dest.writeInt(style);
         dest.writeString(current);
+        dest.writeString(unit);
     }
 }
 
