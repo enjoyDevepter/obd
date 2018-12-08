@@ -101,7 +101,7 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
             childViewHolder.current.setText("");
         }
         childViewHolder.up.setBackgroundResource(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? R.drawable.high : R.drawable.low);
-        childViewHolder.range.setText(physicaltems.get(groupPosition).getMin() + "-" + physicaltems.get(groupPosition).getMax());
+        childViewHolder.range.setText("(" + physicaltems.get(groupPosition).getMin() + "-" + physicaltems.get(groupPosition).getMax() + ")" + physicaltems.get(groupPosition).getUnit());
         if (physicaltems.get(groupPosition).isHigh()) {
             childViewHolder.reason.setText(Html.fromHtml(physicaltems.get(groupPosition).getHigt_reason()));
             childViewHolder.resolvent.setText(Html.fromHtml(physicaltems.get(groupPosition).getHigt_resolvent()));

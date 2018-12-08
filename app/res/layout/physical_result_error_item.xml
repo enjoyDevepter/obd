@@ -10,28 +10,6 @@
     android:paddingRight="15dp"
     android:paddingTop="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="所属系统："
-            android:textColor="@color/title"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/title"
-            android:textSize="16sp" />
-    </LinearLayout>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,20 +26,21 @@
 
             <TextView
                 android:id="@+id/tag"
-                android:layout_width="0dp"
+                android:layout_width="85dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_weight="1"
+                android:layout_marginRight="15dp"
+                android:gravity="left"
                 android:text="检测值："
-                android:textColor="@color/title"
+                android:textColor="#FF737373"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/current"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:textColor="@android:color/holo_red_light"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:textColor="#FF000000"
                 android:textSize="16sp" />
 
             <View
@@ -74,43 +53,76 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/current_layout"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="85dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
                 android:text="正常范围："
-                android:textColor="@color/title"
+                android:textColor="#FF737373"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/range"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="left"
                 android:textColor="@color/title"
                 android:textSize="16sp" />
 
+            <View
+                android:layout_width="9dp"
+                android:layout_height="11dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/high"
+                android:visibility="invisible" />
+
         </LinearLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:background="#FFF4F4F4" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/unit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tag"
-            android:textColor="@color/title"
-            android:textSize="16sp" />
+            android:text="所属系统："
+            android:textColor="#FF000000"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF35bdb2"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/error_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -125,27 +137,24 @@
                 android:layout_height="wrap_content"
                 android:text="原因(供参考)："
                 android:textColor="#FF4A4A4A"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/reason"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:lineSpacingExtra="4dp"
                 android:singleLine="false"
                 android:textColor="@color/title"
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:background="#FFF4F4F4" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
@@ -154,12 +163,14 @@
                 android:layout_height="wrap_content"
                 android:text="解决方法(供参考)："
                 android:textColor="#FF4A4A4A"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/resolvent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:lineSpacingExtra="4dp"
                 android:singleLine="false"
                 android:textColor="@color/title"
                 android:textSize="16sp" />

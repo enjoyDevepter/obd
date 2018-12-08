@@ -126,7 +126,7 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
         if (physicaltem.getMin() == 0 && physicaltem.getMax() == 0) {
             childViewHolder.range.setText("--");
         } else {
-            childViewHolder.range.setText(physicaltem.getMin() + "-" + physicaltem.getMax());
+            childViewHolder.range.setText("(" + physicaltem.getMin() + "-" + physicaltem.getMax() + ")" + physicaltem.getUnit());
         }
         return convertView;
     }

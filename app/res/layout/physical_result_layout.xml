@@ -16,6 +16,17 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="体检异常项"
+                android:textColor="#FFFF0000"
+                android:textSize="18sp" />
+
             <com.mapbar.adas.view.CustomExpandableListView
                 android:id="@+id/errorlistView"
                 android:layout_width="match_parent"
@@ -25,20 +36,14 @@
                 android:scrollbars="none" />
 
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="70dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="35dp"
-                    android:text="更多体检结果（正常范围）："
-                    android:textColor="#FF4A4A4A"
-                    android:textSize="18sp" />
-            </LinearLayout>
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="体检正常项"
+                android:textColor="#FF4A4A4A"
+                android:textSize="18sp" />
 
             <com.mapbar.adas.view.CustomExpandableListView
                 android:id="@+id/normallistView"

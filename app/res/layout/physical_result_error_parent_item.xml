@@ -9,24 +9,11 @@
     android:paddingRight="15dp"
     android:paddingTop="5dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/error_bg"
-        android:gravity="center"
-        android:padding="1dp"
-        android:text="异"
-        android:textColor="@android:color/white"
-        android:textSize="15sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:text="体检项："
-        android:textColor="@color/title"
-        android:textSize="16sp" />
+    <View
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/error" />
 
     <TextView
         android:id="@+id/name"
