@@ -67,6 +67,7 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
             groupViewHolder = new GroupViewHolder();
             groupViewHolder.icon = convertView.findViewById(R.id.icon);
             groupViewHolder.type = convertView.findViewById(R.id.type);
+            groupViewHolder.tagV = convertView.findViewById(R.id.tag);
             convertView.setTag(groupViewHolder);
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
@@ -97,6 +98,7 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
         }
         groupViewHolder.icon.setBackgroundResource(iconId);
         groupViewHolder.type.setText(name);
+        groupViewHolder.tagV.setBackgroundResource(isExpanded ? R.drawable.up : R.drawable.down);
         return convertView;
 
     }
@@ -137,6 +139,8 @@ public class PhysicalNormalAdapter extends BaseExpandableListAdapter {
     static class GroupViewHolder {
         View icon;
         TextView type;
+        View tagV;
+
     }
 
     static class ChildViewHolder {

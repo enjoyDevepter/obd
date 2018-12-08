@@ -66,12 +66,14 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
             groupViewHolder = new GroupViewHolder();
             groupViewHolder.name = convertView.findViewById(R.id.name);
             groupViewHolder.status = convertView.findViewById(R.id.status);
+            groupViewHolder.tagV = convertView.findViewById(R.id.tag);
             convertView.setTag(groupViewHolder);
         } else {
             groupViewHolder = (GroupViewHolder) convertView.getTag();
         }
         groupViewHolder.name.setText(physicaltems.get(groupPosition).getName());
         groupViewHolder.status.setText(Double.valueOf(physicaltems.get(groupPosition).getCurrent()) > physicaltems.get(groupPosition).getMax() ? "偏高" : "偏低");
+        groupViewHolder.tagV.setBackgroundResource(isExpanded ? R.drawable.up : R.drawable.down);
         return convertView;
 
     }
@@ -118,6 +120,7 @@ public class PhysicalErrorAdapter extends BaseExpandableListAdapter {
     static class GroupViewHolder {
         TextView name;
         TextView status;
+        View tagV;
     }
 
     static class ChildViewHolder {
