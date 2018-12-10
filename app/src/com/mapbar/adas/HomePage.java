@@ -9,10 +9,15 @@ import android.widget.TextView;
 import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.hamster.BleCallBackListener;
+import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.OBDEvent;
+import com.mapbar.hamster.OBDStatusInfo;
+import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
-public class HomePage extends AppBasePage implements View.OnClickListener {
+public class HomePage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.title_text)
@@ -31,11 +36,14 @@ public class HomePage extends AppBasePage implements View.OnClickListener {
     private View messageV;
     @ViewInject(R.id.hud)
     private View hudV;
+    private OBDStatusInfo obdStatusInfo;
 
     @Override
     public void onResume() {
         super.onResume();
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        BlueManager.getInstance().addBleCallBackListener(this);
+        BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
         back.setVisibility(View.GONE);
         reportV.setVisibility(View.GONE);
         trieV.setOnClickListener(this);
@@ -56,11 +64,13 @@ public class HomePage extends AppBasePage implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.trie:
-                MainPage mainPage = new MainPage();
-                Bundle mainBundle = new Bundle();
-                mainBundle.putSerializable("obdStatusInfo", getDate().getSerializable("obdStatusInfo"));
-                mainPage.setDate(mainBundle);
-                PageManager.go(mainPage);
+                if (null != obdStatusInfo) {
+                    MainPage mainPage = new MainPage();
+                    Bundle mainBundle = new Bundle();
+                    mainBundle.putSerializable("obdStatusInfo", obdStatusInfo);
+                    mainPage.setDate(mainBundle);
+                    PageManager.go(mainPage);
+                }
                 break;
             case R.id.fault:
                 PageManager.go(new FaultReadyPage());
@@ -79,10 +89,24 @@ public class HomePage extends AppBasePage implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        BlueManager.getInstance().removeCallBackListener(this);
+    }
 
     @Override
     public boolean onBackPressed() {
         PageManager.finishActivity(MainActivity.getInstance());
         return true;
+    }
+
+    @Override
+    public void onEvent(int event, Object data) {
+        switch (event) {
+            case OBDEvent.NORMAL:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+        }
     }
 }

@@ -175,11 +175,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 checkOBDVersionForNew();
                 break;
             case OBDEvent.ADJUST_SUCCESS:
-                HomePage mainPage = new HomePage();
-                Bundle mainBundle = new Bundle();
-                mainBundle.putSerializable("obdStatusInfo", (OBDStatusInfo) data);
-                mainPage.setDate(mainBundle);
-                PageManager.go(mainPage);
+                PageManager.go(new HomePage());
                 break;
         }
     }

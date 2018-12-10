@@ -58,7 +58,7 @@ public class ProtocolUtils {
     }
 
     /**
-     * 检查是否匹配
+     * 获取终端版本
      *
      * @return
      */
