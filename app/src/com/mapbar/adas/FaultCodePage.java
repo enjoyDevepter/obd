@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.DBManager;
@@ -56,6 +57,11 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
     @Override
     public void onResume() {
         super.onResume();
+        ImmersionBar.with(GlobalUtil.getMainActivity())
+                .fitsSystemWindows(true)
+                .statusBarDarkFont(true)
+                .statusBarColor(android.R.color.white)
+                .init(); //初始化，默认透明状态栏和黑色导航栏
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         BlueManager.getInstance().addBleCallBackListener(this);
         titleTV.setText("故障码解析");
