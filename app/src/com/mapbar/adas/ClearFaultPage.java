@@ -74,6 +74,7 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
                 break;
             case R.id.confirm:
                 BlueManager.getInstance().send(ProtocolUtils.clearFaultCode());
+                confirmV.setEnabled(false);
                 break;
             case R.id.home:
                 PageManager.go(new HomePage());
@@ -88,8 +89,6 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
                 int status = (int) data;
                 if (status == 0) {
                     showSuccessDialog();
-                } else {
-
                 }
                 break;
         }
@@ -107,7 +106,7 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
                         confirm.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                PageManager.go(new HomePage());
+                                PageManager.go(new FaultCodePage());
                                 dialog.dismiss();
                             }
                         });

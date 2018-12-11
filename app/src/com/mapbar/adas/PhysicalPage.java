@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.mapbar.hamster.OBDEvent.COMMON_INFO;
 import static com.mapbar.hamster.OBDEvent.PHYSICAL_STEP_FIVE;
 import static com.mapbar.hamster.OBDEvent.PHYSICAL_STEP_FOUR;
 import static com.mapbar.hamster.OBDEvent.PHYSICAL_STEP_ONE;
@@ -77,13 +78,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
         confirmV.setOnClickListener(checked ? this : null);
         if (!checked) {
             initPhysical();
-
-            back.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    BlueManager.getInstance().send(ProtocolUtils.sendPhysical(01));
-                }
-            }, 4000);
+            BlueManager.getInstance().send(ProtocolUtils.stopGetNewTirePressureStatus());
         }
         normalAdapter = new NormalAdapter(physicalList);
         contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -182,6 +177,11 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     animationDrawable.stop();
                 }
                 checked = true;
+                break;
+            case COMMON_INFO:
+                if (!checked) {
+                    BlueManager.getInstance().send(ProtocolUtils.sendPhysical(01)); // 开始体检
+                }
                 break;
         }
     }

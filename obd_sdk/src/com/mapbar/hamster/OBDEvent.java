@@ -133,6 +133,7 @@ public class OBDEvent {
     public static final int FAULT_CODE = 270; // 故障码
     public static final int CLEAN_FAULT_CODE = 280; // 清除故障码
     public static final int SENSITIVE_CHANGE = 290; // 灵敏度改变
+    public static final int COMMON_INFO = 300; // 统一回复信息
 
 
 }

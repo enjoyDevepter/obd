@@ -75,7 +75,6 @@ public class PhysicalReadyPage extends AppBasePage implements View.OnClickListen
 
     @Override
     public void onStop() {
-        BlueManager.getInstance().send(ProtocolUtils.stopGetNewTirePressureStatus());
         BlueManager.getInstance().removeCallBackListener(this);
         if (null != heartTimer) {
             heartTimer.cancel();

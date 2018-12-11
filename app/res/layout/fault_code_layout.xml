@@ -76,7 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="25dp"
-            android:text="机器无故障"
+            android:text="无故障"
             android:textColor="@color/text_color"
             android:textSize="20sp"
             android:visibility="gone" />

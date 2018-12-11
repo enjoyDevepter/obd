@@ -72,6 +72,7 @@ public class BlueManager {
     private static final int MSG_FAULT_CODE = 140; // 故障码
     private static final int MSG_CLEAR_FAULT_CODE = 150; // 清除故障码
     private static final int MSG_SENSITIVE_CODE = 160; // 清除故障码
+    private static final int MSG_COMMON_INFO = 170; // 统一回复信息
 
 
     private static final int MSG_VERIFY = 2;
@@ -870,6 +871,12 @@ public class BlueManager {
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
+            } else if (content[0] == 0x3E) {
+                if (content[1] == 01) {
+                    Message message = mHandler.obtainMessage();
+                    message.what = MSG_COMMON_INFO;
+                    mHandler.sendMessage(message);
+                }
             }
         }
     }
@@ -1222,6 +1229,14 @@ public class BlueManager {
                         public void run() {
                             byte[] result = bundle.getByteArray("status");
                             notifyBleCallBackListener(OBDEvent.SENSITIVE_CHANGE, result);
+                        }
+                    });
+                    break;
+                case MSG_COMMON_INFO:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.COMMON_INFO, null);
                         }
                     });
                     break;
