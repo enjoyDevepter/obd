@@ -9,63 +9,73 @@ android {
         targetSdkVersion 27
         versionCode 1000
         versionName "1.0"
-    }
 
-
-    signingConfigs {
-        release {
-            storeFile file("../key/miyuan_android.keystore")
-            storePassword "miyuan2018"
-            keyAlias "miyuan_android"
-            keyPassword "miyuan2018"
-            v2SigningEnabled false
-        }
-    }
-
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
+        ndk {
+            //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
+            abiFilters "armeabi"
         }
 
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+
+        signingConfigs {
+            release {
+                storeFile file("../key/miyuan_android.keystore")
+                storePassword "miyuan2018"
+                keyAlias "miyuan_android"
+                keyPassword "miyuan2018"
+                v2SigningEnabled false
+            }
         }
-    }
-    sourceSets { // 从ANT迁移的工程，可以使用 sourceSets 来配置工程结构.
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            res.srcDirs = ['res']
 
-            java.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
+        lintOptions {
+            checkReleaseBuilds false
+            abortOnError false
+        }
 
-            assets.srcDirs = ['assets']
-            jniLibs.srcDirs = ['libs'] // 配置此处才会打包jni 的.so 文件
+        buildTypes {
+            debug {
+                minifyEnabled false
+                signingConfig signingConfigs.release
+            }
+
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                signingConfig signingConfigs.release
+            }
+        }
+
+        sourceSets { // 从ANT迁移的工程，可以使用 sourceSets 来配置工程结构.
+            main {
+                manifest.srcFile 'AndroidManifest.xml'
+                res.srcDirs = ['res']
+
+                java.srcDirs = ['src']
+                aidl.srcDirs = ['src']
+                renderscript.srcDirs = ['src']
+
+                assets.srcDirs = ['assets']
+                jniLibs.srcDirs = ['libs'] // 配置此处才会打包jni 的.so 文件
 //            jni.srcDirs=['jni']
+            }
         }
     }
-}
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(path: ':core')
-    compile project(path: ':zxing_lib')
-    compile project(path: ':obd_sdk')
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'org.simple:androideventbus:1.0.5.1'
-    compile 'com.alibaba:fastjson:1.2.47'
-    compile 'com.gyf.barlibrary:barlibrary:2.3.0'
-    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
-    compile 'me.jessyan:rxerrorhandler:2.1.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.12'
-    compile 'com.jungly:gridPasswordView:0.3'
-    compile 'com.android.support:recyclerview-v7:27.1.1'
+    dependencies {
+        compile fileTree(include: ['*.jar'], dir: 'libs')
+        compile project(path: ':core')
+        compile project(path: ':zxing_lib')
+        compile project(path: ':obd_sdk')
+        compile 'com.android.support:multidex:1.0.1'
+        compile 'org.simple:androideventbus:1.0.5.1'
+        compile 'com.alibaba:fastjson:1.2.47'
+        compile 'com.gyf.barlibrary:barlibrary:2.3.0'
+        compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+        compile 'me.jessyan:rxerrorhandler:2.1.1'
+        compile 'io.reactivex.rxjava2:rxjava:2.1.12'
+        compile 'com.jungly:gridPasswordView:0.3'
+        compile 'com.android.support:recyclerview-v7:27.1.1'
+        compile 'com.amap.api:navi-3dmap:latest.integration'
+        compile 'com.amap.api:location:latest.integration'
+        compile 'com.amap.api:search:latest.integration'
+    }
 }
