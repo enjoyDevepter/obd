@@ -54,7 +54,7 @@ public class PhysicalReadyPage extends AppBasePage implements View.OnClickListen
         backV.setOnClickListener(this);
         confirmV.setEnabled(false);
         reportV.setVisibility(View.INVISIBLE);
-        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>体检项目包括:</font><br><font color='#FD0505'>七大</font><font color='#4A4A4A'>系统，至多</font><font color='#FD0505'>121项</font><font color='#4A4A4A'>数据流</font><br><br>"));
+        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>体检项目包括:</font><br><font color='#FD0505'>七大</font><font color='#4A4A4A'>系统，</font><font color='#FD0505'>168项</font><font color='#4A4A4A'>数据流</font><br><br>"));
         BlueManager.getInstance().send(ProtocolUtils.getNewTirePressureStatus());
         heartTimer = new Timer();
         heartTimer.schedule(new TimerTask() {
