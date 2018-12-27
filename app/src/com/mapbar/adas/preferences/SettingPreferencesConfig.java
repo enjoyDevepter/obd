@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.mapbar.adas.GlobalUtil;
 import com.mapbar.adas.preferences.item.BooleanPreferences;
+import com.mapbar.adas.preferences.item.IntPreferences;
 import com.mapbar.adas.preferences.item.LongPreferences;
 import com.mapbar.adas.preferences.item.StringPreferences;
 
@@ -31,5 +32,6 @@ public class SettingPreferencesConfig {
 
     public static final BooleanPreferences TIRE_WARM = new BooleanPreferences(SHARED_PREFERENCES_INIT, "tire_warm", true);
 
+    public static final IntPreferences TIRE_STATUS = new IntPreferences(SHARED_PREFERENCES_INIT, "tire_status", 0);
 
 }

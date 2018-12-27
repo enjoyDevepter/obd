@@ -62,6 +62,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
     private NormalAdapter normalAdapter;
 
     private boolean checked;
+    private boolean start;
 
     private AnimationDrawable animationDrawable;
 
@@ -179,7 +180,8 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                 checked = true;
                 break;
             case COMMON_INFO:
-                if (!checked) {
+                if (!checked && !start) {
+                    start = true;
                     BlueManager.getInstance().send(ProtocolUtils.sendPhysical(01)); // 开始体检
                 }
                 break;

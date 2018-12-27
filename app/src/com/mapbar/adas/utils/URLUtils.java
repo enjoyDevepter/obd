@@ -20,6 +20,7 @@ public class URLUtils {
     public static final String APK_UPDATE = HOST + "service/soft/getUpdate";
     public static final String SMS_CHECK = HOST + "service/sms/check";
     public static final String SN_CHECK = HOST + "service/box/check";
+    public static final String TIRE_CHECK = HOST + "service/box/checkTPMS";
     public static final String CLEAR_PARAM = HOST + "service/paramTemp/addParamTemp";
     public static final String GET_USER_INFO = HOST + "service/box/getUserInfo";
     public static final String UPDATE_TIRE = HOST + "service/data/uploadData";

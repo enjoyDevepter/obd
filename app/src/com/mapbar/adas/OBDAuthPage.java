@@ -36,6 +36,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_STATUS;
+
 @PageSetting(contentViewId = R.layout.obd_auth_layout, toHistory = false)
 public class OBDAuthPage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
 
@@ -144,7 +146,8 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 uploadLog();
             case OBDEvent.NO_PARAM: // 无参数
                 obdStatusInfo = (OBDStatusInfo) data;
-                checkOBDVersion();
+                checkSupportTire();
+//                checkOBDVersion();
                 break;
             case OBDEvent.PARAM_UPDATE_SUCCESS:
                 obdStatusInfo = (OBDStatusInfo) data;
@@ -531,6 +534,100 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 uploadLog();
                 break;
         }
+    }
+
+
+    private void checkSupportTire() {
+
+        switch (TIRE_STATUS.get()) {
+            case 0:
+                checkTireSupport();
+                break;
+            case 1:
+                checkOBDVersion();
+                break;
+            case 2:
+                PageManager.go(new HomePage());
+                break;
+        }
+    }
+
+    private void checkTireSupport() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("boxId", obdStatusInfo.getBoxId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("checkSupportTire input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.TIRE_CHECK)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("checkSupportTire failure " + e.getMessage());
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                checkSupportTire();
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("checkSupportTire success " + responese);
+                final TPMSStatus tpmsStatus = JSON.parseObject(responese, TPMSStatus.class);
+                if ("000".equals(tpmsStatus.getStatus())) {
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            TIRE_STATUS.set(tpmsStatus.getState());
+                            switch (tpmsStatus.getState()) {
+                                case 1:
+                                    checkOBDVersion();
+                                    break;
+                                case 2:
+                                    PageManager.go(new HomePage());
+                                    break;
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void checkOBDVersion() {

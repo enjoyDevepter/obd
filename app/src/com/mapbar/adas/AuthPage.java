@@ -83,16 +83,6 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.back:

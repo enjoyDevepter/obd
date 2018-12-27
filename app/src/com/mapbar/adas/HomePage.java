@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.anno.PageSetting;
@@ -15,6 +16,8 @@ import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
+
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_STATUS;
 
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class HomePage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
@@ -64,12 +67,14 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.trie:
-                if (null != obdStatusInfo) {
+                if (null != obdStatusInfo && TIRE_STATUS.get() != 2) {
                     MainPage mainPage = new MainPage();
                     Bundle mainBundle = new Bundle();
                     mainBundle.putSerializable("obdStatusInfo", obdStatusInfo);
                     mainPage.setDate(mainBundle);
                     PageManager.go(mainPage);
+                } else {
+                    Toast.makeText(getContext(), "此硬件不支持胎压功能！", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.fault:
