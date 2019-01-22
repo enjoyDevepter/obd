@@ -123,7 +123,7 @@ public class BlueManager {
                 return;
             }
             scanResult.add(name);
-            if (name != null && name.startsWith("Guardian")) {
+            if (name != null && (name.toUpperCase().startsWith("GUARDIAN") || name.toUpperCase().startsWith("MYOBD"))) {
                 Log.d("device.getName()=    " + device.getName() + " device.getAddress()=" + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;

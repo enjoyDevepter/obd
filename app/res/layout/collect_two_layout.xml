@@ -15,7 +15,7 @@
         android:layout_marginLeft="@dimen/common_margin_lr"
         android:layout_marginRight="@dimen/common_margin_lr"
         android:layout_marginTop="10dp"
-        android:text="请不要关闭手机，不要关闭APP，正在深度校准中。"
+        android:text="请不要关闭手机和APP，正在深度校准中..."
         android:textColor="@color/text_color"
         android:textSize="@dimen/text_size" />
 

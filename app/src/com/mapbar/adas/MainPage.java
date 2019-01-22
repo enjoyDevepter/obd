@@ -277,7 +277,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     @Override
                     public void bindView(View view) {
                         TextView infoTV = view.findViewById(R.id.info);
-                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>导致误报的常见原因:<br><br>1、车辆跑偏：<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>优先做四轮定位；也可以点击\"下一步\"来修正误报。<br>2、校准路况不好，有明显颠簸或未直线行驶。<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>重新校准。<br>3、当前路况路况不好：例如路面打滑，或者单边长时间偏高，单边长期压隔离带行驶等。<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>重新插拔盒子，消除蜂鸣声，保持原有灵敏度。<br><br>上述\"2\"和\"3\"的情况，则点击\"取消\"，上述情况\"1\"或者其他未知原因请点击\"下一步\"</font>"));
+                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>导致误报的常见原因:<br><br>1、车辆跑偏：<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>优先做四轮定位；也可以点击\"下一步\"来修正误报。<br>2、校准路况不好，有明显颠簸或未直线行驶。<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>重新校准。<br>3、当前路况不好：例如路面打滑，或者单边长时间偏高，单边长期压隔离带行驶等。<br></font><font color='#009488'>解决办法：</font><font color='#4A4A4A'>重新插拔盒子，消除蜂鸣声，保持原有灵敏度。<br><br>上述\"2\"和\"3\"的情况，则点击\"取消\"，上述情况\"1\"或者其他未知原因请点击\"下一步\"</font>"));
                         view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -309,7 +309,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     public void bindView(View view) {
                         TextView infoTV = view.findViewById(R.id.info);
 
-                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>在您修正误报之前，请您确认：<br><br>1、误报后未重新校准或插拔盒子。<br>2、当前胎压正常(胎压变化在10%以内)。<br>由于我司胎压检测非常灵敏，所以有时候肉眼观察不到亏气，也会报警。<br><br>确认以上情况后，请继续修正，否则取消。</font>"));
+                        infoTV.setText(Html.fromHtml("<font color='#4A4A4A'>在您修正误报之前，请您确认：<br><br>1、误报后未重新校准或插拔盒子。<br>2、当前胎压正常(胎压变化在10%以内)。<br>由于我司胎压监测非常灵敏，所以有时候肉眼观察不到的亏气，也会报警。<br><br>确认以上情况后，请继续修正，否则取消。</font>"));
 
                         view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
                             @Override

@@ -135,13 +135,13 @@
 
             <View
                 android:layout_width="35dp"
-                android:layout_height="32dp"
+                android:layout_height="29dp"
                 android:background="@drawable/warm" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="13dp"
                 android:text="模拟报警"
                 android:textColor="#555555"
                 android:textSize="16sp" />
@@ -160,7 +160,7 @@
 
             <View
                 android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_height="29dp"
                 android:background="@drawable/setting" />
 
             <TextView
