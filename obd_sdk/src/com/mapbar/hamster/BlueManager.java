@@ -56,6 +56,7 @@ public class BlueManager {
     private static final int MSG_AUTHORIZATION = 40; //未授权或者授权过期
     private static final int MSG_AUTHORIZATION_SUCCESS = 41; //授权成功
     private static final int MSG_AUTHORIZATION_FAIL = 42; //授权成功
+    private static final int MSG_NO_CAR_ID = 43; //未选择车型
     private static final int MSG_NO_PARAM = 50; // 无车型参数
     private static final int MSG_PARAM_UPDATE_SUCCESS = 51; // 车型参数更新成功
     private static final int MSG_PARAM_UPDATE_FAIL = 53; // 车型参数更新失败
@@ -73,6 +74,8 @@ public class BlueManager {
     private static final int MSG_CLEAR_FAULT_CODE = 150; // 清除故障码
     private static final int MSG_SENSITIVE_CODE = 160; // 清除故障码
     private static final int MSG_COMMON_INFO = 170; // 统一回复信息
+    private static final int MSG_HUD_STATUS_INFO = 180; // HUD区域属性
+    private static final int MSG_HUD_WARM_STATUS_INFO = 181; // HUD区域警告属性
 
 
     private static final int MSG_VERIFY = 2;
@@ -597,7 +600,8 @@ public class BlueManager {
      */
     private void validateAndNotify(byte[] res) {
         Log.d(" validateAndNotify");
-        if (!(res[0] == (byte) 0x09 && res[1] == 01 || res[0] == (byte) 0x08 && res[1] == 03)) {
+        if (!((res[0] == (byte) 0x09 && res[1] == 01) || (res[0] == (byte) 0x08 && res[1] == 03))) {
+            Log.d(" validateAndNotify next ");
             timeOutThread.endCommand();
             byte[] msg = instructList.pollLast();
             canGo = true;
@@ -622,7 +626,7 @@ public class BlueManager {
             if (content[0] == 00) {
                 if (content[1] == 00) { // 通用错误
 
-                } else if (content[1] == 01) { // 获取终端状态
+                } else if (content[1] == 01 || content[1] == 02) { // 获取终端状态
                     OBDStatusInfo obdStatusInfo = new OBDStatusInfo();
                     obdStatusInfo.setBoxId(HexUtils.formatHexString(Arrays.copyOfRange(content, 12, 24)));
                     obdStatusInfo.setSn(new String(Arrays.copyOfRange(content, 24, 43)));
@@ -682,6 +686,20 @@ public class BlueManager {
                         message.setData(bundle);
                         message.what = MSG_AUTHORIZATION_SUCCESS;
                         mHandler.sendMessage(message);
+                    }
+                    // 三期新需求，优先判断是否选择车型
+                    if (content[1] == 02) {
+                        if (content[67] == 00) { // 未选择车型
+                            Message message = mHandler.obtainMessage();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+                            message.setData(bundle);
+                            message.what = MSG_NO_CAR_ID;
+                            mHandler.sendMessage(message);
+                            return;
+                        }
+                        obdStatusInfo.setHudType(content[68]);
+                        obdStatusInfo.setSupportNavi(content[69] == 1);
                     }
 
                     // 判断是否存在车型参数
@@ -868,6 +886,109 @@ public class BlueManager {
                     Bundle bundle = new Bundle();
                     message.what = MSG_COLLECT_DATA_FOR_CAR;
                     bundle.putByteArray("status", content);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            } else if (content[0] == 0x0A) { // 区域属性反馈
+                if (content[1] == 2) {
+                    HUDStatus hudStatus = new HUDStatus();
+                    hudStatus.setHudType(content[4]);
+                    int count = content[5];
+                    for (int i = 0; i < count; i++) {
+                        int value = content[7 + i * 2];
+                        switch (content[6 + i * 2]) {
+                            case 0x01: // 水温
+                                hudStatus.setTempShow(value == 1);
+                                break;
+                            case 0x02: // 转速
+                                hudStatus.setRpmShow(value == 1);
+                                break;
+                            case 0x03: // 车速
+                                hudStatus.setSpeedShow(value == 1);
+                                break;
+                            case 0x04: // 瞬时油耗
+                                hudStatus.setOilShow(value == 1);
+                                break;
+                            case 0x05: // 平均油耗
+                                hudStatus.setAvgOilShow(value == 1);
+                                break;
+                            case 0x06: // 燃油总消耗
+                                hudStatus.setAvgOilShow(value == 1);
+                                break;
+                            case 0x07: // 剩余燃油
+                                hudStatus.setAvgOilShow(value == 1);
+                                break;
+                            case 0x08: // 电压
+                                hudStatus.setAvgOilShow(value == 1);
+                                break;
+                            case 0x09: // 行驶时间
+                                hudStatus.setAvgOilShow(value == 1);
+                                break;
+                            case 0x0A: // 小计里程
+                                hudStatus.setAvgOilShow(value == 1);
+                                break;
+                            case 0x0B: // 胎压
+                                hudStatus.setTireShow(value == 1);
+                                break;
+                            case 0x0C: // 发动机负荷
+                                hudStatus.setEngineloadShow(value == 1);
+                                break;
+                            case 0x21: // 多功能一区
+                                hudStatus.setMultifunctionalOneType(value);
+                                break;
+                            case 0x22: // 多功能二区
+                                hudStatus.setMultifunctionalTwoType(value);
+                                break;
+                            case 0x23: // 多功能三区
+                                hudStatus.setMultifunctionalThreeType(value);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_HUD_STATUS_INFO;
+                    bundle.putSerializable("HUDStatus", hudStatus);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
+            } else if (content[0] == 0x0B) { // 警报属性设置反馈
+                if (content[1] == 2) {
+                    int count = content[4];
+                    HUDWarmStatus warmStatus = new HUDWarmStatus();
+                    for (int i = 0; i < count; i++) {
+                        int value = content[6 + i * 2];
+                        switch (content[5 + i * 2]) {
+                            case 0x01: //水温
+                                warmStatus.setTemperatureWarmShow(value == 1);
+                                break;
+                            case 0x02: // 电压
+                                warmStatus.setVoltageWarmShow(value == 1);
+                                break;
+                            case 0x03: // 剩余燃油
+                                warmStatus.setOilWarmShow(value == 1);
+                                break;
+                            case 0x04: // 限速
+                                warmStatus.setSpeedWarmShow(value == 1);
+                                break;
+                            case 0x05: // 胎压
+                                warmStatus.setTrieWarmShow(value == 1);
+                                break;
+                            case 0x06: // 疲劳驾驶
+                                warmStatus.setTiredWarmShow(value == 1);
+                                break;
+                            case 0x07: // 故障
+                                warmStatus.setFaultWarmShow(value == 1);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_HUD_WARM_STATUS_INFO;
+                    bundle.putSerializable("HUDWarmStatus", warmStatus);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
@@ -1063,6 +1184,15 @@ public class BlueManager {
                         }
                     });
                     break;
+                case MSG_NO_CAR_ID:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.NO_CAR_ID");
+                            notifyBleCallBackListener(OBDEvent.NO_CAR_ID, bundle.getSerializable("obd_status_info"));
+                        }
+                    });
+                    break;
                 case MSG_NO_PARAM: // 无车型参数
                     mMainHandler.post(new Runnable() {
                         @Override
@@ -1239,6 +1369,26 @@ public class BlueManager {
                             notifyBleCallBackListener(OBDEvent.COMMON_INFO, null);
                         }
                     });
+                    break;
+                case MSG_HUD_STATUS_INFO:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.HUD_STATUS_INFO");
+                            notifyBleCallBackListener(OBDEvent.HUD_STATUS_INFO, bundle.getSerializable("HUDStatus"));
+                        }
+                    });
+                    break;
+                case MSG_HUD_WARM_STATUS_INFO:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.HUD_WARM_STATUS_INFO");
+                            notifyBleCallBackListener(OBDEvent.HUD_WARM_STATUS_INFO, bundle.getSerializable("HUDWarmStatus"));
+                        }
+                    });
+                    break;
+                default:
                     break;
             }
         }

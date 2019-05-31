@@ -95,6 +95,11 @@ public class OBDEvent {
     public static final int NO_PARAM = 120; // 无车型参数
     public static final int PARAM_UPDATE_SUCCESS = 121; // 无车型参数
     public static final int PARAM_UPDATE_FAIL = 122; // 无车型参数
+
+    /**
+     * 未选择车型
+     */
+    public static final int NO_CAR_ID = 125; // 未选择车型
     /**
      * 当前胎压不匹配
      */
@@ -134,6 +139,8 @@ public class OBDEvent {
     public static final int CLEAN_FAULT_CODE = 280; // 清除故障码
     public static final int SENSITIVE_CHANGE = 290; // 灵敏度改变
     public static final int COMMON_INFO = 300; // 统一回复信息
+    public static final int HUD_STATUS_INFO = 310; // HUD设置属性信息
+    public static final int HUD_WARM_STATUS_INFO = 320; // HUD预警设置属性信息
 
 
 }

@@ -87,9 +87,27 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 PageManager.go(new DashBoardPage());
                 break;
             case R.id.message:
+                // 判断HUD类型跳转对应设置界面
+                if (null != obdStatusInfo){
+                    switch (obdStatusInfo.getHudType()) {
+                        case 0x04:
+                            break;
+                        case 0x21:
+                            PageManager.go(new F2SettingPage());
+                            break;
+                        case 0x22:
+                            break;
+                        case 0x41:
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 break;
             case R.id.hud:
                 PageManager.go(new HUDPage());
+                break;
+            default:
                 break;
         }
     }
@@ -109,6 +127,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
             case OBDEvent.NORMAL:
                 obdStatusInfo = (OBDStatusInfo) data;
                 break;

@@ -68,8 +68,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private TextView title;
     @ViewInject(R.id.report)
     private View reportV;
-    //    @ViewInject(R.id.sensitive)
-//    private View sensitive;
     @ViewInject(R.id.warm)
     private View warm;
     @ViewInject(R.id.reset)
@@ -160,7 +158,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         reportV.setOnClickListener(this);
 //        sensitive.setOnClickListener(this);
         misinformationV.setOnClickListener(this);
-        phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
+//        phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
         carTV.setText(SettingPreferencesConfig.CAR.get());
         BlueManager.getInstance().addBleCallBackListener(this);
         obdStatusInfo = (OBDStatusInfo) getDate().getSerializable("obdStatusInfo");
@@ -933,9 +931,9 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 GlobalUtil.getHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        SettingPreferencesConfig.PHONE.set(userInfo.getPhone());
+//                        SettingPreferencesConfig.PHONE.set(userInfo.getPhone());
                         SettingPreferencesConfig.CAR.set(userInfo.getModelName() + " " + userInfo.getStyleName());
-                        phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
+//                        phoneTV.setText("手机号:" + SettingPreferencesConfig.PHONE.get());
                         carTV.setText(SettingPreferencesConfig.CAR.get());
                     }
                 });

@@ -75,15 +75,15 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
                     OBDActivatePage page = new OBDActivatePage();
                     Bundle bundle = new Bundle();
                     bundle.putString("boxId", getDate().getString("boxId"));
-                    bundle.putString("phone", getDate().getString("phone"));
-                    bundle.putString("code", getDate().getString("code"));
-                    bundle.putString("sn", getDate().getString("sn").toString());
-                    bundle.putString("carId", getDate().getString("carId").toString());
+                    bundle.putString("sn", getDate().getString("sn"));
+                    bundle.putString("carId", getDate().getString("carId"));
                     bundle.putString("carName", getDate().get("carName").toString());
                     page.setDate(bundle);
                     PageManager.go(page);
                 }
                 times++;
+                break;
+            default:
                 break;
         }
     }

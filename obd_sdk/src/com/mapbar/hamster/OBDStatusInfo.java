@@ -16,6 +16,8 @@ public class OBDStatusInfo implements Serializable {
     private boolean berforeMatching;
     private boolean currentMatching;
     private byte[] orginal;
+    private int hudType;
+    private boolean supportNavi;
 
     public byte[] getOrginal() {
         return orginal;
@@ -81,6 +83,22 @@ public class OBDStatusInfo implements Serializable {
         this.currentMatching = currentMatching;
     }
 
+    public int getHudType() {
+        return hudType;
+    }
+
+    public void setHudType(int hudType) {
+        this.hudType = hudType;
+    }
+
+    public boolean isSupportNavi() {
+        return supportNavi;
+    }
+
+    public void setSupportNavi(boolean supportNavi) {
+        this.supportNavi = supportNavi;
+    }
+
     @Override
     public String toString() {
         return "OBDStatusInfo{" +
@@ -92,6 +110,8 @@ public class OBDStatusInfo implements Serializable {
                 ", berforeMatching=" + berforeMatching +
                 ", currentMatching=" + currentMatching +
                 ", orginal=" + Arrays.toString(orginal) +
+                ", hudType=" + hudType +
+                ", supportNavi=" + supportNavi +
                 '}';
     }
 }

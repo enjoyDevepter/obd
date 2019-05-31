@@ -490,9 +490,7 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
         ConfirmCarPage confirmCarPage = new ConfirmCarPage();
         Bundle bundle = new Bundle();
         bundle.putString("boxId", getDate().getString("boxId"));
-        bundle.putString("phone", getDate().getString("phone"));
-        bundle.putString("code", getDate().getString("code"));
-        bundle.putString("sn", getDate().getString("sn").toString());
+        bundle.putString("sn", getDate().getString("sn"));
         bundle.putString("carId", carId);
         bundle.putString("carName", carName);
         confirmCarPage.setDate(bundle);

@@ -360,6 +360,18 @@ public class ProtocolUtils {
         return result;
     }
 
+    public static byte[] setCarID() {
+        Log.d("Protocol setCarID ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_05;
+        result[2] = 03;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
     /**
      * 清除参数
      *
@@ -427,6 +439,78 @@ public class ProtocolUtils {
         result[3] = 2;
         result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
         result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 获取HUD区域属性
+     *
+     * @return
+     */
+    public static byte[] getHUDStatus() {
+        Log.d("Protocol getHUDStatus ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8A;
+        result[2] = 02;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 设置HUD区域属性
+     *
+     * @return
+     */
+    public static byte[] setHUDStatus(int type, int value) {
+        Log.d("Protocol setHUDStatus ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8A;
+        result[2] = 02;
+        result[3] = 1;
+        result[4] = (byte) type;
+        result[5] = (byte) value;
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 获取HUD预警属性
+     *
+     * @return
+     */
+    public static byte[] getHUDWarmStatus() {
+        Log.d("Protocol getHUDWarmStatus ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8B;
+        result[2] = 02;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 设置HUD预警属性
+     *
+     * @return
+     */
+    public static byte[] setHUDWarmStatus(int type, int value) {
+        Log.d("Protocol setHUDWarmStatus ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8B;
+        result[2] = 02;
+        result[3] = 1;
+        result[4] = (byte) type;
+        result[5] = (byte) value;
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
         return result;
     }
 

@@ -144,10 +144,19 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
             case OBDEvent.AUTHORIZATION_FAIL:
                 authFail("授权失败!请联系客服!");
                 uploadLog();
+                break;
+            case OBDEvent.NO_CAR_ID:
+                obdStatusInfo = (OBDStatusInfo) data;
+                ChoiceCarPage choiceCarPage = new ChoiceCarPage();
+                Bundle carBundle = new Bundle();
+                carBundle.putString("boxId", obdStatusInfo.getbVersion());
+                carBundle.putString("sn", obdStatusInfo.getSn());
+                choiceCarPage.setDate(carBundle);
+                PageManager.go(choiceCarPage);
+                break;
             case OBDEvent.NO_PARAM: // 无参数
                 obdStatusInfo = (OBDStatusInfo) data;
                 checkSupportTire();
-//                checkOBDVersion();
                 break;
             case OBDEvent.PARAM_UPDATE_SUCCESS:
                 obdStatusInfo = (OBDStatusInfo) data;
@@ -179,6 +188,8 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 break;
             case OBDEvent.ADJUST_SUCCESS:
                 PageManager.go(new HomePage());
+                break;
+            default:
                 break;
         }
     }
