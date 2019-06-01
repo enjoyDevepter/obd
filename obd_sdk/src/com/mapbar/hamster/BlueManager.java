@@ -913,19 +913,19 @@ public class BlueManager {
                                 hudStatus.setAvgOilShow(value == 1);
                                 break;
                             case 0x06: // 燃油总消耗
-                                hudStatus.setAvgOilShow(value == 1);
+                                hudStatus.setConsumeOilShow(value == 1);
                                 break;
                             case 0x07: // 剩余燃油
-                                hudStatus.setAvgOilShow(value == 1);
+                                hudStatus.setRemainderOilShow(value == 1);
                                 break;
                             case 0x08: // 电压
-                                hudStatus.setAvgOilShow(value == 1);
+                                hudStatus.setVoltageShow(value == 1);
                                 break;
                             case 0x09: // 行驶时间
-                                hudStatus.setAvgOilShow(value == 1);
+                                hudStatus.setTimeShow(value == 1);
                                 break;
                             case 0x0A: // 小计里程
-                                hudStatus.setAvgOilShow(value == 1);
+                                hudStatus.setMileShow(value == 1);
                                 break;
                             case 0x0B: // 胎压
                                 hudStatus.setTireShow(value == 1);

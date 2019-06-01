@@ -27,7 +27,7 @@
 
         <FrameLayout
             android:layout_width="540dp"
-            android:layout_height="306dp"
+            android:layout_height="325dp"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
             android:orientation="horizontal">
@@ -36,14 +36,79 @@
             <FrameLayout
                 android:layout_width="319dp"
                 android:layout_height="296dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp">
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="105dp">
 
                 <View
                     android:id="@+id/ff_speed_bg"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:background="@drawable/ff_speed_bg" />
 
+                <View
+                    android:id="@+id/ff_speed"
+                    android:layout_width="305dp"
+                    android:layout_height="233dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/ff_speed_show" />
+
+                <View
+                    android:id="@+id/multifunctional"
+                    android:layout_width="172dp"
+                    android:layout_height="109dp"
+                    android:layout_marginLeft="72dp"
+                    android:background="@drawable/ff_multifunctional_v"
+                    android:layout_marginTop="124dp"/>
+                
+                
+                <FrameLayout
+                    android:layout_width="130dp"
+                    android:layout_marginLeft="93dp"
+                    android:layout_marginTop="60dp"
+                    android:layout_height="50dp">
+
+                    <View
+                        android:id="@+id/ff_warm_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        android:background="@drawable/ff_warm_bg"/>
+
+                    <View
+                        android:id="@+id/fault"
+                        android:layout_width="25dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/fault_show" />
+
+                    <View
+                        android:id="@+id/voltage"
+                        android:layout_width="25dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginLeft="38dp"
+                        android:background="@drawable/voltage_show" />
+
+                    <View
+                        android:id="@+id/speed"
+                        android:layout_width="25dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="68dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/speed_show" />
+
+                    <View
+                        android:id="@+id/tired"
+                        android:layout_width="25dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginLeft="100dp"
+                        android:background="@drawable/tired_show" />
+
+                </FrameLayout>
             </FrameLayout>
 
 
@@ -52,12 +117,14 @@
                 android:layout_width="62dp"
                 android:layout_height="94dp"
                 android:layout_gravity="right|top"
-                android:layout_marginRight="15dp">
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="11dp">
 
                 <View
                     android:id="@+id/ff_tire_bg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:visibility="invisible"
                     android:background="@drawable/ff_tire_bg" />
 
                 <View
@@ -75,22 +142,98 @@
             <FrameLayout
                 android:layout_width="86dp"
                 android:layout_height="206dp"
-                android:layout_gravity="right|bottom">
+                android:layout_gravity="right|bottom"
+                android:layout_marginBottom="11dp">
 
                 <View
                     android:id="@+id/ff_temp_bg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:visibility="invisible"
                     android:background="@drawable/ff_temp_bg" />
 
                 <View
                     android:id="@+id/ff_temp"
                     android:layout_width="47dp"
                     android:layout_height="158dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="15dp"
                     android:background="@drawable/ff_temp_show" />
 
+            </FrameLayout>
+
+            <!-- 发动机转速 -->
+            <FrameLayout
+                android:layout_width="137dp"
+                android:layout_height="262dp"
+                android:layout_gravity="right|bottom"
+                android:layout_marginRight="45dp"
+                android:layout_marginBottom="11dp">
+
+                <View
+                    android:id="@+id/ff_rpm_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:background="@drawable/ff_rpm_bg" />
+
+                <View
+                    android:id="@+id/ff_rpm"
+                    android:layout_width="73dp"
+                    android:layout_height="211dp"
+                    android:layout_marginLeft="38dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/ff_rpm_show" />
+
+            </FrameLayout>
+
+
+            <!-- 瞬时油耗 -->
+            <FrameLayout
+                android:layout_width="115dp"
+                android:layout_height="262dp"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="54dp"
+                android:layout_marginBottom="11dp">
+
+                <View
+                    android:id="@+id/ff_oil_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:background="@drawable/ff_oil_bg" />
+
+                <View
+                    android:id="@+id/ff_oil"
+                    android:layout_width="75dp"
+                    android:layout_height="210dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="9dp"
+                    android:background="@drawable/ff_oil_show" />
+
+            </FrameLayout>
+
+            <!-- 燃油 -->
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="205dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="11dp">
+
+                <View
+                    android:id="@+id/ff_oil_l_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:background="@drawable/ff_oil_l_bg" />
+
+                <View
+                    android:id="@+id/ff_oil_l"
+                    android:layout_width="47dp"
+                    android:layout_height="159dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/ff_oil_l_show" />
             </FrameLayout>
 
         </FrameLayout>

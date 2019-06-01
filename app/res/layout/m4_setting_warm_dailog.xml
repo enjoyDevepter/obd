@@ -13,7 +13,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="19dp"
         android:layout_marginBottom="19dp"
-        android:text="报警灯显示"
+        android:text="报警开关设置"
         android:textColor="#ff42484B"
         android:textSize="18sp" />
 

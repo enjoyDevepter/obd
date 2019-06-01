@@ -473,10 +473,10 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
             }
         }
         if (null != hudWarmStatus) {
-            f2_faultV.setVisibility(hudWarmStatus.isFaultWarmShow() ? View.VISIBLE : View.INVISIBLE);
-            f2_vV.setVisibility(hudWarmStatus.isVoltageWarmShow() ? View.VISIBLE : View.INVISIBLE);
-            f2_tV.setVisibility(hudWarmStatus.isTemperatureWarmShow() ? View.VISIBLE : View.INVISIBLE);
-            f2_tiredV.setVisibility(hudWarmStatus.isTiredWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            f2_faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.fault_show : R.drawable.fault_dismiss);
+            f2_vV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.voltage_show : R.drawable.voltage_dismiss);
+            f2_tV.setBackgroundResource(hudWarmStatus.isTemperatureWarmShow() ? R.drawable.temperature_show : R.drawable.temperature_dismiss);
+            f2_tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.tired_show : R.drawable.tired_dismiss);
         }
     }
 }

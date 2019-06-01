@@ -22,6 +22,10 @@
     <dimen name="m4_ultifunctional_dailog_width">@dimen/hud_dailog_width</dimen>
     <dimen name="m4_ultifunctional_dailog_height">294dp</dimen>
 
+    <dimen name="ff_warm_dailog_height">350dp</dimen>
+    <dimen name="ff_ultifunctional_dailog_height">294dp</dimen>
+
+
     <dimen name="sensitive_text_size">16sp</dimen>
     <dimen name="sensitive_radius">8dp</dimen>
     <dimen name="sensitive_height">8dp</dimen>
