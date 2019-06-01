@@ -7,14 +7,20 @@
     <dimen name="dailog_width">292dp</dimen>
     <dimen name="dailog_height">265dp</dimen>
 
-    <dimen name="hud_normal_dailog_width">170dp</dimen>
-    <dimen name="hud_normal_dailog_height">110dp</dimen>
+    <dimen name="hud_dailog_width">269dp</dimen>
+    <dimen name="hud_normal_dailog_height">180dp</dimen>
 
-    <dimen name="f2_ultifunctional_dailog_width">190dp</dimen>
-    <dimen name="f2_ultifunctional_dailog_height">170dp</dimen>
+    <dimen name="f2_ultifunctional_dailog_width">@dimen/hud_dailog_width</dimen>
+    <dimen name="f2_ultifunctional_dailog_height">280dp</dimen>
 
-    <dimen name="f2_warm_dailog_width">180dp</dimen>
-    <dimen name="f2_warm_dailog_height">160dp</dimen>
+    <dimen name="f2_warm_dailog_width">@dimen/hud_dailog_width</dimen>
+    <dimen name="f2_warm_dailog_height">276dp</dimen>
+
+    <dimen name="m4_warm_dailog_width">@dimen/hud_dailog_width</dimen>
+    <dimen name="m4_warm_dailog_height">320dp</dimen>
+
+    <dimen name="m4_ultifunctional_dailog_width">@dimen/hud_dailog_width</dimen>
+    <dimen name="m4_ultifunctional_dailog_height">294dp</dimen>
 
     <dimen name="sensitive_text_size">16sp</dimen>
     <dimen name="sensitive_radius">8dp</dimen>

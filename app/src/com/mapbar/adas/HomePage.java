@@ -91,6 +91,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 if (null != obdStatusInfo){
                     switch (obdStatusInfo.getHudType()) {
                         case 0x04:
+                            PageManager.go(new M4SettingPage());
                             break;
                         case 0x21:
                             PageManager.go(new F2SettingPage());

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/setting"
+        android:layout_width="46dp"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom|left"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/setting_bg"
+        android:gravity="center"
+        android:text="设置"
+        android:textColor="#FFFEFEFE"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="40dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="560dp"
+            android:layout_height="320dp"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+
+            <FrameLayout
+                android:layout_width="385dp"
+                android:layout_height="180dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true">
+
+                <View
+                    android:id="@+id/m4_multifunctional_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/m4_multifunctional_bg"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/m4_multifunctional"
+                    android:layout_width="335dp"
+                    android:layout_height="127dp"
+                    android:layout_marginLeft="18dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/m4_multifunctional_speed_show" />
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_width="254dp"
+                android:layout_height="293dp">
+
+                <View
+                    android:id="@+id/m4_rpm_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/m4_rpm_bg"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/m4_rpm"
+                    android:layout_width="228dp"
+                    android:layout_height="238dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/m4_rpm_show" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="78dp"
+                android:layout_height="96dp"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="140dp">
+
+                <View
+                    android:id="@+id/m4_tire_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/m4_tire_bg"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/m4_tire"
+                    android:layout_width="48dp"
+                    android:layout_height="42dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/tire_show" />
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_width="216dp"
+                android:layout_height="124dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp">
+
+
+
+                <View
+                    android:id="@+id/m4_warm_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/m4_warm_bg"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/fault"
+                    android:layout_width="34dp"
+                    android:layout_height="29dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="48dp"
+                    android:background="@drawable/fault_show" />
+
+                <View
+                    android:id="@+id/temperature"
+                    android:layout_width="29dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="92dp"
+                    android:layout_marginTop="48dp"
+                    android:background="@drawable/temperature_show" />
+
+                <View
+                    android:id="@+id/voltage"
+                    android:layout_width="33dp"
+                    android:layout_height="29dp"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginTop="48dp"
+                    android:background="@drawable/voltage_show" />
+
+                <View
+                    android:id="@+id/oil"
+                    android:layout_width="34dp"
+                    android:layout_height="29dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="85dp"
+                    android:background="@drawable/oil_show" />
+
+                <View
+                    android:id="@+id/speed"
+                    android:layout_width="33dp"
+                    android:layout_height="29dp"
+                    android:layout_marginLeft="92dp"
+                    android:layout_marginTop="85dp"
+                    android:background="@drawable/speed_show" />
+
+                <View
+                    android:id="@+id/tired"
+                    android:layout_width="33dp"
+                    android:layout_height="29dp"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginTop="85dp"
+                    android:background="@drawable/tired_show" />
+
+            </FrameLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

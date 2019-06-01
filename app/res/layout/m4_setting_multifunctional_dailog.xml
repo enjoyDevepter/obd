@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/f2_ultifunctional_dailog_width"
-    android:layout_height="@dimen/f2_ultifunctional_dailog_height"
+    android:layout_width="@dimen/m4_ultifunctional_dailog_width"
+    android:layout_height="@dimen/m4_ultifunctional_dailog_height"
     android:background="@drawable/hud_setting_bg"
     android:gravity="center_horizontal"
     android:orientation="vertical">
@@ -11,11 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="19dp"
-        android:layout_marginBottom="19dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="12dp"
         android:text="多功能显示区"
         android:textColor="#ff42484B"
-        android:textSize="18sp" />
+        android:textSize="12sp" />
 
     <View
         android:layout_width="match_parent"
@@ -26,49 +26,73 @@
 
     <TextView
         android:id="@+id/voltage"
-        android:layout_width="110dp"
-        android:layout_height="35dp"
+        android:layout_width="54dp"
+        android:layout_height="18dp"
         android:layout_marginTop="12dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="电压(V)"
         android:textColor="#FFFFFFFF"
-        android:textSize="15sp" />
+        android:textSize="9sp" />
 
     <TextView
-        android:id="@+id/tpm"
-        android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="12dp"
+        android:id="@+id/speed"
+        android:layout_width="54dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="8dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
-        android:text="转速(R)"
+        android:text="车速(KM/h)"
         android:textColor="#FFFFFFFF"
-        android:textSize="15sp" />
+        android:textSize="9sp" />
 
     <TextView
         android:id="@+id/temp"
-        android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="12dp"
+        android:layout_width="54dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="8dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="水温(C)"
         android:textColor="#FFFFFFFF"
-        android:textSize="15sp" />
+        android:textSize="9sp" />
+
+    <TextView
+        android:id="@+id/oil"
+        android:layout_width="54dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="瞬时油耗"
+        android:textColor="#FFFFFFFF"
+        android:textSize="9sp" />
+
+    <TextView
+        android:id="@+id/avg_oil"
+        android:layout_width="54dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="平均油耗"
+        android:textColor="#FFFFFFFF"
+        android:textSize="9sp" />
 
     <TextView
         android:id="@+id/dismiss"
-        android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="23dp"
+        android:layout_width="54dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="8dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="隐藏"
         android:textColor="#FFFFFFFF"
-        android:textSize="15sp" />
+        android:textSize="9sp" />
 </LinearLayout>

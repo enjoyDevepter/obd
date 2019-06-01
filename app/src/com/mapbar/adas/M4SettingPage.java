@@ -18,49 +18,36 @@ import com.miyuan.obd.R;
 import static com.mapbar.hamster.OBDEvent.HUD_STATUS_INFO;
 import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 
-@PageSetting(contentViewId = R.layout.f2_layout, toHistory = false)
-public class F2SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+@PageSetting(contentViewId = R.layout.m4_layout, toHistory = false)
+public class M4SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;
-    @ViewInject(R.id.f2_oil_bg)
-    View f2_oil_bgV;
-    @ViewInject(R.id.f2_oil)
-    View f2_oilV;
-    @ViewInject(R.id.f2_tire_bg)
-    View f2_tire_bgV;
-    @ViewInject(R.id.f2_tire)
-    View f2_tireV;
-    @ViewInject(R.id.f2_voltage_bg)
-    View f2_voltage_bgV;
-    @ViewInject(R.id.f2_voltage)
-    View f2_voltageV;
-    @ViewInject(R.id.f2_engineload_bg)
-    View f2_engineload_bgV;
-    @ViewInject(R.id.f2_engineload)
-    View f2_engineloadV;
-    @ViewInject(R.id.f2_rpm_bg)
-    View f2_rpm_bgV;
-    @ViewInject(R.id.f2_rpm)
-    View f2_rpmV;
-    @ViewInject(R.id.f2_speed)
-    View f2_speedV;
-    @ViewInject(R.id.f2_temp_bg)
-    View f2_temp_bgV;
-    @ViewInject(R.id.f2_temp)
-    View f2_tempV;
-    @ViewInject(R.id.f2_fault_bg)
-    View f2_fault_bgV;
-    @ViewInject(R.id.f2_fault)
-    View f2_faultV;
-    @ViewInject(R.id.f2_v)
-    View f2_vV;
-    @ViewInject(R.id.f2_tired_bg)
-    View f2_tired_bgV;
-    @ViewInject(R.id.f2_t)
-    View f2_tV;
-    @ViewInject(R.id.f2_tired)
-    View f2_tiredV;
-
+    @ViewInject(R.id.m4_multifunctional_bg)
+    View m4_multifunctional_bgV;
+    @ViewInject(R.id.m4_multifunctional)
+    View m4_multifunctionalV;
+    @ViewInject(R.id.m4_rpm_bg)
+    View m4_rpm_bgV;
+    @ViewInject(R.id.m4_rpm)
+    View m4_rpmV;
+    @ViewInject(R.id.m4_tire_bg)
+    View m4_tire_bgV;
+    @ViewInject(R.id.m4_tire)
+    View m4_tireV;
+    @ViewInject(R.id.m4_warm_bg)
+    View m4_warm_bgV;
+    @ViewInject(R.id.fault)
+    View faultV;
+    @ViewInject(R.id.temperature)
+    View temperatureV;
+    @ViewInject(R.id.voltage)
+    View voltageV;
+    @ViewInject(R.id.oil)
+    View oilV;
+    @ViewInject(R.id.speed)
+    View speedV;
+    @ViewInject(R.id.tired)
+    View tiredV;
     CustomDialog dialog = null;
 
     private HUDStatus hudStatus;
@@ -74,17 +61,10 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
         BlueManager.getInstance().send(ProtocolUtils.getHUDStatus());
         BlueManager.getInstance().send(ProtocolUtils.getHUDWarmStatus());
         settingV.setOnClickListener(this);
-        f2_oil_bgV.setOnClickListener(this);
-        f2_tire_bgV.setOnClickListener(this);
-        f2_voltage_bgV.setOnClickListener(this);
-        f2_engineload_bgV.setOnClickListener(this);
-        f2_rpm_bgV.setOnClickListener(this);
-        f2_temp_bgV.setOnClickListener(this);
-        f2_faultV.setOnClickListener(this);
-        f2_vV.setOnClickListener(this);
-        f2_tV.setOnClickListener(this);
-        f2_tiredV.setOnClickListener(this);
-        f2_speedV.setOnClickListener(this);
+        m4_multifunctional_bgV.setOnClickListener(this);
+        m4_rpm_bgV.setOnClickListener(this);
+        m4_tireV.setOnClickListener(this);
+        m4_warm_bgV.setOnClickListener(this);
     }
 
 
@@ -105,14 +85,10 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                     settingV.setText("完成");
                 }
                 settingV.setSelected(!choice);
-                f2_oil_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_tire_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_voltage_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_engineload_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_rpm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_temp_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_fault_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f2_tired_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                m4_multifunctional_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                m4_rpm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                m4_tire_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                m4_warm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 break;
             default:
                 if (choice) {
@@ -127,32 +103,15 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
             return;
         }
         switch (viewId) {
-            case R.id.f2_oil_bg:
-                showNormalDailog(viewId, "油耗显示区", hudStatus.isOilShow());
-                break;
-            case R.id.f2_tire_bg:
-                showNormalDailog(viewId, "胎压显示区", hudStatus.isTireShow());
-                break;
-            case R.id.f2_voltage_bg:
+            case R.id.m4_multifunctional_bg:
                 showMultifunctional();
                 break;
-            case R.id.f2_engineload_bg:
-                showNormalDailog(viewId, "发动机负荷显示区", hudStatus.isEngineloadShow());
-                break;
-            case R.id.f2_rpm_bg:
+            case R.id.m4_rpm_bg:
                 showNormalDailog(viewId, "发动机转速显示区", hudStatus.isRpmShow());
                 break;
-            case R.id.f2_temp_bg:
-                showNormalDailog(viewId, "水温显示区", hudStatus.isTempShow());
-                break;
-            case R.id.f2_fault:
-            case R.id.f2_tired:
-            case R.id.f2_v:
-            case R.id.f2_t:
+            case R.id.m4_tire:
+            case R.id.m4_warm_bg:
                 showWarm();
-                break;
-            case R.id.f2_speed:
-                showNormalDailog(viewId, "车速显示区", hudStatus.isSpeedShow());
                 break;
             default:
                 break;
@@ -165,20 +124,28 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                     @Override
                     public void bindView(View view) {
                         final View voltageV = view.findViewById(R.id.voltage);
-                        final View tpmV = view.findViewById(R.id.tpm);
+                        final View speedV = view.findViewById(R.id.tpm);
                         final View tempV = view.findViewById(R.id.temp);
+                        final View oilV = view.findViewById(R.id.oil);
+                        final View avgOilV = view.findViewById(R.id.avg_oil);
                         final View dismissV = view.findViewById(R.id.dismiss);
                         switch (hudStatus.getMultifunctionalOneType()) {
-                            case 0x00:
+                            case 0x00: //隐藏
                                 dismissV.setSelected(true);
                                 break;
-                            case 0x01:
+                            case 0x01: // 水温
                                 tempV.setSelected(true);
                                 break;
-                            case 0x02:
-                                tpmV.setSelected(true);
+                            case 0x03: // 车速
+                                speedV.setSelected(true);
                                 break;
-                            case 0x08:
+                            case 0x04: // 瞬时油耗
+                                oilV.setSelected(true);
+                                break;
+                            case 0x05: // 平均油耗
+                                avgOilV.setSelected(true);
+                                break;
+                            case 0x08: // 电压
                                 voltageV.setSelected(true);
                                 break;
                             default:
@@ -188,21 +155,25 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(true);
-                                tpmV.setSelected(false);
+                                speedV.setSelected(false);
                                 tempV.setSelected(false);
                                 dismissV.setSelected(false);
+                                oilV.setSelected(false);
+                                avgOilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x08));
                                 dialog.dismiss();
                             }
                         });
 
-                        tpmV.setOnClickListener(new View.OnClickListener() {
+                        speedV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(false);
-                                tpmV.setSelected(true);
+                                speedV.setSelected(true);
                                 tempV.setSelected(false);
                                 dismissV.setSelected(false);
+                                oilV.setSelected(false);
+                                avgOilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x02));
                                 dialog.dismiss();
                             }
@@ -211,9 +182,11 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(false);
-                                tpmV.setSelected(false);
+                                speedV.setSelected(false);
                                 tempV.setSelected(true);
                                 dismissV.setSelected(false);
+                                oilV.setSelected(false);
+                                avgOilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x01));
                                 dialog.dismiss();
                             }
@@ -222,20 +195,48 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(false);
-                                tpmV.setSelected(false);
+                                speedV.setSelected(false);
                                 tempV.setSelected(false);
                                 dismissV.setSelected(true);
+                                oilV.setSelected(false);
+                                avgOilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
+                                dialog.dismiss();
+                            }
+                        });
+                        oilV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                voltageV.setSelected(false);
+                                speedV.setSelected(false);
+                                tempV.setSelected(false);
+                                dismissV.setSelected(false);
+                                oilV.setSelected(true);
+                                avgOilV.setSelected(false);
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
+                                dialog.dismiss();
+                            }
+                        });
+                        avgOilV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                voltageV.setSelected(false);
+                                speedV.setSelected(false);
+                                tempV.setSelected(false);
+                                dismissV.setSelected(false);
+                                oilV.setSelected(false);
+                                avgOilV.setSelected(true);
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x05, 00));
                                 dialog.dismiss();
                             }
                         });
                     }
                 })
-                .setLayoutRes(R.layout.f2_setting_multifunctional_dailog)
+                .setLayoutRes(R.layout.m4_setting_multifunctional_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
-                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
-                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.f2_ultifunctional_dailog_height))
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.m4_ultifunctional_dailog_width))
+                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.m4_ultifunctional_dailog_height))
                 .show();
     }
 
@@ -252,23 +253,11 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 switch (type) {
-                                    case R.id.f2_oil_bg:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 01));
-                                        break;
                                     case R.id.f2_tire_bg:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 01));
                                         break;
-                                    case R.id.f2_engineload_bg:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0C, 01));
-                                        break;
                                     case R.id.f2_rpm_bg:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x02, 01));
-                                        break;
-                                    case R.id.f2_temp_bg:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 01));
-                                        break;
-                                    case R.id.f2_speed:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x03, 01));
                                         break;
                                     default:
                                         break;
@@ -283,23 +272,11 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 switch (type) {
-                                    case R.id.f2_oil_bg:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
-                                        break;
                                     case R.id.f2_tire_bg:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 00));
                                         break;
-                                    case R.id.f2_engineload_bg:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0C, 00));
-                                        break;
                                     case R.id.f2_rpm_bg:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x02, 00));
-                                        break;
-                                    case R.id.f2_temp_bg:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 00));
-                                        break;
-                                    case R.id.f2_speed:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x03, 00));
                                         break;
                                     default:
                                         break;
@@ -402,32 +379,53 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             }
                         });
 
-                        View tire_showV = view.findViewById(R.id.tire_show);
-                        tire_showV.setSelected(hudWarmStatus.isTrieWarmShow());
-                        tire_showV.setOnClickListener(new View.OnClickListener() {
+
+                        View speed_showV = view.findViewById(R.id.speed_show);
+                        speed_showV.setSelected(hudWarmStatus.isSpeedWarmShow());
+                        speed_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x05, 1));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 1));
                                 dialog.dismiss();
                             }
                         });
 
-                        View tire_dismissV = view.findViewById(R.id.tire_dismiss);
-                        tire_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
-                        tire_dismissV.setOnClickListener(new View.OnClickListener() {
+                        View speed_dismissV = view.findViewById(R.id.speed_dismiss);
+                        speed_dismissV.setSelected(!hudWarmStatus.isSpeedWarmShow());
+                        speed_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x05, 0));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 0));
+                                dialog.dismiss();
+                            }
+                        });
+
+                        View oil_showV = view.findViewById(R.id.oil_show);
+                        oil_showV.setSelected(hudWarmStatus.isOilWarmShow());
+                        oil_showV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x03, 1));
+                                dialog.dismiss();
+                            }
+                        });
+
+                        View oil_dismissV = view.findViewById(R.id.oil_dismiss);
+                        oil_dismissV.setSelected(!hudWarmStatus.isOilWarmShow());
+                        oil_dismissV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x03, 0));
                                 dialog.dismiss();
                             }
                         });
                     }
                 })
-                .setLayoutRes(R.layout.f2_setting_warm_dailog)
+                .setLayoutRes(R.layout.m4_setting_warm_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
-                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.f2_warm_dailog_width))
-                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.f2_warm_dailog_height))
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.m4_warm_dailog_width))
+                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.m4_warm_dailog_height))
                 .show();
     }
 
@@ -448,35 +446,40 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
 
     private void updateUI() {
         if (null != hudStatus) {
-            f2_oilV.setBackgroundResource(hudStatus.isOilShow() ? R.drawable.f2_oil_show : R.drawable.f2_oil_dismiss);
-            f2_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.f2_tire_show : R.drawable.f2_tire_dismiss);
-            f2_engineloadV.setBackgroundResource(hudStatus.isEngineloadShow() ? R.drawable.f2_engineload_show : R.drawable.f2_engineload_dismiss);
-            f2_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.f2_rpm_show : R.drawable.f2_rpm_dismiss);
-            f2_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.f2_speed_show : R.drawable.f2_speed_dismiss);
-            f2_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f2_temp_show : R.drawable.f2_temp_dismiss);
+            m4_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.m4_rpm_show : R.drawable.m4_rpm_dismiss);
 
             switch (hudStatus.getMultifunctionalOneType()) {
                 case 0x00:
-                    f2_voltageV.setBackgroundResource(R.drawable.f2_voltage_dismiss);
+                    m4_multifunctionalV.setBackgroundResource(R.drawable.m4_multifunctional_dismiss);
                     break;
                 case 0x01:
-                    f2_voltageV.setBackgroundResource(R.drawable.f2_voltage_c_show);
+                    m4_multifunctionalV.setBackgroundResource(R.drawable.m4_multifunctional_temp_show);
                     break;
-                case 0x02:
-                    f2_voltageV.setBackgroundResource(R.drawable.f2_voltage_r_show);
+                case 0x03:
+                    m4_multifunctionalV.setBackgroundResource(R.drawable.m4_multifunctional_speed_show);
+                    break;
+                case 0x04:
+                    m4_multifunctionalV.setBackgroundResource(R.drawable.m4_multifunctional_oil_show);
+                    break;
+                case 0x05:
+                    m4_multifunctionalV.setBackgroundResource(R.drawable.m4_multifunctional_avg_oil_show);
                     break;
                 case 0x08:
-                    f2_voltageV.setBackgroundResource(R.drawable.f2_voltage_v_show);
+                    m4_multifunctionalV.setBackgroundResource(R.drawable.m4_multifunctional_voltage_show);
                     break;
                 default:
                     break;
             }
         }
         if (null != hudWarmStatus) {
-            f2_faultV.setVisibility(hudWarmStatus.isFaultWarmShow() ? View.VISIBLE : View.INVISIBLE);
-            f2_vV.setVisibility(hudWarmStatus.isVoltageWarmShow() ? View.VISIBLE : View.INVISIBLE);
-            f2_tV.setVisibility(hudWarmStatus.isTemperatureWarmShow() ? View.VISIBLE : View.INVISIBLE);
-            f2_tiredV.setVisibility(hudWarmStatus.isTiredWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            faultV.setVisibility(hudWarmStatus.isFaultWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            voltageV.setVisibility(hudWarmStatus.isVoltageWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            temperatureV.setVisibility(hudWarmStatus.isTemperatureWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            tiredV.setVisibility(hudWarmStatus.isTiredWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            oilV.setVisibility(hudWarmStatus.isOilWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            speedV.setVisibility(hudWarmStatus.isSpeedWarmShow() ? View.VISIBLE : View.INVISIBLE);
+            m4_tireV.setVisibility(hudWarmStatus.isTiredWarmShow() ? View.VISIBLE : View.INVISIBLE);
         }
     }
+
 }

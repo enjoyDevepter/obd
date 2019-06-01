@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/f2_warm_dailog_width"
-    android:layout_height="@dimen/f2_warm_dailog_height"
+    android:layout_width="@dimen/m4_warm_dailog_width"
+    android:layout_height="@dimen/m4_warm_dailog_height"
     android:background="@drawable/hud_setting_bg"
     android:gravity="center_horizontal"
     android:orientation="vertical">
@@ -197,12 +197,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:gravity="center"
-            android:text="胎压"
+            android:text="超速"
             android:textColor="#FF4A4A4A"
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/tire_show"
+            android:id="@+id/speed_show"
             android:layout_width="53dp"
             android:layout_height="27dp"
             android:layout_gravity="center_horizontal"
@@ -214,7 +214,48 @@
             android:textSize="13sp" />
 
         <TextView
-            android:id="@+id/tire_dismiss"
+            android:id="@+id/speed_dismiss"
+            android:layout_width="53dp"
+            android:layout_height="27dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/hud_setting_item_bg"
+            android:gravity="center"
+            android:text="关"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="剩余油量"
+            android:textColor="#FF4A4A4A"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/oil_show"
+            android:layout_width="53dp"
+            android:layout_height="27dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/hud_setting_item_bg"
+            android:gravity="center"
+            android:text="开"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/oil_dismiss"
             android:layout_width="53dp"
             android:layout_height="27dp"
             android:layout_gravity="center_horizontal"
