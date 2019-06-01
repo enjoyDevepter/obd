@@ -88,7 +88,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case R.id.message:
                 // 判断HUD类型跳转对应设置界面
-                if (null != obdStatusInfo){
+                if (null != obdStatusInfo) {
                     switch (obdStatusInfo.getHudType()) {
                         case 0x04:
                             PageManager.go(new M4SettingPage());
@@ -97,6 +97,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             PageManager.go(new F2SettingPage());
                             break;
                         case 0x22:
+                            PageManager.go(new FFSettingPage());
                             break;
                         case 0x41:
                             break;
