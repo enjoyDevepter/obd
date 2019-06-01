@@ -30,10 +30,8 @@ public class FFSettingPage extends AppBasePage implements View.OnClickListener, 
     View ff_tire_bgV;
     @ViewInject(R.id.ff_tire)
     View ff_tireV;
-
     @ViewInject(R.id.multifunctional)
     View multifunctionalV;
-
     @ViewInject(R.id.ff_warm_bg)
     View ff_warm_bgV;
     @ViewInject(R.id.fault)
@@ -44,27 +42,22 @@ public class FFSettingPage extends AppBasePage implements View.OnClickListener, 
     View speedV;
     @ViewInject(R.id.tired)
     View tiredV;
-
     @ViewInject(R.id.ff_temp_bg)
     View ff_temp_bgV;
     @ViewInject(R.id.ff_temp)
     View ff_tempV;
-
     @ViewInject(R.id.ff_rpm_bg)
     View ff_rpm_bgV;
     @ViewInject(R.id.ff_rpm)
     View ff_rpmV;
-
     @ViewInject(R.id.ff_oil_bg)
     View ff_oil_bgV;
     @ViewInject(R.id.ff_oil)
     View ff_oilV;
-
     @ViewInject(R.id.ff_oil_l_bg)
     View ff_oil_l_bgV;
     @ViewInject(R.id.ff_oil_l)
     View ff_oil_lV;
-
     CustomDialog dialog = null;
 
     private HUDStatus hudStatus;
@@ -293,7 +286,7 @@ public class FFSettingPage extends AppBasePage implements View.OnClickListener, 
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 01));
                                         break;
                                     case R.id.ff_oil_l:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x06, 01));
+                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 01));
                                         break;
                                     default:
                                         break;
@@ -324,7 +317,7 @@ public class FFSettingPage extends AppBasePage implements View.OnClickListener, 
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
                                         break;
                                     case R.id.ff_oil_l:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x06, 00));
+                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 00));
                                         break;
                                     default:
                                         break;
@@ -492,7 +485,7 @@ public class FFSettingPage extends AppBasePage implements View.OnClickListener, 
                 .setLayoutRes(R.layout.ff_setting_warm_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
-                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.f2_warm_dailog_width))
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
                 .setHeight(OBDUtils.getDimens(getContext(), R.dimen.ff_warm_dailog_height))
                 .show();
     }
@@ -515,11 +508,11 @@ public class FFSettingPage extends AppBasePage implements View.OnClickListener, 
     private void updateUI() {
         if (null != hudStatus) {
             ff_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.ff_speed_show : R.drawable.ff_speed_dismiss);
-            ff_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.f2_tire_show : R.drawable.f2_tire_dismiss);
-            ff_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f2_temp_show : R.drawable.f2_temp_dismiss);
-            ff_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.f2_rpm_show : R.drawable.f2_rpm_dismiss);
+            ff_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.ff_tire_show : R.drawable.ff_tire_dismiss);
+            ff_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.ff_temp_show : R.drawable.ff_temp_dismiss);
+            ff_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.ff_rpm_show : R.drawable.ff_rpm_dismiss);
             ff_oil_lV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.ff_oil_l_show : R.drawable.ff_oil_l_dismiss);
-            ff_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f2_temp_show : R.drawable.f2_temp_dismiss);
+            ff_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.ff_temp_show : R.drawable.ff_temp_dismiss);
 
             switch (hudStatus.getMultifunctionalOneType()) {
                 case 0x00:

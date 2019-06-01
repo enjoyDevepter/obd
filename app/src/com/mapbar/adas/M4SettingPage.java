@@ -61,8 +61,8 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
         BlueManager.getInstance().send(ProtocolUtils.getHUDStatus());
         BlueManager.getInstance().send(ProtocolUtils.getHUDWarmStatus());
         settingV.setOnClickListener(this);
-        m4_multifunctional_bgV.setOnClickListener(this);
-        m4_rpm_bgV.setOnClickListener(this);
+        m4_multifunctionalV.setOnClickListener(this);
+        m4_rpmV.setOnClickListener(this);
         m4_tireV.setOnClickListener(this);
         m4_warm_bgV.setOnClickListener(this);
     }
@@ -103,10 +103,10 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
             return;
         }
         switch (viewId) {
-            case R.id.m4_multifunctional_bg:
+            case R.id.m4_multifunctional:
                 showMultifunctional();
                 break;
-            case R.id.m4_rpm_bg:
+            case R.id.m4_rpm:
                 showNormalDailog(viewId, "发动机转速显示区", hudStatus.isRpmShow());
                 break;
             case R.id.m4_tire:
@@ -124,7 +124,7 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                     @Override
                     public void bindView(View view) {
                         final View voltageV = view.findViewById(R.id.voltage);
-                        final View speedV = view.findViewById(R.id.tpm);
+                        final View speedV = view.findViewById(R.id.speed);
                         final View tempV = view.findViewById(R.id.temp);
                         final View oilV = view.findViewById(R.id.oil);
                         final View avgOilV = view.findViewById(R.id.avg_oil);
@@ -174,7 +174,7 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(false);
                                 avgOilV.setSelected(false);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x02));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x03));
                                 dialog.dismiss();
                             }
                         });
@@ -213,7 +213,7 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(true);
                                 avgOilV.setSelected(false);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
                                 dialog.dismiss();
                             }
                         });
@@ -226,7 +226,7 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(false);
                                 avgOilV.setSelected(true);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x05, 00));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
                                 dialog.dismiss();
                             }
                         });
@@ -253,10 +253,10 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 switch (type) {
-                                    case R.id.f2_tire_bg:
+                                    case R.id.m4_tire_bg:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 01));
                                         break;
-                                    case R.id.f2_rpm_bg:
+                                    case R.id.m4_rpm:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x02, 01));
                                         break;
                                     default:
@@ -272,10 +272,10 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 switch (type) {
-                                    case R.id.f2_tire_bg:
+                                    case R.id.m4_tire_bg:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 00));
                                         break;
-                                    case R.id.f2_rpm_bg:
+                                    case R.id.m4_rpm:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x02, 00));
                                         break;
                                     default:
@@ -299,6 +299,27 @@ public class M4SettingPage extends AppBasePage implements View.OnClickListener, 
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
+
+                        View tire_showV = view.findViewById(R.id.tire_show);
+                        tire_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        tire_showV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x05, 1));
+                                dialog.dismiss();
+                            }
+                        });
+
+                        View tire_dismissV = view.findViewById(R.id.tire_dismiss);
+                        tire_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        tire_dismissV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x05, 0));
+                                dialog.dismiss();
+                            }
+                        });
+
                         View fault_showV = view.findViewById(R.id.fault_show);
                         fault_showV.setSelected(hudWarmStatus.isFaultWarmShow());
                         fault_showV.setOnClickListener(new View.OnClickListener() {

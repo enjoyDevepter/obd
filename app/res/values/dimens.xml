@@ -17,13 +17,13 @@
     <dimen name="f2_warm_dailog_height">276dp</dimen>
 
     <dimen name="m4_warm_dailog_width">@dimen/hud_dailog_width</dimen>
-    <dimen name="m4_warm_dailog_height">320dp</dimen>
+    <dimen name="m4_warm_dailog_height">350dp</dimen>
 
     <dimen name="m4_ultifunctional_dailog_width">@dimen/hud_dailog_width</dimen>
     <dimen name="m4_ultifunctional_dailog_height">294dp</dimen>
 
     <dimen name="ff_warm_dailog_height">350dp</dimen>
-    <dimen name="ff_ultifunctional_dailog_height">294dp</dimen>
+    <dimen name="ff_ultifunctional_dailog_height">325dp</dimen>
 
 
     <dimen name="sensitive_text_size">16sp</dimen>

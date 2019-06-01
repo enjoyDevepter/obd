@@ -24,75 +24,76 @@
         android:layout_marginRight="8dp"
         android:background="#ff707070" />
 
+
+    <TextView
+        android:id="@+id/temp"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="水温(℃)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
     <TextView
         android:id="@+id/voltage"
-        android:layout_width="54dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="12dp"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="电压(V)"
         android:textColor="#FFFFFFFF"
-        android:textSize="9sp" />
-
-    <TextView
-        android:id="@+id/speed"
-        android:layout_width="54dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/hud_setting_item_bg"
-        android:gravity="center"
-        android:text="车速(KM/h)"
-        android:textColor="#FFFFFFFF"
-        android:textSize="9sp" />
-
-    <TextView
-        android:id="@+id/temp"
-        android:layout_width="54dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/hud_setting_item_bg"
-        android:gravity="center"
-        android:text="水温(C)"
-        android:textColor="#FFFFFFFF"
-        android:textSize="9sp" />
+        android:textSize="13sp" />
 
     <TextView
         android:id="@+id/oil"
-        android:layout_width="54dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="瞬时油耗"
         android:textColor="#FFFFFFFF"
-        android:textSize="9sp" />
+        android:textSize="13sp" />
 
     <TextView
         android:id="@+id/avg_oil"
-        android:layout_width="54dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="平均油耗"
         android:textColor="#FFFFFFFF"
-        android:textSize="9sp" />
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/speed"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="车速(KM/h)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
 
     <TextView
         android:id="@+id/dismiss"
-        android:layout_width="54dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="20dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="隐藏"
         android:textColor="#FFFFFFFF"
-        android:textSize="9sp" />
+        android:textSize="13sp" />
 </LinearLayout>
