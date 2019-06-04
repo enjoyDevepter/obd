@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <RelativeLayout
+        android:layout_width="612dp"
+        android:layout_height="312dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <!--多功能区 -->
+        <FrameLayout
+            android:layout_width="156dp"
+            android:layout_height="97dp"
+            android:layout_alignParentRight="true">
+
+            <View
+                android:id="@+id/multifunctional_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_multifunctional_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/multifunctional"
+                android:layout_width="83dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="38dp"
+                android:background="@drawable/multifunctional_voltage_show" />
+
+        </FrameLayout>
+
+        <!-- 速度面板-->
+        <FrameLayout
+            android:layout_width="209dp"
+            android:layout_height="212dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="96dp">
+
+            <View
+                android:id="@+id/da_speed_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_speed_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_speed"
+                android:layout_width="205dp"
+                android:layout_height="157dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/da_speed_show" />
+
+            <View
+                android:id="@+id/da_mile"
+                android:layout_width="121dp"
+                android:layout_height="82dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="75dp"
+                android:background="@drawable/da_mile_show" />
+
+
+            <FrameLayout
+                android:layout_width="93dp"
+                android:layout_height="29dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="35dp">
+
+                <View
+                    android:id="@+id/da_warm_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/da_warm_bg"
+                    android:visibility="invisible" />
+
+                <View
+                    android:id="@+id/fault"
+                    android:layout_width="16dp"
+                    android:layout_height="11dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/fault_show" />
+
+                <View
+                    android:id="@+id/voltage"
+                    android:layout_width="14dp"
+                    android:layout_height="11dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/voltage_show" />
+
+                <View
+                    android:id="@+id/speed"
+                    android:layout_width="17dp"
+                    android:layout_height="9dp"
+                    android:layout_marginLeft="52dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/speed_show" />
+
+                <View
+                    android:id="@+id/tired"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginLeft="77dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/tired_show" />
+
+            </FrameLayout>
+        </FrameLayout>
+        <!-- 转速-->
+        <FrameLayout
+            android:layout_width="75dp"
+            android:layout_height="187dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="60dp"
+            android:layout_marginBottom="10dp">
+
+            <View
+                android:id="@+id/da_rpm_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_rpm_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_rpm"
+                android:layout_width="46dp"
+                android:layout_height="146dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/da_rpm_show" />
+        </FrameLayout>
+
+        <!-- 瞬时油耗-->
+        <FrameLayout
+            android:layout_width="75dp"
+            android:layout_height="187dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="266dp"
+            android:layout_marginBottom="10dp">
+
+            <View
+                android:id="@+id/da_oil_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_oil_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_oil"
+                android:layout_width="46dp"
+                android:layout_height="141dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/da_oil_show" />
+        </FrameLayout>
+
+        <!-- 水温 -->
+        <FrameLayout
+            android:layout_width="45dp"
+            android:layout_height="151dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="10dp">
+
+            <View
+                android:id="@+id/lily_temp_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/lily_temp_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/lily_temp"
+                android:layout_width="32dp"
+                android:layout_height="107dp"
+                android:layout_marginLeft="11dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/lily_temp_show" />
+
+        </FrameLayout>
+
+        <!-- 剩余燃油 -->
+        <FrameLayout
+            android:layout_width="45dp"
+            android:layout_height="151dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="330dp"
+            android:layout_marginBottom="10dp">
+
+            <View
+                android:id="@+id/lily_remaining_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/lily_remaining_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/lily_remaining"
+                android:layout_width="32dp"
+                android:layout_height="107dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/lily_remaining_show" />
+
+        </FrameLayout>
+
+        <!-- 电子眼-->
+        <FrameLayout
+            android:layout_width="130dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="88dp">
+
+            <View
+                android:id="@+id/da_camera_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_line_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_camera"
+                android:layout_width="18dp"
+                android:layout_height="15dp"
+                android:layout_marginLeft="48dp"
+                android:layout_marginTop="45dp"
+                android:background="@drawable/da_camera_show" />
+        </FrameLayout>
+
+        <!-- 车道线-->
+        <View
+            android:id="@+id/da_line"
+            android:layout_width="68dp"
+            android:layout_height="33dp"
+            android:layout_marginLeft="172dp"
+            android:layout_marginTop="47dp"
+            android:background="@drawable/da_line_show" />
+
+        <!-- 胎压-->
+        <FrameLayout
+            android:layout_width="88dp"
+            android:layout_height="57dp"
+            android:layout_marginLeft="181dp"
+            android:layout_marginTop="95dp">
+
+            <View
+                android:id="@+id/da_tire_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_tire_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_tire"
+                android:layout_width="33dp"
+                android:layout_height="44dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/da_tire_show" />
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/da_distance_bg"
+            android:layout_width="209dp"
+            android:layout_height="113dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/da_trun_bg"
+            android:visibility="invisible" />
+
+        <View
+            android:id="@+id/da_navi"
+            android:layout_width="155dp"
+            android:layout_height="173dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="72dp"
+            android:background="@drawable/da_navi_show" />
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/setting"
+        android:layout_width="46dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/setting_bg"
+        android:gravity="center"
+        android:text="设置"
+        android:textColor="#FFFEFEFE"
+        android:textSize="14sp" />
+
+
+</RelativeLayout>
