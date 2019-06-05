@@ -100,6 +100,13 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             PageManager.go(new FFSettingPage());
                             break;
                         case 0x41:
+                            PageManager.go(new ProLilySettingPage());
+                            break;
+                        case 0x42:
+                            PageManager.go(new DaSettingPage());
+                            break;
+                        case 0x43:
+                            PageManager.go(new ProLingSettingPage());
                             break;
                         default:
                             break;
