@@ -266,7 +266,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                         });
                     }
                 })
-                .setLayoutRes(R.layout.ff_setting_multifunctional_dailog)
+                .setLayoutRes(R.layout.da_setting_multifunctional_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
@@ -293,7 +293,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_tire:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 01));
                                         break;
-                                    case R.id.temp:
+                                    case R.id.lily_temp:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 01));
                                         break;
                                     case R.id.da_rpm:
@@ -302,7 +302,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_oil:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 01));
                                         break;
-                                    case R.id.remaining:
+                                    case R.id.lily_remaining:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 01));
                                         break;
                                     case R.id.da_mile:
@@ -327,7 +327,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_tire:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 00));
                                         break;
-                                    case R.id.temp:
+                                    case R.id.lily_temp:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 00));
                                         break;
                                     case R.id.da_rpm:
@@ -336,7 +336,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_oil:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
                                         break;
-                                    case R.id.remaining:
+                                    case R.id.lily_remaining:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 00));
                                         break;
                                     case R.id.da_mile:

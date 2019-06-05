@@ -256,7 +256,7 @@ public class ProLingSettingPage extends AppBasePage implements View.OnClickListe
                         });
                     }
                 })
-                .setLayoutRes(R.layout.ff_setting_multifunctional_dailog)
+                .setLayoutRes(R.layout.da_setting_multifunctional_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
