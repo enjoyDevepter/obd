@@ -139,7 +139,7 @@ public class PermissionUtil {
      * 请求app运行初始化
      */
     public static void requestPermissionForInit(RequestPermission requestPermission, RxPermissions rxPermissions, RxErrorHandler errorHandler) {
-        requestPermission(requestPermission, rxPermissions, errorHandler, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WAKE_LOCK, Manifest.permission.CAMERA);
+        requestPermission(requestPermission, rxPermissions, errorHandler, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA);
     }
 
     public interface RequestPermission {

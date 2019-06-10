@@ -60,20 +60,10 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
     View da_oil_bgV;
     @ViewInject(R.id.da_oil)
     View da_oilV;
-    @ViewInject(R.id.da_camera_bg)
-    View da_camera_bgV;
-    @ViewInject(R.id.da_camera)
-    View da_cameraV;
-    @ViewInject(R.id.da_line)
-    View da_lineV;
     @ViewInject(R.id.da_tire_bg)
     View da_tire_bgV;
     @ViewInject(R.id.da_tire)
     View da_tireV;
-    @ViewInject(R.id.da_distance_bg)
-    View da_distance_bgV;
-    @ViewInject(R.id.da_navi)
-    View da_naviV;
     CustomDialog dialog = null;
 
     private HUDStatus hudStatus;
@@ -124,9 +114,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                 da_warm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 da_rpm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 da_oil_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                da_camera_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 da_tire_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                da_distance_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 break;
             default:
                 if (choice) {

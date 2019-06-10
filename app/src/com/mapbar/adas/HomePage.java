@@ -131,6 +131,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             break;
                     }
                 }
+                break;
+            case R.id.hud:
+//                PageManager.go(new HUDPage());
                 AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
                     @Override
                     public void onInitNaviFailure() {
@@ -212,6 +215,41 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 "getIconType  " + naviInfo.getIconType() + "\n" +
                                 "getCurStepRetainDistance  " + naviInfo.getCurStepRetainDistance()
                         );
+                        int type = 0;
+                        switch (naviInfo.getIconType()) {
+                            case 0:
+                                break;
+                            case 2:
+                                type = 5;
+                                break;
+                            case 3:
+                                type = 2;
+                                break;
+                            case 4:
+                            case 51:
+                                type = 4;
+                                break;
+                            case 5:
+                            case 52:
+                                type = 1;
+                                break;
+                            case 6:
+                                type = 6;
+                                break;
+                            case 7:
+                                type = 3;
+                                break;
+                            case 8:
+                                type = 7;
+                                break;
+                            case 11:
+                                type = 8;
+                                break;
+                            default:
+                                type = 0;
+                                break;
+                        }
+                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(type, naviInfo.getCurStepRetainDistance()));
                     }
 
                     @Override
@@ -224,6 +262,41 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         for (AMapNaviCameraInfo cameraInfo : aMapNaviCameraInfos) {
                             Log.d("getCameraType  " + cameraInfo.getCameraType() + "\n" +
                                     "getCameraSpeed  " + cameraInfo.getCameraSpeed());
+                        }
+                        if (aMapNaviCameraInfos.length > 0) {
+                            int type = 0;
+                            switch (aMapNaviCameraInfos[0].getCameraType()) {
+                                case 0: // 测速
+                                    type = 6;
+                                    break;
+                                case 1: // 监控摄像
+                                    type = 7;
+                                    break;
+                                case 2: // 闯红灯拍照
+                                    type = 8;
+                                    break;
+                                case 3: // 违章拍照
+                                    type = 1;
+                                    break;
+                                case 4: // 公交专用道摄像头
+                                    type = 2;
+                                    break;
+                                case 5: // 应急车道拍照
+                                    type = 3;
+                                    break;
+                                case 6: // 非机动车道(暂未使用)
+                                    type = 0;
+                                    break;
+                                case 8: // 区间测速起始
+                                    type = 4;
+                                    break;
+                                case 9: // 区间测速解除
+                                    type = 5;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getCameraSpeed()));
                         }
                     }
 
@@ -264,12 +337,12 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
-
+//                        BlueManager.getInstance().send(ProtocolUtils.getLineInfo(true, aMapLaneInfo.laneCount, 0));
                     }
 
                     @Override
                     public void hideLaneInfo() {
-
+                        BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
                     }
 
                     @Override
@@ -328,9 +401,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                 });
                 AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
-                break;
-            case R.id.hud:
-                PageManager.go(new HUDPage());
                 break;
             default:
                 break;

@@ -169,7 +169,6 @@ public class HexUtils {
         s = (short) (s0 | s1);
         return s;
     }
-
     /**
      * @param
      * @return 长整型

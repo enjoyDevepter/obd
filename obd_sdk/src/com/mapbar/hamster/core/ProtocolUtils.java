@@ -514,5 +514,66 @@ public class ProtocolUtils {
         return result;
     }
 
+    /**
+     * 转向
+     *
+     * @param turnType
+     * @return
+     */
+    public static byte[] getTurnInfo(int turnType, int distance) {
+        Log.d("Protocol getTurnInfo ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x90;
+        result[2] = 01;
+        result[3] = (byte) turnType;
+        result[4] = (byte) ((distance >> 8) & 0xFF);
+        result[5] = (byte) (distance & 0xFF);
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 车道线
+     *
+     * @return
+     */
+    public static byte[] getLineInfo(boolean show, int count, int enter) {
+        Log.d("Protocol getTurnInfo ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x90;
+        result[2] = 02;
+        result[3] = (byte) (show ? 1 : 0);
+        result[4] = (byte) count;
+        result[5] = (byte) enter;
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
+    /**
+     * 电子狗
+     *
+     * @param type
+     * @return
+     */
+    public static byte[] getCameraInfo(boolean show, int type, int distance) {
+        Log.d("Protocol getTurnInfo ===");
+        byte[] result = new byte[9];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x90;
+        result[2] = 03;
+        result[3] = (byte) (show ? 1 : 0);
+        result[4] = (byte) type;
+        result[5] = (byte) ((distance >> 8) & 0xFF);
+        result[6] = (byte) (distance & 0xFF);
+        result[7] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[8] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
 }
 
