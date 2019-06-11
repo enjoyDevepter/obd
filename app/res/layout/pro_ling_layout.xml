@@ -20,7 +20,7 @@
                 android:id="@+id/multifunctional_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_multifunctional_bg"
+                android:background="@drawable/ling_multifunctional_bg"
                 android:visibility="invisible" />
 
             <View
@@ -44,7 +44,7 @@
                 android:id="@+id/remaining_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_remaining_bg"
+                android:background="@drawable/ling_remaining_bg"
                 android:visibility="invisible" />
 
             <View
@@ -69,7 +69,7 @@
                 android:id="@+id/da_temp_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_temp_bg"
+                android:background="@drawable/ling_temp_bg"
                 android:visibility="invisible" />
 
             <View
@@ -93,7 +93,7 @@
                 android:id="@+id/da_speed_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_speed_bg"
+                android:background="@drawable/ling_speed_bg"
                 android:visibility="invisible" />
 
             <View
@@ -101,9 +101,8 @@
                 android:layout_width="267dp"
                 android:layout_height="205dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="7dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/da_speed_show" />
+                android:background="@drawable/ling_speed_show" />
 
             <View
                 android:id="@+id/da_mile"
@@ -115,49 +114,49 @@
 
 
             <FrameLayout
-                android:layout_width="118dp"
-                android:layout_height="34dp"
+                android:layout_width="136dp"
+                android:layout_height="39dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="60dp">
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="53dp">
 
                 <View
                     android:id="@+id/da_warm_bg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/da_warm_bg"
+                    android:background="@drawable/ling_warm_bg"
                     android:visibility="invisible" />
 
                 <View
                     android:id="@+id/fault"
-                    android:layout_width="20dp"
-                    android:layout_height="13dp"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_width="24dp"
+                    android:layout_height="17dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="18dp"
                     android:background="@drawable/fault_show" />
 
                 <View
                     android:id="@+id/voltage"
-                    android:layout_width="19dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="35dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_width="23dp"
+                    android:layout_height="17dp"
+                    android:layout_marginLeft="42dp"
+                    android:layout_marginTop="18dp"
                     android:background="@drawable/voltage_show" />
 
                 <View
                     android:id="@+id/speed"
-                    android:layout_width="21dp"
-                    android:layout_height="11dp"
-                    android:layout_marginLeft="66dp"
-                    android:layout_marginTop="13dp"
+                    android:layout_width="24dp"
+                    android:layout_height="13dp"
+                    android:layout_marginLeft="76dp"
+                    android:layout_marginTop="20dp"
                     android:background="@drawable/speed_show" />
 
                 <View
                     android:id="@+id/tired"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="98dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_width="18dp"
+                    android:layout_height="17dp"
+                    android:layout_marginLeft="114dp"
+                    android:layout_marginTop="18dp"
                     android:background="@drawable/tired_show" />
 
             </FrameLayout>
@@ -168,22 +167,21 @@
             android:layout_width="188dp"
             android:layout_height="188dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="275dp"
             android:layout_marginBottom="10dp">
 
             <View
                 android:id="@+id/pro_rpm_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/pro_rpm_bg"
+                android:background="@drawable/ling_rpm_bg"
                 android:visibility="invisible" />
 
             <View
                 android:id="@+id/pro_rpm"
                 android:layout_width="170dp"
                 android:layout_height="134dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="9dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/pro_rpm_show" />
         </FrameLayout>
 
@@ -198,7 +196,7 @@
                 android:id="@+id/da_tire_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_tire_bg"
+                android:background="@drawable/ling_tire_bg"
                 android:visibility="invisible" />
 
             <View

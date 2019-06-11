@@ -570,7 +570,7 @@ public class ProtocolUtils {
         result[4] = (byte) type;
         result[5] = (byte) ((distance >> 8) & 0xFF);
         result[6] = (byte) (distance & 0xFF);
-        result[7] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6]);
         result[8] = PROTOCOL_HEAD_TAIL;
         return result;
     }

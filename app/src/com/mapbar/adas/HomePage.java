@@ -332,7 +332,15 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void showLaneInfo(AMapLaneInfo[] aMapLaneInfos, byte[] bytes, byte[] bytes1) {
-
+                        int enter = 0;
+                        int count = 0;
+                        for (int i = 0; i < aMapLaneInfos.length; i++) {
+                            if (aMapLaneInfos[i].isRecommended()) {
+                                enter += Math.pow(2, i);
+                            }
+                            count = aMapLaneInfos[0].laneCount;
+                        }
+                        BlueManager.getInstance().send(ProtocolUtils.getLineInfo(true, count, enter));
                     }
 
                     @Override

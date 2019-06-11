@@ -5,8 +5,8 @@
     android:background="@android:color/black">
 
     <RelativeLayout
-        android:layout_width="550dp"
-        android:layout_height="312dp"
+        android:layout_width="592dp"
+        android:layout_height="330dp"
         android:layout_centerInParent="true"
         android:orientation="vertical">
 
@@ -45,7 +45,7 @@
                 android:id="@+id/da_speed_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_speed_bg"
+                android:background="@drawable/lily_speed_bg"
                 android:visibility="invisible" />
 
             <View
@@ -124,7 +124,7 @@
                 android:id="@+id/da_rpm_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/da_rpm_bg"
+                android:background="@drawable/lily_rpm_bg"
                 android:visibility="invisible" />
 
             <View

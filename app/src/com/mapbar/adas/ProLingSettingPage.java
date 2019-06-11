@@ -504,7 +504,7 @@ public class ProLingSettingPage extends AppBasePage implements View.OnClickListe
         if (null != hudStatus) {
             remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.da_remaining_show : R.drawable.da_remaining_dismiss);
             tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_temp_show : R.drawable.da_temp_dismiss);
-            da_speedV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_speed_show : R.drawable.da_speed_dismiss);
+            da_speedV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.ling_speed_show : R.drawable.ling_speed_dismiss);
             da_mileV.setBackgroundResource(hudStatus.isMileShow() ? R.drawable.da_mile_show : R.drawable.da_mile_dismiss);
             pro_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.pro_rpm_show : R.drawable.pro_rpm_dismiss);
             da_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.da_tire_show : R.drawable.da_tire_dismiss);
