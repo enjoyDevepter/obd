@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <RelativeLayout
+        android:layout_width="608dp"
+        android:layout_height="310dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <!--多功能区 -->
+        <FrameLayout
+            android:layout_width="156dp"
+            android:layout_height="99dp"
+            android:layout_alignParentRight="true">
+
+            <View
+                android:id="@+id/f3_multifunctional_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_multifunctional_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_multifunctional"
+                android:layout_width="91dp"
+                android:layout_height="57dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="37dp"
+                android:background="@drawable/f3_multifunctional_voltage_show" />
+
+        </FrameLayout>
+
+        <!-- 胎压-->
+        <FrameLayout
+            android:layout_width="58dp"
+            android:layout_height="99dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="170dp">
+
+            <View
+                android:id="@+id/f3_tire_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_tire_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_tire"
+                android:layout_width="33dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="11dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/da_tire_show" />
+
+        </FrameLayout>
+
+        <!-- 转速-->
+        <FrameLayout
+            android:layout_width="466dp"
+            android:layout_height="102dp"
+            android:layout_marginTop="89dp">
+
+            <View
+                android:id="@+id/f3_rpm_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_rpm_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_rpm"
+                android:layout_width="385dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="69dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/f3_rpm_show" />
+
+        </FrameLayout>
+
+        <!-- 瞬时油耗-->
+        <FrameLayout
+            android:layout_width="302dp"
+            android:layout_height="127dp"
+            android:layout_marginLeft="64dp">
+
+            <View
+                android:id="@+id/f3_oil_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_oil_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_oil"
+                android:layout_width="282dp"
+                android:layout_height="65dp"
+                android:layout_marginLeft="11dp"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/f3_oil_show" />
+
+        </FrameLayout>
+
+
+        <!-- 剩余燃油-->
+        <FrameLayout
+            android:layout_width="120dp"
+            android:layout_height="92dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="12dp"
+            android:layout_marginBottom="105dp">
+
+            <View
+                android:id="@+id/f3_remaining_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_remaining_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_remaining"
+                android:layout_width="94dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="33dp"
+                android:background="@drawable/f3_remaining_show" />
+        </FrameLayout>
+
+        <!-- 水温-->
+        <FrameLayout
+            android:layout_width="121dp"
+            android:layout_height="95dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp">
+
+            <View
+                android:id="@+id/f3_temp_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_temp_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_temp"
+                android:layout_width="94dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/f3_temp_show" />
+        </FrameLayout>
+
+        <!-- 速度-->
+        <FrameLayout
+            android:layout_width="269dp"
+            android:layout_height="143dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="129dp">
+
+            <View
+                android:id="@+id/f3_speed_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_speed_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/f3_speed"
+                android:layout_width="253dp"
+                android:layout_height="102dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/f3_speed_show" />
+        </FrameLayout>
+
+        <!-- 预警一-->
+        <FrameLayout
+            android:layout_width="84dp"
+            android:layout_height="109dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="43dp">
+
+            <View
+                android:id="@+id/f3_warm_bg1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_warm_bg1"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/fault"
+                android:layout_width="25dp"
+                android:layout_height="17dp"
+                android:layout_marginLeft="37dp"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/fault_show" />
+
+            <View
+                android:id="@+id/voltage"
+                android:layout_width="23dp"
+                android:layout_height="18dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/voltage_show" />
+
+        </FrameLayout>
+
+        <!-- 预警二-->
+        <FrameLayout
+            android:layout_width="94dp"
+            android:layout_height="109dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="125dp">
+
+            <View
+                android:id="@+id/f3_warm_bg2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/f3_warm_bg2"
+                android:visibility="invisible" />
+
+
+            <View
+                android:id="@+id/tired"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/tired_show" />
+
+            <View
+                android:id="@+id/speed"
+                android:layout_width="26dp"
+                android:layout_height="14dp"
+                android:layout_marginLeft="33dp"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/speed_show" />
+
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/setting"
+        android:layout_width="46dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/setting_bg"
+        android:gravity="center"
+        android:text="设置"
+        android:textColor="#FFFEFEFE"
+        android:textSize="14sp" />
+
+
+</RelativeLayout>

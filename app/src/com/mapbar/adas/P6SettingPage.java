@@ -520,7 +520,7 @@ public class P6SettingPage extends AppBasePage implements View.OnClickListener, 
         if (null != hudStatus) {
             lily_remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.lily_remaining_show : R.drawable.lily_remaining_dismiss);
             lily_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.lily_temp_show : R.drawable.lily_temp_dismiss);
-            da_speedV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_speed_show : R.drawable.da_speed_dismiss);
+            da_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.da_speed_show : R.drawable.da_speed_dismiss);
             da_mileV.setBackgroundResource(hudStatus.isMileShow() ? R.drawable.da_mile_show : R.drawable.da_mile_dismiss);
             da_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.da_rpm_show : R.drawable.da_rpm_dismiss);
             da_oilV.setBackgroundResource(hudStatus.isOilShow() ? R.drawable.da_oil_show : R.drawable.da_oil_dismiss);

@@ -33,6 +33,53 @@
                 android:background="@drawable/multifunctional_voltage_show" />
 
         </FrameLayout>
+        <!-- 转速-->
+        <FrameLayout
+            android:layout_width="137dp"
+            android:layout_height="262dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="368dp"
+            android:layout_marginBottom="10dp">
+
+            <View
+                android:id="@+id/da_rpm_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/lily_rpm_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_rpm"
+                android:layout_width="73dp"
+                android:layout_height="211dp"
+                android:layout_marginLeft="38dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/da_rpm_show" />
+        </FrameLayout>
+
+        <!-- 瞬时油耗-->
+        <FrameLayout
+            android:layout_width="115dp"
+            android:layout_height="262dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="72dp"
+            android:layout_marginBottom="10dp">
+
+            <View
+                android:id="@+id/da_oil_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/da_oil_bg"
+                android:visibility="invisible" />
+
+            <View
+                android:id="@+id/da_oil"
+                android:layout_width="75dp"
+                android:layout_height="201dp"
+                android:layout_marginLeft="3dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/da_oil_show" />
+        </FrameLayout>
 
         <!-- 速度面板-->
         <FrameLayout
@@ -112,54 +159,6 @@
 
             </FrameLayout>
         </FrameLayout>
-        <!-- 转速-->
-        <FrameLayout
-            android:layout_width="137dp"
-            android:layout_height="262dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="368dp"
-            android:layout_marginBottom="10dp">
-
-            <View
-                android:id="@+id/da_rpm_bg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/lily_rpm_bg"
-                android:visibility="invisible" />
-
-            <View
-                android:id="@+id/da_rpm"
-                android:layout_width="73dp"
-                android:layout_height="211dp"
-                android:layout_marginLeft="38dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/da_rpm_show" />
-        </FrameLayout>
-
-        <!-- 瞬时油耗-->
-        <FrameLayout
-            android:layout_width="115dp"
-            android:layout_height="262dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="72dp"
-            android:layout_marginBottom="10dp">
-
-            <View
-                android:id="@+id/da_oil_bg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/da_oil_bg"
-                android:visibility="invisible" />
-
-            <View
-                android:id="@+id/da_oil"
-                android:layout_width="75dp"
-                android:layout_height="201dp"
-                android:layout_marginLeft="3dp"
-                android:layout_marginTop="7dp"
-                android:background="@drawable/da_oil_show" />
-        </FrameLayout>
-
         <!-- 水温 -->
         <FrameLayout
             android:layout_width="86dp"

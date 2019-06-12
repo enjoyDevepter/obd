@@ -122,7 +122,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             PageManager.go(new F2SettingPage());
                             break;
                         case 0x23:
-//                            PageManager.go(new F3SettingPage());
+                            PageManager.go(new F3SettingPage());
                             break;
                         case 0x24:
 //                            PageManager.go(new F4SettingPage());
