@@ -515,6 +515,42 @@ public class ProtocolUtils {
     }
 
     /**
+     * 获取盒子参数
+     *
+     * @return
+     */
+    public static byte[] getHUDParams() {
+        Log.d("Protocol getHUDWarmStatus ===");
+        byte[] result = new byte[6];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8B;
+        result[2] = 01;
+        result[3] = 0;
+        result[4] = (byte) (result[1] ^ result[2] ^ result[3]);
+        result[5] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 设置HUD参数
+     *
+     * @return
+     */
+    public static byte[] setHUDParams(int type, int value) {
+        Log.d("Protocol setHUDParams ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8B;
+        result[2] = 01;
+        result[3] = 1;
+        result[4] = (byte) type;
+        result[5] = (byte) value;
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
      * 转向
      *
      * @param turnType

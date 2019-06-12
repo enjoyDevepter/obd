@@ -22,6 +22,8 @@ import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 public class F6SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;
+    @ViewInject(R.id.params)
+    TextView paramsV;
     @ViewInject(R.id.ff_speed_bg)
     View ff_speed_bgV;
     @ViewInject(R.id.ff_speed)
@@ -71,6 +73,7 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
         BlueManager.getInstance().send(ProtocolUtils.getHUDStatus());
         BlueManager.getInstance().send(ProtocolUtils.getHUDWarmStatus());
         settingV.setOnClickListener(this);
+        paramsV.setOnClickListener(this);
         ff_speedV.setOnClickListener(this);
         ff_tireV.setOnClickListener(this);
         multifunctionalV.setOnClickListener(this);
@@ -110,6 +113,9 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
                 ff_rpm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 ff_oil_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 ff_oil_l_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                break;
+            case R.id.params:
+                PageManager.go(new HUDSettingPage());
                 break;
             default:
                 if (choice) {

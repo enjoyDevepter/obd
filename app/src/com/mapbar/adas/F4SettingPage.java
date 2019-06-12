@@ -22,6 +22,8 @@ import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 public class F4SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;
+    @ViewInject(R.id.params)
+    TextView paramsV;
     @ViewInject(R.id.f3_multifunctional_bg)
     View f3_multifunctional_bgV;
     @ViewInject(R.id.f3_multifunctional)
@@ -34,10 +36,6 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
     View p4_rpm_bgV;
     @ViewInject(R.id.p4_rpm)
     View p4_rpmV;
-    @ViewInject(R.id.f3_oil_bg)
-    View f3_oil_bgV;
-    @ViewInject(R.id.f3_oil)
-    View f3_oilV;
     @ViewInject(R.id.f3_remaining_bg)
     View f3_remaining_bgV;
     @ViewInject(R.id.f3_remaining)
@@ -73,10 +71,10 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
         BlueManager.getInstance().send(ProtocolUtils.getHUDStatus());
         BlueManager.getInstance().send(ProtocolUtils.getHUDWarmStatus());
         settingV.setOnClickListener(this);
+        paramsV.setOnClickListener(this);
         f3_multifunctionalV.setOnClickListener(this);
         f3_tireV.setOnClickListener(this);
         p4_rpmV.setOnClickListener(this);
-        f3_oilV.setOnClickListener(this);
         f3_remainingV.setOnClickListener(this);
         f3_tempV.setOnClickListener(this);
         p4_speedV.setOnClickListener(this);
@@ -107,11 +105,13 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
                 f3_multifunctional_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 f3_tire_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 p4_rpm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                f3_oil_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 f3_remaining_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 f3_temp_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 p4_speed_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 p4_warm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                break;
+            case R.id.params:
+                PageManager.go(new HUDSettingPage());
                 break;
             default:
                 if (choice) {
@@ -447,7 +447,6 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
 
     private void updateUI() {
         if (null != hudStatus) {
-            f3_oilV.setBackgroundResource(hudStatus.isOilShow() ? R.drawable.f3_oil_show : R.drawable.f3_oil_dismiss);
             f3_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.da_tire_show : R.drawable.da_tire_dismiss);
             f3_remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.f3_remaining_show : R.drawable.f3_remaining_dismiss);
             p4_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.p4_rpm_show : R.drawable.p4_rpm_dismiss);

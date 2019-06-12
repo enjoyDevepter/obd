@@ -76,6 +76,7 @@ public class BlueManager {
     private static final int MSG_COMMON_INFO = 170; // 统一回复信息
     private static final int MSG_HUD_STATUS_INFO = 180; // HUD区域属性
     private static final int MSG_HUD_WARM_STATUS_INFO = 181; // HUD区域警告属性
+    private static final int MSG_HUD_PARAMS_INFO = 182; // HUD参数属性
 
 
     private static final int MSG_VERIFY = 2;
@@ -126,7 +127,7 @@ public class BlueManager {
                 return;
             }
             scanResult.add(name);
-            if (name != null && name.toUpperCase().startsWith("MYOBD")){
+            if (name != null && name.toUpperCase().startsWith("MYOBD")) {
                 Log.d("device.getName()=    " + device.getName() + " device.getAddress()=" + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
@@ -953,8 +954,51 @@ public class BlueManager {
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
-            } else if (content[0] == 0x0B) { // 警报属性设置反馈
-                if (content[1] == 2) {
+            } else if (content[0] == 0x0B) {
+                if (content[1] == 1) { // HUD  参数
+                    int count = content[4];
+                    HUDParams params = new HUDParams();
+                    for (int i = 0; i < count; i++) {
+                        int value = content[6 + i * 2];
+                        switch (content[5 + i * 2]) {
+                            case 0x01: // 亮度等级
+                                params.setLight(value);
+                                break;
+                            case 0x02: // 音量等级
+                                params.setVolume(value);
+                                break;
+                            case 0x03: // 疲劳驾驶时长
+                                params.setDriveTime(value);
+                                break;
+                            case 0x04: // 水温报警
+                                params.setTempWarm(value);
+                                break;
+                            case 0x05: // 语音播报开关
+                                params.setSound(value == 1);
+                                break;
+                            case 0x06: // 车辆自动启停配置
+                                params.setStart(value);
+                                break;
+                            case 0x07: // 休眠模式
+                                params.setSleep(value == 1);
+                                break;
+                            case 0x08: // 车速误差
+                                params.setSpeedError(value);
+                                break;
+                            case 0x09: // 超速阈值
+                                params.setOverspeed(value);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_HUD_PARAMS_INFO;
+                    bundle.putSerializable("HUDParams", params);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                } else if (content[1] == 2) { // 警报属性设置反馈
                     int count = content[4];
                     HUDWarmStatus warmStatus = new HUDWarmStatus();
                     for (int i = 0; i < count; i++) {
@@ -1385,6 +1429,15 @@ public class BlueManager {
                         public void run() {
                             Log.d("OBDEvent.HUD_WARM_STATUS_INFO");
                             notifyBleCallBackListener(OBDEvent.HUD_WARM_STATUS_INFO, bundle.getSerializable("HUDWarmStatus"));
+                        }
+                    });
+                    break;
+                case MSG_HUD_PARAMS_INFO:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.HUD_WARM_STATUS_INFO");
+                            notifyBleCallBackListener(OBDEvent.HUD_PARAMS_INFO, bundle.getSerializable("HUDParams"));
                         }
                     });
                     break;
