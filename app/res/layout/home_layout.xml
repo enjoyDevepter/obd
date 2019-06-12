@@ -149,13 +149,13 @@
                         <View
                             android:layout_width="78dp"
                             android:layout_height="78dp"
-                            android:background="@drawable/message" />
+                            android:background="@drawable/hud" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
-                            android:text="消息中心"
+                            android:text="HUD界面设置"
                             android:textColor="#FF303030"
                             android:textSize="17sp" />
 
@@ -172,13 +172,13 @@
                         <View
                             android:layout_width="78dp"
                             android:layout_height="78dp"
-                            android:background="@drawable/hud" />
+                            android:background="@drawable/navi" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
-                            android:text="HUD模式"
+                            android:text="高德导航"
                             android:textColor="#FF303030"
                             android:textSize="17sp" />
 

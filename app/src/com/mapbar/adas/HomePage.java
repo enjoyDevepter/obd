@@ -154,7 +154,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.hud:
-//                PageManager.go(new HUDPage());
                 AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
                     @Override
                     public void onInitNaviFailure() {
@@ -193,11 +192,12 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void onEndEmulatorNavi() {
-
+                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
                     }
 
                     @Override
                     public void onArriveDestination() {
+                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
 
                     }
 
@@ -318,6 +318,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                     break;
                             }
                             BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getCameraSpeed()));
+                        } else {
+                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
                         }
                     }
 
@@ -354,19 +356,17 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     @Override
                     public void showLaneInfo(AMapLaneInfo[] aMapLaneInfos, byte[] bytes, byte[] bytes1) {
                         int enter = 0;
-                        int count = 0;
+                        int count = aMapLaneInfos.length;
                         for (int i = 0; i < aMapLaneInfos.length; i++) {
                             if (aMapLaneInfos[i].isRecommended()) {
                                 enter += Math.pow(2, i);
                             }
-                            count = aMapLaneInfos[0].laneCount;
                         }
                         BlueManager.getInstance().send(ProtocolUtils.getLineInfo(true, count, enter));
                     }
 
                     @Override
                     public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
-//                        BlueManager.getInstance().send(ProtocolUtils.getLineInfo(true, aMapLaneInfo.laneCount, 0));
                     }
 
                     @Override
