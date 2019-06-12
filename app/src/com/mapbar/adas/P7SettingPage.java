@@ -18,23 +18,23 @@ import com.miyuan.obd.R;
 import static com.mapbar.hamster.OBDEvent.HUD_STATUS_INFO;
 import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 
-@PageSetting(contentViewId = R.layout.pro_lily_layout, toHistory = false)
-public class ProLilySettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+@PageSetting(contentViewId = R.layout.p7_layout, toHistory = false)
+public class P7SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;
     @ViewInject(R.id.multifunctional_bg)
     View multifunctional_bgV;
     @ViewInject(R.id.multifunctional)
     View multifunctionalV;
-    @ViewInject(R.id.lily_remaining_bg)
-    View lily_remaining_bgV;
-    @ViewInject(R.id.lily_remaining)
-    View lily_remainingV;
+    @ViewInject(R.id.remaining_bg)
+    View remaining_bgV;
+    @ViewInject(R.id.remaining)
+    View remainingV;
 
-    @ViewInject(R.id.lily_temp_bg)
-    View lily_temp_bgV;
-    @ViewInject(R.id.lily_temp)
-    View lily_tempV;
+    @ViewInject(R.id.da_temp_bg)
+    View da_temp_bgV;
+    @ViewInject(R.id.temp)
+    View tempV;
 
     @ViewInject(R.id.da_speed_bg)
     View da_speed_bgV;
@@ -78,8 +78,8 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
         BlueManager.getInstance().send(ProtocolUtils.getHUDWarmStatus());
         settingV.setOnClickListener(this);
         multifunctionalV.setOnClickListener(this);
-        lily_remainingV.setOnClickListener(this);
-        lily_tempV.setOnClickListener(this);
+        remainingV.setOnClickListener(this);
+        tempV.setOnClickListener(this);
         da_speedV.setOnClickListener(this);
         da_mileV.setOnClickListener(this);
         da_warm_bgV.setOnClickListener(this);
@@ -108,8 +108,8 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                 }
                 settingV.setSelected(!choice);
                 multifunctional_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                lily_remaining_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
-                lily_temp_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                remaining_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
+                da_temp_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 da_speed_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 da_warm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 da_rpm_bgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
@@ -135,7 +135,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
             case R.id.da_tire:
                 showNormalDailog(viewId, "胎压显示区", hudStatus.isTireShow());
                 break;
-            case R.id.lily_temp:
+            case R.id.temp:
                 showNormalDailog(viewId, "水温显示区", hudStatus.isTempShow());
                 break;
             case R.id.da_mile:
@@ -147,7 +147,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
             case R.id.da_oil:
                 showNormalDailog(viewId, "瞬时油耗显示区", hudStatus.isOilShow());
                 break;
-            case R.id.lily_remaining:
+            case R.id.remaining:
                 showNormalDailog(viewId, "剩余燃油显示区", hudStatus.isRemainderOilShow());
                 break;
             case R.id.da_warm_bg:
@@ -254,7 +254,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                         });
                     }
                 })
-                .setLayoutRes(R.layout.da_setting_multifunctional_dailog)
+                .setLayoutRes(R.layout.ff_setting_multifunctional_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
@@ -281,7 +281,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_tire:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 01));
                                         break;
-                                    case R.id.lily_temp:
+                                    case R.id.temp:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 01));
                                         break;
                                     case R.id.da_rpm:
@@ -290,7 +290,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_oil:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 01));
                                         break;
-                                    case R.id.lily_remaining:
+                                    case R.id.remaining:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 01));
                                         break;
                                     case R.id.da_mile:
@@ -315,7 +315,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_tire:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 00));
                                         break;
-                                    case R.id.lily_temp:
+                                    case R.id.temp:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 00));
                                         break;
                                     case R.id.da_rpm:
@@ -324,7 +324,7 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
                                     case R.id.da_oil:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
                                         break;
-                                    case R.id.lily_remaining:
+                                    case R.id.remaining:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 00));
                                         break;
                                     case R.id.da_mile:
@@ -518,8 +518,8 @@ public class ProLilySettingPage extends AppBasePage implements View.OnClickListe
 
     private void updateUI() {
         if (null != hudStatus) {
-            lily_remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.lily_remaining_show : R.drawable.lily_remaining_dismiss);
-            lily_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.lily_temp_show : R.drawable.lily_temp_dismiss);
+            remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.da_remaining_show : R.drawable.da_remaining_dismiss);
+            tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_temp_show : R.drawable.da_temp_dismiss);
             da_speedV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_speed_show : R.drawable.da_speed_dismiss);
             da_mileV.setBackgroundResource(hudStatus.isMileShow() ? R.drawable.da_mile_show : R.drawable.da_mile_dismiss);
             da_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.da_rpm_show : R.drawable.da_rpm_dismiss);
