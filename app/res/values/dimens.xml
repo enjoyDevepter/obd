@@ -42,6 +42,9 @@
     <dimen name="padding_10">5dp</dimen>
     <dimen name="padding_38">19dp</dimen>
     <dimen name="padding_20">10dp</dimen>
+    <dimen name="top_6">6dp</dimen>
+    <dimen name="top_9">9dp</dimen>
+    <dimen name="top_17">17dp</dimen>
     <dimen name="speed_size">9sp</dimen>
     <dimen name="size_40">20dp</dimen>
     <dimen name="size_22">11dp</dimen>
@@ -53,5 +56,6 @@
 
     <dimen name="physical_normal_item_height">42dp</dimen>
     <dimen name="physical_error_item_height">32dp</dimen>
+    <dimen name="setting_item_padding">25dp</dimen>
 
 </resources>

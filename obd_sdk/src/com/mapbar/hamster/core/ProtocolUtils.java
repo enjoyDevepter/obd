@@ -520,7 +520,7 @@ public class ProtocolUtils {
      * @return
      */
     public static byte[] getHUDParams() {
-        Log.d("Protocol getHUDWarmStatus ===");
+        Log.d("Protocol getHUDParams ===");
         byte[] result = new byte[6];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x8B;

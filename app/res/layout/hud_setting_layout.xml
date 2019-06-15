@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/tittle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/title_color"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/back"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/back" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="58dp"
+            android:text="安装引导一"
+            android:textColor="@color/title"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/report"
+            android:layout_width="44dp"
+            android:layout_height="18dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="9dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/report_bg"
+            android:gravity="center"
+            android:text="上报错误"
+            android:textColor="#FFB0B0AF"
+            android:textSize="8dp" />
+
+    </FrameLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/light"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/light"
+                app:icon="@drawable/light"
+                app:subTitle="0:自动,1~7个等级可调节,亮度由暗到亮"
+                app:subTitleType="one"
+                app:title="亮度" />
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/volume"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/volume"
+                app:icon="@drawable/volume"
+                app:subTitle="0:静音,1~8个等级可调节,声音由低到高"
+                app:subTitleType="one"
+                app:title="音量" />
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/tempWarm"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/tempWarm"
+                app:icon="@drawable/tempwarm"
+                app:subTitle="90~120℃可设置"
+                app:subTitleType="one"
+                app:title="水温报警"
+                app:unit="℃" />
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/overSpeed"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/overSpeed"
+                app:icon="@drawable/speederror"
+                app:subTitle="10~200可设置"
+                app:subTitleType="one"
+                app:title="超速报警"
+                app:unit="Km/h" />
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/speedCalibration"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/speedCalibration"
+                app:icon="@drawable/speedcalibration"
+                app:subTitle=" 0~20个等级可设置,\nHUD显示时速偏高可适当调小该值,反之可适当调大该值."
+                app:subTitleType="two"
+                app:title="车速校准"
+                app:unit="%" />
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/mileCalibration"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/mileCalibration"
+                app:icon="@drawable/milecalibration"
+                app:subTitle="0~20个等级可设置,\nHUD显示里程偏高可适当调小该值,反之可适当调大该值."
+                app:subTitleType="two"
+                app:title="里程校准"
+                app:unit="%" />
+
+            <com.mapbar.adas.view.SettingItem
+                android:id="@+id/driveTime"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:content="@array/driveTime"
+                app:icon="@drawable/drivetime"
+                app:subTitleType="no"
+                app:title="疲劳驾驶提醒"
+                app:unit="小时" />
+
+            <!--  智能高速模式-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/setting_item_bg">
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/highmode" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="29dp"
+                    android:text="智能高速模式"
+                    android:textColor="#FF494949"
+                    android:textSize="18sp" />
+
+                <View
+                    android:id="@+id/divide"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="#FFD2D2D2" />
+
+                <TextView
+                    android:layout_width="210dp"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/divide"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginBottom="8dp"
+                    android:maxLines="2"
+                    android:text="开启时,车速＞80km/h,HUD界面自动只显示车速"
+                    android:textAlignment="textEnd"
+                    android:textColor="#FFAAAAAA"
+                    android:textSize="8sp" />
+
+                <LinearLayout
+                    android:id="@+id/highmode"
+                    android:layout_width="84dp"
+                    android:layout_height="26dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="35dp"
+                    android:background="@drawable/setting_item_switch_bg"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#FF35BDB2"
+                        android:gravity="center"
+                        android:text="开启"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="#FFBCBCBC"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <!--  行程结束语音播报-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/setting_item_bg">
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/sound" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="29dp"
+                    android:text="行程结束语音播报"
+                    android:textColor="#FF494949"
+                    android:textSize="18sp" />
+
+
+                <View
+                    android:id="@+id/divide1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="#FFD2D2D2" />
+
+                <LinearLayout
+                    android:id="@+id/sound"
+                    android:layout_width="84dp"
+                    android:layout_height="26dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="35dp"
+                    android:background="@drawable/setting_item_switch_bg"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#FF35BDB2"
+                        android:gravity="center"
+                        android:text="开启"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="#FFBCBCBC"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <!--  功耗模式-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/setting_item_bg">
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/powermode" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="29dp"
+                    android:text="功耗模式"
+                    android:textColor="#FF494949"
+                    android:textSize="18sp" />
+
+                <View
+                    android:id="@+id/divide2"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="#FFD2D2D2" />
+
+                <TextView
+                    android:layout_width="168dp"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/divide2"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginBottom="8dp"
+                    android:maxLines="2"
+                    android:text="检测不到车辆启动时可设置为睡眠模式"
+                    android:textAlignment="textEnd"
+                    android:textColor="#FFAAAAAA"
+                    android:textSize="8sp" />
+
+
+                <LinearLayout
+                    android:id="@+id/sleep"
+                    android:layout_width="84dp"
+                    android:layout_height="26dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="35dp"
+                    android:background="@drawable/setting_item_switch_bg"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#FF35BDB2"
+                        android:gravity="center"
+                        android:text="开启"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="#FFBCBCBC"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <!--  自动启停功能-->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/setting_item_bg">
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/start" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="29dp"
+                    android:layout_marginTop="12dp"
+                    android:text="自动启停功能"
+                    android:textColor="#FF494949"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="35dp"
+                    android:layout_marginTop="44dp"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="0:未配置启停功能.\n1:熄火等红灯时不会息屏,真正熄火停车大约1分钟左右息屏,有语音播报.\n2:熄火等红灯时会暂时息屏,车辆再次行驶后,屏幕会再次点亮,\n   真正熄火停车后,屏幕立马息屏,没有语音播报."
+                    android:textColor="#FFAAAAAA"
+                    android:textSize="8sp" />
+
+                <LinearLayout
+                    android:layout_width="125dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="35dp"
+                    android:background="@drawable/setting_item_switch_bg"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/start0"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#FF35BDB2"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="0.5dp"
+                        android:layout_height="match_parent"
+                        android:background="#FFC8F7F3" />
+
+                    <TextView
+                        android:id="@+id/start1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textColor="#FFBCBCBC"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="0.5dp"
+                        android:layout_height="match_parent"
+                        android:background="#FFC8F7F3" />
+
+                    <TextView
+                        android:id="@+id/start2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="2"
+                        android:textColor="#FFBCBCBC"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_gravity="bottom"
+                    android:background="#FFD2D2D2" />
+
+            </FrameLayout>
+
+            <!--  导航模式-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/setting_item_bg">
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/navimode" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="29dp"
+                    android:text="导航模式"
+                    android:textColor="#FF494949"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="168dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="35dp"
+                    android:layout_marginBottom="1dp"
+                    android:maxLines="2"
+                    android:text="此功能仅支持导航版,\n开启时,HUD界面自动只显示导航+车速。"
+                    android:textAlignment="textEnd"
+                    android:textColor="#FFAAAAAA"
+                    android:textSize="8sp" />
+
+
+                <LinearLayout
+                    android:id="@+id/naviMode"
+                    android:layout_width="84dp"
+                    android:layout_height="26dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="35dp"
+                    android:background="@drawable/setting_item_switch_bg"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#FF35BDB2"
+                        android:gravity="center"
+                        android:text="开启"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="关闭"
+                        android:textColor="#FFBCBCBC"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>

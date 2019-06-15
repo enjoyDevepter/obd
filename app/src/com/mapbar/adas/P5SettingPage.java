@@ -520,16 +520,16 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
                     multifunctionalV.setBackgroundResource(R.drawable.multifunctional_dismiss);
                     break;
                 case 0x01:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_temp_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_temp_show);
                     break;
                 case 0x04:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_l_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_avg_oil_show);
                     break;
                 case 0x05:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_oil_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_oil_show);
                     break;
                 case 0x08:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_voltage_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_voltage_show);
                     break;
                 default:
                     break;

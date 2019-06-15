@@ -545,7 +545,6 @@ public class BlueManager {
      * @param data
      */
     public synchronized void analyzeProtocol(byte[] data) {
-        Log.d(" analyzeProtocol");
         if (null != data && data.length > 0) {
             if (data[0] == ProtocolUtils.PROTOCOL_HEAD_TAIL && data.length != 1 && unfinish && data.length >= 7) {
                 // 获取包长度
@@ -600,7 +599,6 @@ public class BlueManager {
      * @param res
      */
     private void validateAndNotify(byte[] res) {
-        Log.d(" validateAndNotify");
         if (!((res[0] == (byte) 0x09 && res[1] == 01) || (res[0] == (byte) 0x08 && res[1] == 03))) {
             Log.d(" validateAndNotify next ");
             timeOutThread.endCommand();
@@ -983,10 +981,19 @@ public class BlueManager {
                                 params.setSleep(value == 1);
                                 break;
                             case 0x08: // 车速误差
-                                params.setSpeedError(value);
+                                params.setSpeedCalibration(value);
                                 break;
                             case 0x09: // 超速阈值
-                                params.setOverspeed(value);
+                                params.setOverSpeed(value);
+                                break;
+                            case 0x0A: // 智能高速模式
+                                params.setHighMode(value == 1);
+                                break;
+                            case 0x0B: // 里程误差校准
+                                params.setMileCalibration(value);
+                                break;
+                            case 0x0C: // 导航模式
+                                params.setHighMode(value == 1);
                                 break;
                             default:
                                 break;
@@ -1436,7 +1443,7 @@ public class BlueManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("OBDEvent.HUD_WARM_STATUS_INFO");
+                            Log.d("OBDEvent.MSG_HUD_PARAMS_INFO");
                             notifyBleCallBackListener(OBDEvent.HUD_PARAMS_INFO, bundle.getSerializable("HUDParams"));
                         }
                     });

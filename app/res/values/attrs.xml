@@ -19,4 +19,17 @@
     <declare-styleable name="Typeface">
         <attr name="typeface" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="SettingItemView">
+        <attr name="title" format="string" />
+        <attr name="subTitle" format="string" />
+        <attr name="icon" format="reference" />
+        <attr name="unit" format="string" />
+        <attr name="content" format="reference" />
+        <attr name="subTitleType" format="enum">
+            <enum name="no" value="0" />
+            <enum name="one" value="1" />
+            <enum name="two" value="2" />
+        </attr>
+    </declare-styleable>
 </resources>

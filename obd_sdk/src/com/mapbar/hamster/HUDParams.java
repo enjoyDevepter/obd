@@ -13,8 +13,11 @@ public class HUDParams implements Serializable {
     private boolean sound;
     private int start;
     private boolean sleep;
-    private int speedError;
-    private int overspeed;
+    private int speedCalibration;
+    private int overSpeed;
+    private boolean highMode;
+    private int mileCalibration;
+    private boolean naviMode;
 
     public int getLight() {
         return light;
@@ -73,20 +76,44 @@ public class HUDParams implements Serializable {
         this.sleep = sleep;
     }
 
-    public int getSpeedError() {
-        return speedError;
+    public int getSpeedCalibration() {
+        return speedCalibration;
     }
 
-    public void setSpeedError(int speedError) {
-        this.speedError = speedError;
+    public void setSpeedCalibration(int speedCalibration) {
+        this.speedCalibration = speedCalibration;
     }
 
-    public int getOverspeed() {
-        return overspeed;
+    public int getOverSpeed() {
+        return overSpeed;
     }
 
-    public void setOverspeed(int overspeed) {
-        this.overspeed = overspeed;
+    public void setOverSpeed(int overSpeed) {
+        this.overSpeed = overSpeed;
+    }
+
+    public boolean isHighMode() {
+        return highMode;
+    }
+
+    public void setHighMode(boolean highMode) {
+        this.highMode = highMode;
+    }
+
+    public int getMileCalibration() {
+        return mileCalibration;
+    }
+
+    public void setMileCalibration(int mileCalibration) {
+        this.mileCalibration = mileCalibration;
+    }
+
+    public boolean isNaviMode() {
+        return naviMode;
+    }
+
+    public void setNaviMode(boolean naviMode) {
+        this.naviMode = naviMode;
     }
 
     @Override
@@ -99,8 +126,11 @@ public class HUDParams implements Serializable {
                 ", sound=" + sound +
                 ", start=" + start +
                 ", sleep=" + sleep +
-                ", speedError=" + speedError +
-                ", overspeed=" + overspeed +
+                ", speedCalibration=" + speedCalibration +
+                ", overSpeed=" + overSpeed +
+                ", highMode=" + highMode +
+                ", mileCalibration=" + mileCalibration +
+                ", naviMode=" + naviMode +
                 '}';
     }
 }

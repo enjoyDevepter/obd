@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/setting_item_bg">
+
+    <View
+        android:id="@+id/icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_centerVertical="true"
+        android:background="@drawable/light" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/icon"
+        android:text="亮度"
+        android:textColor="#FF494949"
+        android:textSize="18sp" />
+
+
+    <View
+        android:id="@+id/divide"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_alignParentBottom="true"
+        android:background="#FFD2D2D2" />
+
+    <TextView
+        android:id="@+id/subTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/divide"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="35dp"
+        android:layout_marginBottom="5dp"
+        android:maxLines="2"
+        android:text="0~20个等级可设置，\nHUD显示时速偏高可适当调小该值，反之可适当调大该值。"
+        android:textAlignment="textEnd"
+        android:textColor="#FFAAAAAA"
+        android:textSize="8sp" />
+
+    <LinearLayout
+        android:id="@+id/operate"
+        android:layout_width="135dp"
+        android:layout_height="26dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="9dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/setting_item_operate_bg"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/subtract"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <View
+                    android:id="@+id/subtract_icon"
+                    android:layout_width="9dp"
+                    android:layout_height="1dp"
+                    android:background="@drawable/subtract" />
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:background="#FFA7D3CF" />
+
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="39dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#FF079085"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:background="#FFA7D3CF" />
+
+            <LinearLayout
+                android:id="@+id/add"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <View
+                    android:id="@+id/add_icon"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@drawable/add" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/unit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:gravity="center_vertical"
+            android:text="Km/h"
+            android:textColor="#FFAAAAAA"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</RelativeLayout>
+
+
+

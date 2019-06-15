@@ -228,14 +228,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void onNaviInfoUpdate(NaviInfo naviInfo) {
-                        Log.d("getCurrentRoadName  " + naviInfo.getCurrentRoadName() + "\n" +
-                                "getNextRoadName  " + naviInfo.getNextRoadName() + "\n" +
-                                "getCurrentSpeed  " + naviInfo.getCurrentSpeed() + "\n" +
-                                "getPathRetainDistance  " + naviInfo.getPathRetainDistance() + "\n" +
-                                "getPathRetainTime  " + naviInfo.getPathRetainTime() + "\n" +
-                                "getIconType  " + naviInfo.getIconType() + "\n" +
-                                "getCurStepRetainDistance  " + naviInfo.getCurStepRetainDistance()
-                        );
                         int type = 0;
                         switch (naviInfo.getIconType()) {
                             case 0:
@@ -280,10 +272,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
-                        for (AMapNaviCameraInfo cameraInfo : aMapNaviCameraInfos) {
-                            Log.d("getCameraType  " + cameraInfo.getCameraType() + "\n" +
-                                    "getCameraSpeed  " + cameraInfo.getCameraSpeed());
-                        }
                         if (aMapNaviCameraInfos.length > 0) {
                             int type = 0;
                             switch (aMapNaviCameraInfos[0].getCameraType()) {
@@ -362,6 +350,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 enter += Math.pow(2, i);
                             }
                         }
+                        Log.d("aMapLaneInfo  showLaneInfo ");
                         BlueManager.getInstance().send(ProtocolUtils.getLineInfo(true, count, enter));
                     }
 
@@ -371,6 +360,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void hideLaneInfo() {
+                        Log.d("aMapLaneInfo  hideLaneInfo ");
                         BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
                     }
 

@@ -518,6 +518,7 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
             ff_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.ff_temp_show : R.drawable.ff_temp_dismiss);
             ff_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.ff_rpm_show : R.drawable.ff_rpm_dismiss);
             ff_oil_lV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.ff_oil_l_show : R.drawable.ff_oil_l_dismiss);
+            ff_oilV.setBackgroundResource(hudStatus.isOilShow() ? R.drawable.ff_oil_show : R.drawable.ff_oil_dismiss);
             ff_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.ff_temp_show : R.drawable.ff_temp_dismiss);
 
             switch (hudStatus.getMultifunctionalOneType()) {
