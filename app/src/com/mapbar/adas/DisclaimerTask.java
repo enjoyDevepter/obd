@@ -22,13 +22,13 @@ public class DisclaimerTask extends BaseTask {
         // 第一次启动的时候
         boolean isFistSatrt = DISCALIMER_VISIBLE.get();
         if (!isFistSatrt) {
-            PageManager.go(new HomePage());
+            PageManager.go(new DisclaimerPage());
         } else {
             if (BlueManager.getInstance().isConnected()) {
-                PageManager.go(new HomePage());
+                PageManager.go(new OBDAuthPage());
             } else {
                 BlueManager.getInstance().stopScan(false);
-                PageManager.go(new HomePage());
+                PageManager.go(new ConnectPage());
             }
         }
         complate();
