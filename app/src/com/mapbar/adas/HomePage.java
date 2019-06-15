@@ -59,6 +59,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     @ViewInject(R.id.hud)
     private View hudV;
     private OBDStatusInfo obdStatusInfo;
+    private boolean showLane;
 
     @Override
     public void onResume() {
@@ -350,8 +351,11 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 enter += Math.pow(2, i);
                             }
                         }
-                        Log.d("aMapLaneInfo  showLaneInfo ");
-                        BlueManager.getInstance().send(ProtocolUtils.getLineInfo(true, count, enter));
+                        Log.d("aMapLaneInfo  showLaneInfo " + count);
+                        if (!showLane) {
+                            showLane = true;
+                            BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter));
+                        }
                     }
 
                     @Override
@@ -361,7 +365,10 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     @Override
                     public void hideLaneInfo() {
                         Log.d("aMapLaneInfo  hideLaneInfo ");
-                        BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
+                        if (showLane) {
+                            showLane = false;
+                            BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
+                        }
                     }
 
                     @Override
