@@ -10,7 +10,7 @@ public class OBDEvent {
      */
     public static final int BLUE_SCAN_STATRED = 0;
     /**
-     * 扫描设备结束<br>
+     * 扫描设备结束<br>BLUE_SCAN_FINISHED
      */
     public static final int BLUE_SCAN_FINISHED = 1;
     /**

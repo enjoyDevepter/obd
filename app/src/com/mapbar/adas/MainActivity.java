@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onResume() {
         super.onResume();
-
         PermissionUtil.requestPermissionForInit(new PermissionUtil.RequestPermission() {
             @Override
             public void onRequestPermissionSuccess() {
@@ -267,6 +266,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 break;
             case OBDEvent.COLLECT_DATA_FOR_CAR:
                 new Thread(new CarRunnable((byte[]) data)).start();
+                break;
+            default:
                 break;
         }
     }

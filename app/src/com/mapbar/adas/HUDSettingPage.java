@@ -186,7 +186,7 @@ public class HUDSettingPage extends AppBasePage implements View.OnClickListener,
                 BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0A, highModeVG.isSelected() ? 0 : 1));
                 break;
             case R.id.naviMode:
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0C, highModeVG.isSelected() ? 0 : 1));
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0C, naviModeVG.isSelected() ? 0 : 1));
                 break;
             default:
                 break;

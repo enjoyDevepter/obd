@@ -81,6 +81,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 .statusBarDarkFont(true)
                 .statusBarColor(MainActivity.getInstance().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : R.color.main_title_color)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
+
+        BlueManager.getInstance().setNavi(false);
     }
 
     @Override
@@ -155,20 +157,21 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.hud:
+                BlueManager.getInstance().setNavi(true);
                 AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
                     @Override
                     public void onInitNaviFailure() {
-
+                        Log.d("onInitNaviFailure");
                     }
 
                     @Override
                     public void onInitNaviSuccess() {
-
+                        Log.d("onInitNaviSuccess");
                     }
 
                     @Override
                     public void onStartNavi(int i) {
-
+                        Log.d("onStartNavi " + i);
                     }
 
                     @Override
@@ -193,13 +196,24 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                     @Override
                     public void onEndEmulatorNavi() {
-                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
+                        Log.d("onEndEmulatorNavi");
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
+                            }
+                        }).start();
                     }
 
                     @Override
                     public void onArriveDestination() {
-                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
-
+                        Log.d("onArriveDestination");
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
+                            }
+                        }).start();
                     }
 
                     @Override

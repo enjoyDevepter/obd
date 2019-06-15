@@ -107,6 +107,7 @@ public class BlueManager {
     private Handler mHandler;
     private int connectStatus;
     private boolean isScaning = false;
+    private boolean isNavi;
     private volatile boolean canGo = true;
     private ArrayList<String> scanResult = new ArrayList<>();
     private ArrayList<BleCallBackListener> callBackListeners = new ArrayList<>();
@@ -136,47 +137,6 @@ public class BlueManager {
             }
         }
     };
-    private volatile boolean split;
-    private byte[] mData;
-    private int mCount = 20;
-    private Queue<byte[]> mDataQueue;
-    private TimeOutThread timeOutThread;
-    private BleWriteCallback bleWriteCallback = new BleWriteCallback() {
-        @Override
-        public void onWriteSuccess(byte[] justWrite) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            write();
-        }
-
-        @Override
-        public void onWriteFailure(byte[] date) {
-            // 重新发送
-            realWrite(date);
-        }
-    };
-    private BluetoothManager bluetoothManager;
-    private byte[] currentProtocol;
-    private volatile int currentRepeat = 0;
-    private int repeat = 0;
-    private LinkedList<byte[]> instructList;
-    /**
-     * 待发送指令
-     */
-    private LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue(1);
-    /**
-     * 上一包是否接受完成
-     */
-    private boolean unfinish = true;
-    /**
-     * 完整包
-     */
-    private byte[] full;
-    private int currentIndex;
-    private int count;
     private BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -192,17 +152,17 @@ public class BlueManager {
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.d("onConnectionStateChange  STATE_DISCONNECTED");
                     connectStatus = DISCONNECTED;
+                    disconnect();
                     Message message = new Message();
                     message.what = MSG_OBD_DISCONNECTED;
                     mHandler.sendMessage(message);
-                    disconnect();
                 }
             } else {
                 connectStatus = DISCONNECTED;
+                disconnect();
                 Message message = new Message();
                 message.what = MSG_OBD_DISCONNECTED;
                 mHandler.sendMessage(message);
-                disconnect();
             }
         }
 
@@ -259,6 +219,56 @@ public class BlueManager {
             mHandler.sendMessage(message);
         }
     };
+
+    public boolean isNavi() {
+        return isNavi;
+    }
+
+    private volatile boolean split;
+    private byte[] mData;
+    private int mCount = 20;
+    private Queue<byte[]> mDataQueue;
+    private TimeOutThread timeOutThread;
+    private BleWriteCallback bleWriteCallback = new BleWriteCallback() {
+        @Override
+        public void onWriteSuccess(byte[] justWrite) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            write();
+        }
+
+        @Override
+        public void onWriteFailure(byte[] date) {
+            // 重新发送
+            realWrite(date);
+        }
+    };
+    private BluetoothManager bluetoothManager;
+    private byte[] currentProtocol;
+    private volatile int currentRepeat = 0;
+    private int repeat = 0;
+    private LinkedList<byte[]> instructList;
+    /**
+     * 待发送指令
+     */
+    private LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue(1);
+    /**
+     * 上一包是否接受完成
+     */
+    private boolean unfinish = true;
+    /**
+     * 完整包
+     */
+    private byte[] full;
+    private int currentIndex;
+    private int count;
+
+    public void setNavi(boolean navi) {
+        isNavi = navi;
+    }
 
     private BlueManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -420,7 +430,7 @@ public class BlueManager {
         }
 
         byte[] last = instructList.pollLast();
-        if (last != null && data[1] == last[1] && data[2] == last[2]) {
+        if (last != null && data[1] == last[1] && data[2] == last[2] && data[1] != 0x90) {
             return;
         }
         instructList.addLast(data);
@@ -993,7 +1003,7 @@ public class BlueManager {
                                 params.setMileCalibration(value);
                                 break;
                             case 0x0C: // 导航模式
-                                params.setHighMode(value == 1);
+                                params.setNaviMode(value == 1);
                                 break;
                             default:
                                 break;
@@ -1183,12 +1193,18 @@ public class BlueManager {
                     });
                     break;
                 case MSG_OBD_DISCONNECTED:
-                    mMainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
-                        }
-                    });
+                    if (isNavi) {
+                        Log.d("isNavi MSG_OBD_DISCONNECTED");
+                        startScan();
+                    } else {
+                        mMainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d("OBDEvent.STATUS_UPDATA");
+                                notifyBleCallBackListener(OBDEvent.OBD_DISCONNECTED, null);
+                            }
+                        });
+                    }
                     break;
                 case MSG_STATUS_UPDATA:
                     mMainHandler.post(new Runnable() {
