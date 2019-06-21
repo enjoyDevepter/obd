@@ -96,7 +96,7 @@ public class BlueManager {
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final int CONNECTED = 1; // 连接成功
     private static final int DISCONNECTED = 0; // 断开连接
-    private static final long COMMAND_TIMEOUT = 15000;
+    private static final long COMMAND_TIMEOUT = 5000;
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
     private BluetoothGatt mBluetoothGatt;
@@ -189,6 +189,7 @@ public class BlueManager {
                 readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
 
                 mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
+                Log.d("onServicesDiscovered  success");
             }
         }
 
@@ -337,6 +338,7 @@ public class BlueManager {
     }
 
     public synchronized void startScan() {
+        Log.d("startScan  " + isScaning + " mBluetoothAdapter   " + (null == mBluetoothAdapter));
         if (null == mBluetoothAdapter || isScaning) {
             return;
         }
@@ -356,6 +358,7 @@ public class BlueManager {
                 stopScan(false);
             }
         }, 10000);
+        Log.d("startScan   success");
 
     }
 
@@ -363,7 +366,12 @@ public class BlueManager {
         if (null == mBluetoothAdapter || !isScaning) {
             return;
         }
+        Log.d("stopScan  ");
         isScaning = false;
+        if (isNavi && !find) {
+            startScan();
+            return;
+        }
         notifyBleCallBackListener(OBDEvent.BLUE_SCAN_FINISHED, find);
         mBluetoothAdapter.stopLeScan(leScanCallback);
     }
@@ -388,6 +396,7 @@ public class BlueManager {
      */
     public synchronized void disconnect() {
 
+        Log.d(" disconnect ");
         timeOutThread.endCommand();
 
         if (mBluetoothGatt == null) {
@@ -402,8 +411,19 @@ public class BlueManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        writeCharacteristic = null;
+        readCharacteristic = null;
         mBluetoothGatt.close();
         mBluetoothGatt = null;
+
+        isScaning = false;
+        canGo = true;
+        queue.clear();
+        if (instructList != null) {
+            instructList.clear();
+        }
+        Log.d(" disconnect success  queue.size()  " + queue.size() + "  instructList.size() " + instructList.size() + "  canGo  " + canGo);
+
     }
 
     public boolean isConnected() {
@@ -418,11 +438,15 @@ public class BlueManager {
     public synchronized void send(byte[] data) {
         // 判断该指令是否和待发送队列中最后一个指令相同，如果相同则不放入，不相同则加入，判断date中第2、3位是否一致既可
 
+        Log.d("send1  instructList size " + (instructList != null ? instructList.size() : "NULL "));
+
         if (instructList == null) {
             instructList = new LinkedList<>();
             queue.add(data);
             return;
         }
+
+        Log.d("send1  queue size " + queue.size() + " canGo " + canGo);
 
         if (queue.size() == 0 && canGo) {
             queue.add(data);
@@ -431,8 +455,10 @@ public class BlueManager {
 
         byte[] last = instructList.pollLast();
         if (last != null && data[1] == last[1] && data[2] == last[2] && data[1] != 0x90) {
+            Log.d("instructList has one ");
             return;
         }
+        Log.d("add to instructList");
         instructList.addLast(data);
     }
 
@@ -491,13 +517,13 @@ public class BlueManager {
     }
 
     private void realWrite(byte[] data) {
-        canGo = false;
-        Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
-        if (mBluetoothGatt == null) {
+        if (mBluetoothGatt == null || writeCharacteristic == null) {
             return;
         }
+        canGo = false;
+        Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
 
-        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x88 && data[2] == 03)) { // 未拆封包 或者 心跳包
+        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x88 && data[2] == 03) || (data[1] == (byte) 0x90 && data[2] == 01)) { // 未拆封包 或者 心跳包
         } else {
             timeOutThread.startCommand(true);
         }
@@ -1525,7 +1551,6 @@ public class BlueManager {
                             }
                             Log.d("TimeOutThread notifyAll ");
                             TIMEOUTSYNC.notifyAll();
-//                            TIMEOUTSYNC.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

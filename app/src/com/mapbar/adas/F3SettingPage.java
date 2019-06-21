@@ -174,9 +174,10 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
                     @Override
                     public void bindView(View view) {
                         final View voltageV = view.findViewById(R.id.voltage);
-                        final View tpmV = view.findViewById(R.id.tpm);
+                        final View oil_lV = view.findViewById(R.id.oil_l);
                         final View tempV = view.findViewById(R.id.temp);
                         final View dismissV = view.findViewById(R.id.dismiss);
+                        final View oilV = view.findViewById(R.id.oil);
                         switch (hudStatus.getMultifunctionalOneType()) {
                             case 0x00:
                                 dismissV.setSelected(true);
@@ -184,8 +185,11 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
                             case 0x01:
                                 tempV.setSelected(true);
                                 break;
-                            case 0x02:
-                                tpmV.setSelected(true);
+                            case 0x04:
+                                oil_lV.setSelected(true);
+                                break;
+                            case 0x05:
+                                oilV.setSelected(true);
                                 break;
                             case 0x08:
                                 voltageV.setSelected(true);
@@ -197,22 +201,24 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(true);
-                                tpmV.setSelected(false);
+                                oil_lV.setSelected(false);
                                 tempV.setSelected(false);
                                 dismissV.setSelected(false);
+                                oilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x08));
                                 dialog.dismiss();
                             }
                         });
 
-                        tpmV.setOnClickListener(new View.OnClickListener() {
+                        oil_lV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(false);
-                                tpmV.setSelected(true);
+                                oil_lV.setSelected(true);
                                 tempV.setSelected(false);
                                 dismissV.setSelected(false);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x02));
+                                oilV.setSelected(false);
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x04));
                                 dialog.dismiss();
                             }
                         });
@@ -220,10 +226,24 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(false);
-                                tpmV.setSelected(false);
+                                oil_lV.setSelected(false);
                                 tempV.setSelected(true);
                                 dismissV.setSelected(false);
+                                oilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x01));
+                                dialog.dismiss();
+                            }
+                        });
+
+                        oilV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                voltageV.setSelected(false);
+                                oil_lV.setSelected(false);
+                                tempV.setSelected(true);
+                                oilV.setSelected(true);
+                                dismissV.setSelected(false);
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x05));
                                 dialog.dismiss();
                             }
                         });
@@ -231,20 +251,21 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
                             @Override
                             public void onClick(View v) {
                                 voltageV.setSelected(false);
-                                tpmV.setSelected(false);
+                                oil_lV.setSelected(false);
                                 tempV.setSelected(false);
                                 dismissV.setSelected(true);
+                                oilV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
                                 dialog.dismiss();
                             }
                         });
                     }
                 })
-                .setLayoutRes(R.layout.f2_setting_multifunctional_dailog)
+                .setLayoutRes(R.layout.da_setting_multifunctional_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
-                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.f2_ultifunctional_dailog_height))
+                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.ff_ultifunctional_dailog_height))
                 .show();
     }
 
@@ -430,13 +451,54 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dialog.dismiss();
                             }
                         });
+
+                        View speed_showV = view.findViewById(R.id.speed_show);
+                        speed_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        speed_showV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 1));
+                                dialog.dismiss();
+                            }
+                        });
+
+                        View speed_dismissV = view.findViewById(R.id.speed_dismiss);
+                        speed_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        speed_dismissV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 0));
+                                dialog.dismiss();
+                            }
+                        });
+
+
+                        View remainder_showV = view.findViewById(R.id.remainder_show);
+                        remainder_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        remainder_showV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x03, 1));
+                                dialog.dismiss();
+                            }
+                        });
+
+                        View remainder_dismissV = view.findViewById(R.id.remainder_dismiss);
+                        remainder_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        remainder_dismissV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x03, 0));
+                                dialog.dismiss();
+                            }
+                        });
                     }
                 })
-                .setLayoutRes(R.layout.f2_setting_warm_dailog)
+                .setLayoutRes(R.layout.ff_setting_warm_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
-                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.f2_warm_dailog_width))
-                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.f2_warm_dailog_height))
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.hud_dailog_width))
+                .setHeight(OBDUtils.getDimens(getContext(), R.dimen.ff_warm_dailog_height))
                 .show();
     }
 
@@ -462,7 +524,7 @@ public class F3SettingPage extends AppBasePage implements View.OnClickListener, 
             f3_remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.f3_remaining_show : R.drawable.f3_remaining_dismiss);
             f3_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.f3_rpm_show : R.drawable.f3_rpm_dismiss);
             f3_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.f3_speed_show : R.drawable.f3_speed_dismiss);
-            f3_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f3_temp_show : R.drawable.f2_temp_dismiss);
+            f3_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f3_temp_show : R.drawable.f3_temp_dismiss);
 
             switch (hudStatus.getMultifunctionalOneType()) {
                 case 0x00:
