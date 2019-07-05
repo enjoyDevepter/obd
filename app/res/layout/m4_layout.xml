@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
-    android:orientation="horizontal">
+    android:background="@android:color/black">
 
     <TextView
         android:id="@+id/setting"
         android:layout_width="46dp"
         android:layout_height="30dp"
-        android:layout_gravity="bottom|left"
+        android:layout_alignParentBottom="true"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="36dp"
         android:background="@drawable/setting_bg"
@@ -32,10 +31,9 @@
         android:textSize="14sp" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginRight="40dp"
-        android:gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -119,7 +117,6 @@
                 android:layout_marginRight="20dp">
 
 
-
                 <View
                     android:id="@+id/m4_warm_bg"
                     android:layout_width="match_parent"
@@ -180,4 +177,4 @@
         </RelativeLayout>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

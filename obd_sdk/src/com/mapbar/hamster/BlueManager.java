@@ -660,7 +660,11 @@ public class BlueManager {
             Log.d("content  " + HexUtils.formatHexString(content));
             if (content[0] == 00) {
                 if (content[1] == 00) { // 通用错误
-
+                    if (null != currentProtocol && currentProtocol[1] == 0x80 && currentProtocol[2] == 0x01) {
+                        Message message = mHandler.obtainMessage();
+                        message.what = MSG_ERROR;
+                        mHandler.sendMessage(message);
+                    }
                 } else if (content[1] == 01 || content[1] == 02) { // 获取终端状态
                     OBDStatusInfo obdStatusInfo = new OBDStatusInfo();
                     obdStatusInfo.setBoxId(HexUtils.formatHexString(Arrays.copyOfRange(content, 12, 24)));
@@ -697,15 +701,15 @@ public class BlueManager {
                     }
                     // 判断是否授权
                     if ((content[5] & 15) == 0) { // 未授权或者授权过期或者授权失败
-                        if ((content[5] >> 4) != 0) { // 授权失败
-                            Message message = mHandler.obtainMessage();
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("obd_status_info", obdStatusInfo);
-                            message.setData(bundle);
-                            message.what = MSG_AUTHORIZATION_FAIL;
-                            mHandler.sendMessage(message);
-                            return;
-                        }
+//                        if ((content[5] >> 4) != 0) { // 授权失败
+//                            Message message = mHandler.obtainMessage();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                            message.setData(bundle);
+//                            message.what = MSG_AUTHORIZATION_FAIL;
+//                            mHandler.sendMessage(message);
+//                            return;
+//                        }
                         Message message = mHandler.obtainMessage();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("obd_status_info", obdStatusInfo);
@@ -713,7 +717,7 @@ public class BlueManager {
                         message.what = MSG_AUTHORIZATION;
                         mHandler.sendMessage(message);
                         return;
-                    } else {
+                    } else if ((content[5] & 15) == 1) {
                         // 授权成功
                         Message message = mHandler.obtainMessage();
                         Bundle bundle = new Bundle();
@@ -721,6 +725,14 @@ public class BlueManager {
                         message.setData(bundle);
                         message.what = MSG_AUTHORIZATION_SUCCESS;
                         mHandler.sendMessage(message);
+                    } else {
+                        Message message = mHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+                        message.setData(bundle);
+                        message.what = MSG_AUTHORIZATION_FAIL;
+                        mHandler.sendMessage(message);
+                        return;
                     }
                     // 三期新需求，优先判断是否选择车型
                     if (content[1] == 02) {
@@ -1198,7 +1210,7 @@ public class BlueManager {
                                 write(currentProtocol); // 重发
                                 repeat++;
                             }
-                            notifyBleCallBackListener(OBDEvent.OBD_ERROR, bundle.getInt("status"));
+//                            notifyBleCallBackListener(OBDEvent.OBD_ERROR, bundle.getInt("status"));
                         }
                     });
                     break;
