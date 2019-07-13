@@ -1012,7 +1012,7 @@ public class BlueManager {
                     int count = content[4];
                     HUDParams params = new HUDParams();
                     for (int i = 0; i < count; i++) {
-                        int value = Integer.parseInt(String.valueOf(content[6 + i * 2]), 10);
+                        int value = Integer.parseInt(String.valueOf(content[6 + i * 2] & 0xFF), 10);
                         switch (content[5 + i * 2]) {
                             case 0x01: // 亮度等级
                                 params.setLight(value);
