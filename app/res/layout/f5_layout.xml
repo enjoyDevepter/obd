@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/fly_tire_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fly_tire"
@@ -69,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/fly_oil_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fly_oil"
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/fly_rpm_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fly_rpm"
@@ -125,7 +125,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/fly_speed_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fly_speed"
@@ -154,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/fly_warm_bg"
-                    android:visibility="visible" />
+                    android:visibility="invisible" />
 
                 <View
                     android:id="@+id/voltage"

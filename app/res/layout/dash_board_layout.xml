@@ -137,7 +137,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dip"
-                        android:text="剩余油量（L）:"
+                        android:text="剩余油量（%）:"
                         android:textColor="#02fff6"
                         android:textSize="12sp" />
 
@@ -319,7 +319,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="15dip"
-                                android:text="瞬时油耗      L/100KM"
+                                android:text="瞬时油耗      L/h"
                                 android:textColor="#02fff6"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -358,6 +358,15 @@
                                 android:textColor="#02fff6"
                                 android:textSize="30sp"
                                 berdy:typeface="LcdD.ttf" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="130dp"
+                                android:text="L/Km"
+                                android:textColor="#02fff6"
+                                android:textSize="15sp" />
                         </RelativeLayout>
                     </LinearLayout>
                 </RelativeLayout>

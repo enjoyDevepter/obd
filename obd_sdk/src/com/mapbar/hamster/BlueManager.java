@@ -96,7 +96,7 @@ public class BlueManager {
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final int CONNECTED = 1; // 连接成功
     private static final int DISCONNECTED = 0; // 断开连接
-    private static final long COMMAND_TIMEOUT = 5000;
+    private static long COMMAND_TIMEOUT = 5000;
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic readCharacteristic;
     private BluetoothGatt mBluetoothGatt;
@@ -525,6 +525,11 @@ public class BlueManager {
 
         if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x88 && data[2] == 03) || (data[1] == (byte) 0x90 && data[2] == 01)) { // 未拆封包 或者 心跳包
         } else {
+            if ((data[1] == (byte) 0x88 && data[2] == 05)) {
+                COMMAND_TIMEOUT = 15000;
+            } else {
+                COMMAND_TIMEOUT = 5000;
+            }
             timeOutThread.startCommand(true);
         }
         writeCharacteristic.setValue(data);
@@ -660,11 +665,12 @@ public class BlueManager {
             Log.d("content  " + HexUtils.formatHexString(content));
             if (content[0] == 00) {
                 if (content[1] == 00) { // 通用错误
-                    if (null != currentProtocol && currentProtocol[1] == 0x80 && currentProtocol[2] == 0x01) {
-                        Message message = mHandler.obtainMessage();
-                        message.what = MSG_ERROR;
-                        mHandler.sendMessage(message);
-                    }
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_ERROR;
+                    bundle.putInt("status", content[0]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 } else if (content[1] == 01 || content[1] == 02) { // 获取终端状态
                     OBDStatusInfo obdStatusInfo = new OBDStatusInfo();
                     obdStatusInfo.setBoxId(HexUtils.formatHexString(Arrays.copyOfRange(content, 12, 24)));
@@ -747,6 +753,7 @@ public class BlueManager {
                         }
                         obdStatusInfo.setHudType(content[68]);
                         obdStatusInfo.setSupportNavi(content[69] == 1);
+                        obdStatusInfo.setSupportFM(content[70] == 1);
                     }
 
                     // 判断是否存在车型参数
@@ -1005,7 +1012,7 @@ public class BlueManager {
                     int count = content[4];
                     HUDParams params = new HUDParams();
                     for (int i = 0; i < count; i++) {
-                        int value = content[6 + i * 2];
+                        int value = Integer.parseInt(String.valueOf(content[6 + i * 2]), 10);
                         switch (content[5 + i * 2]) {
                             case 0x01: // 亮度等级
                                 params.setLight(value);
@@ -1593,11 +1600,6 @@ public class BlueManager {
                     needRewire = false;
                     currentRepeat = 0;
                     TIMEOUTSYNC.notifyAll();
-//                    try {
-//                        TIMEOUTSYNC.wait();
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
                 }
             }
         }

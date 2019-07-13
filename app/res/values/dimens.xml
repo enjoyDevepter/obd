@@ -22,7 +22,7 @@
     <dimen name="m4_ultifunctional_dailog_width">@dimen/hud_dailog_width</dimen>
     <dimen name="m4_ultifunctional_dailog_height">294dp</dimen>
 
-    <dimen name="ff_warm_dailog_height">350dp</dimen>
+    <dimen name="ff_warm_dailog_height">316dp</dimen>
     <dimen name="ff_ultifunctional_dailog_height">325dp</dimen>
 
 

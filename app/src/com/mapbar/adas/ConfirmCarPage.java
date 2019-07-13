@@ -82,6 +82,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
                     PageManager.go(page);
                 }
                 times++;
+                title.setText("再次确认");
                 break;
             default:
                 break;

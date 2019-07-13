@@ -443,7 +443,7 @@ public class P4SettingPage extends AppBasePage implements View.OnClickListener, 
                         });
 
                         View speed_showV = view.findViewById(R.id.speed_show);
-                        speed_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        speed_showV.setSelected(hudWarmStatus.isSpeedWarmShow());
                         speed_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -453,7 +453,7 @@ public class P4SettingPage extends AppBasePage implements View.OnClickListener, 
                         });
 
                         View speed_dismissV = view.findViewById(R.id.speed_dismiss);
-                        speed_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        speed_dismissV.setSelected(!hudWarmStatus.isSpeedWarmShow());
                         speed_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -464,7 +464,7 @@ public class P4SettingPage extends AppBasePage implements View.OnClickListener, 
 
 
                         View remainder_showV = view.findViewById(R.id.remainder_show);
-                        remainder_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        remainder_showV.setSelected(hudWarmStatus.isOilWarmShow());
                         remainder_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -474,7 +474,7 @@ public class P4SettingPage extends AppBasePage implements View.OnClickListener, 
                         });
 
                         View remainder_dismissV = view.findViewById(R.id.remainder_dismiss);
-                        remainder_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        remainder_dismissV.setSelected(!hudWarmStatus.isOilWarmShow());
                         remainder_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

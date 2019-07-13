@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m3_tire_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/m3_tire"
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m3_rpm_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/m3_rpm"
@@ -93,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m3_warm_bg1"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fault"
@@ -143,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m3_warm_bg2"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
 
             <View
@@ -178,7 +178,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m3_multifunctional_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/m3_multifunctional"

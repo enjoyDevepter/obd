@@ -3,5 +3,5 @@
     <dimen name="layout_marginTop7">40dip</dimen>
     <dimen name="layout_marginLeft2">173dip</dimen>
     <dimen name="layout_marginBottom">-12dip</dimen>
-    <dimen name="layout_marginTop6">210dip</dimen>
+    <dimen name="layout_marginTop6">215dip</dimen>
 </resources>

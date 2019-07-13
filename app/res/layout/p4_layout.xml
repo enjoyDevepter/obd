@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/f3_multifunctional_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/f3_multifunctional"
@@ -44,7 +44,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="4dp"
                 android:background="@drawable/f3_tire_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/f3_tire"
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/f3_remaining_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/f3_remaining"
@@ -95,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/f3_temp_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/f3_temp"
@@ -119,7 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/p4_rpm_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/p4_rpm"
@@ -142,7 +142,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/p4_speed_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/p4_speed"
@@ -164,7 +164,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/p4_warm_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fault"

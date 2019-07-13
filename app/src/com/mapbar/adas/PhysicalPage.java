@@ -232,32 +232,32 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     normalList.add(physicaltem);
                     break;
                 case 3: // 燃油系统1状态  6
-                    physicaltem = allList.get(301);
-                    switch ((item[1] & 0xff)) {
-                        case 1:
-                            physicaltem.setCurrent("OBD II(California ARB)");
-                            break;
-                        case 2:
-                            physicaltem.setCurrent("OBD(Federal EPA)");
-                            break;
-                        case 3:
-                            physicaltem.setCurrent("OBD and OBD II");
-                            break;
-                        case 4:
-                            physicaltem.setCurrent("OBD I ");
-                            break;
-                        case 5:
-                            physicaltem.setCurrent("Not intended to meet any OBD requirements");
-                            break;
-                        case 6:
-                            physicaltem.setCurrent("EOBD(Europe)");
-                            break;
-                    }
-                    normalList.add(physicaltem);
-
-                    // 燃油系统2状态
-                    physicaltem = allList.get(302);
-                    normalList.add(physicaltem);
+//                    physicaltem = allList.get(301);
+//                    switch ((item[1] & 0xff)) {
+//                        case 1:
+//                            physicaltem.setCurrent("OBD II(California ARB)");
+//                            break;
+//                        case 2:
+//                            physicaltem.setCurrent("OBD(Federal EPA)");
+//                            break;
+//                        case 3:
+//                            physicaltem.setCurrent("OBD and OBD II");
+//                            break;
+//                        case 4:
+//                            physicaltem.setCurrent("OBD I ");
+//                            break;
+//                        case 5:
+//                            physicaltem.setCurrent("Not intended to meet any OBD requirements");
+//                            break;
+//                        case 6:
+//                            physicaltem.setCurrent("EOBD(Europe)");
+//                            break;
+//                    }
+//                    normalList.add(physicaltem);
+//
+//                    // 燃油系统2状态
+//                    physicaltem = allList.get(302);
+//                    normalList.add(physicaltem);
                     break;
                 case 4: // 发动机负荷 1
                     physicaltem.setCurrent(decimalFormat.format(((item[1] & 0xff) * 100) / 255f));
@@ -583,27 +583,29 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     }
                     break;
                 case 28: // 当前所使用的OBD标准  1
-                    switch ((item[1] & 0xff)) {
-                        case 1:
-                            physicaltem.setCurrent("OBD II(California ARB)");
-                            break;
-                        case 2:
-                            physicaltem.setCurrent("OBD(Federal EPA)");
-                            break;
-                        case 3:
-                            physicaltem.setCurrent("OBD and OBD II");
-                            break;
-                        case 4:
-                            physicaltem.setCurrent("OBD I ");
-                            break;
-                        case 5:
-                            physicaltem.setCurrent("Not intended to meet any OBD requirements");
-                            break;
-                        case 6:
-                            physicaltem.setCurrent("EOBD(Europe)");
-                            break;
-                    }
-                    normalList.add(physicaltem);
+//                    switch ((item[1] & 0xff)) {
+//                        case 1:
+//                            physicaltem.setCurrent("OBD II(California ARB)");
+//                            break;
+//                        case 2:
+//                            physicaltem.setCurrent("OBD(Federal EPA)");
+//                            break;
+//                        case 3:
+//                            physicaltem.setCurrent("OBD and OBD II");
+//                            break;
+//                        case 4:
+//                            physicaltem.setCurrent("OBD I ");
+//                            break;
+//                        case 5:
+//                            physicaltem.setCurrent("Not intended to meet any OBD requirements");
+//                            break;
+//                        case 6:
+//                            physicaltem.setCurrent("EOBD(Europe)");
+//                            break;
+//                        default:
+//                            break;
+//                    }
+//                    normalList.add(physicaltem);
                     break;
                 case 29: // 氧传感器当前状态 6
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + "  " + */decimalFormat.format(((item[1] & 0xff))));
@@ -1086,44 +1088,52 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     // 短周期缸组1二次氧传感器燃油调整
                     physicaltem = allList.get(851);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
 
                     // 短周期缸组3二次氧传感器燃油调整
                     physicaltem = allList.get(852);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
                     break;
                 case 86: // 6
                     // 长周期缸组1二次氧传感器燃油调整
                     physicaltem = allList.get(861);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
 
                     // 长周期缸组3二次氧传感器燃油调整
                     physicaltem = allList.get(862);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
                     break;
                 case 87: // 6
                     // 短周期缸组2二次氧传感器燃油调整
                     physicaltem = allList.get(871);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
 
                     // 短周期缸组4二次氧传感器燃油调整
                     physicaltem = allList.get(872);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
                     break;
                 case 88: // 6
                     // 长周期缸组2二次氧传感器燃油调整
                     physicaltem = allList.get(881);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
 
                     // 长周期缸组4二次氧传感器燃油调整
                     physicaltem = allList.get(882);
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) / 128f - 100));
+                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
                     normalList.add(physicaltem);
                     break;
                 case 89: // 油轨压力(绝对压力) 6
@@ -1184,6 +1194,8 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     normalList.add(physicaltem);
                     break;
                 case 100:// 引擎转矩百分比数据信息 1
+                    break;
+                default:
                     break;
             }
         }

@@ -99,7 +99,7 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
             faultTV.setText(String.valueOf(pressureInfo.getFaultCount()));
         }
         voltageTV.setText(String.valueOf(pressureInfo.getVoltage()) + "v");
-        temperatureTV.setText(String.valueOf(pressureInfo.getTemperature()) + "C");
+        temperatureTV.setText(String.valueOf(pressureInfo.getTemperature()) + "℃");
         rpmTVFL.setTextFormat000(pressureInfo.getRotationRate());
         speedTVFL.setTextFormat000(pressureInfo.getSpeed());
         oilConsumptionTVFLE.setTextFormat00dot0((float) pressureInfo.getOilConsumption());

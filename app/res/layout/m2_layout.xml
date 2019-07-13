@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m2_tire_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/m2_tire"
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/m2_warm_bg"
-                android:visibility="visible" />
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/fault"
@@ -130,6 +130,7 @@
             android:layout_height="138dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:visibility="invisible"
             android:background="@drawable/m2_multifunctional_bg" />
 
         <!-- 多功能区-->

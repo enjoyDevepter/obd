@@ -442,7 +442,7 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
                         });
 
                         View speed_showV = view.findViewById(R.id.speed_show);
-                        speed_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        speed_showV.setSelected(hudWarmStatus.isSpeedWarmShow());
                         speed_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -452,7 +452,7 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
                         });
 
                         View speed_dismissV = view.findViewById(R.id.speed_dismiss);
-                        speed_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        speed_dismissV.setSelected(!hudWarmStatus.isSpeedWarmShow());
                         speed_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -463,7 +463,7 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
 
 
                         View remainder_showV = view.findViewById(R.id.remainder_show);
-                        remainder_showV.setSelected(hudWarmStatus.isTrieWarmShow());
+                        remainder_showV.setSelected(hudWarmStatus.isOilWarmShow());
                         remainder_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -473,7 +473,7 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
                         });
 
                         View remainder_dismissV = view.findViewById(R.id.remainder_dismiss);
-                        remainder_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
+                        remainder_dismissV.setSelected(!hudWarmStatus.isOilWarmShow());
                         remainder_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -523,10 +523,10 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
                     multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_temp_show);
                     break;
                 case 0x04:
-                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_avg_oil_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_oil_show);
                     break;
                 case 0x05:
-                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_oil_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_avg_oil_show);
                     break;
                 case 0x08:
                     multifunctionalV.setBackgroundResource(R.drawable.f3_multifunctional_voltage_show);
