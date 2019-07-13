@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black">
+
+        <TextView
+            android:id="@+id/setting"
+            android:layout_width="46dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="36dp"
+            android:background="@drawable/setting_bg"
+            android:gravity="center"
+            android:text="设置"
+            android:textColor="#FFFEFEFE"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/params"
+            android:layout_width="46dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="80dp"
+            android:background="@drawable/setting_bg"
+            android:gravity="center"
+            android:text="参数"
+            android:textColor="#FFFEFEFE"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="502dp"
+                android:layout_height="116dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="176dp"
+                    android:layout_height="match_parent">
+
+                    <View
+                        android:id="@+id/f2_oil_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/f2_oil_bg"
+                        android:visibility="invisible" />
+
+                    <View
+                        android:id="@+id/f2_oil"
+                        android:layout_width="140dp"
+                        android:layout_height="68dp"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/f2_oil_show" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="82dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp">
+
+                    <View
+                        android:id="@+id/f2_tire_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/f2_tire_bg"
+                        android:visibility="invisible" />
+
+                    <View
+                        android:id="@+id/f2_tire"
+                        android:layout_width="50dp"
+                        android:layout_height="70dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginLeft="9dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/f2_tire_show" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="236dp"
+                    android:layout_height="match_parent">
+
+                    <View
+                        android:id="@+id/f2_voltage_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/f2_voltage_bg"
+                        android:visibility="invisible" />
+
+                    <View
+                        android:id="@+id/f2_voltage"
+                        android:layout_width="181dp"
+                        android:layout_height="68dp"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/f2_voltage_v_show" />
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="502dp"
+                android:layout_height="190dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="178dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="111dp"
+                        android:layout_height="match_parent">
+
+                        <View
+                            android:id="@+id/f2_engineload_bg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/f2_engineload_bg"
+                            android:visibility="invisible" />
+
+                        <View
+                            android:id="@+id/f2_engineload"
+                            android:layout_width="71dp"
+                            android:layout_height="121dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/f2_engineload_show" />
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="280dp"
+                        android:layout_height="match_parent">
+
+                        <View
+                            android:id="@+id/f2_rpm_bg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/f2_rpm_bg"
+                            android:visibility="invisible" />
+
+                        <View
+                            android:id="@+id/f2_rpm"
+                            android:layout_width="268dp"
+                            android:layout_height="124dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/f2_rpm_show" />
+
+                        <View
+                            android:id="@+id/f2_speed"
+                            android:layout_width="150dp"
+                            android:layout_height="80dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="45dp"
+                            android:background="@drawable/f2_speed_show" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="111dp"
+                        android:layout_height="match_parent">
+
+                        <View
+                            android:id="@+id/f2_temp_bg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/f2_temp_bg"
+                            android:visibility="invisible" />
+
+                        <View
+                            android:id="@+id/f2_temp"
+                            android:layout_width="71dp"
+                            android:layout_height="121dp"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/f2_temp_show" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="100dp"
+                    android:layout_height="165dp"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="55dp"
+                    android:layout_marginTop="23dp">
+
+                    <View
+                        android:id="@+id/f2_fault_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/f2_fault_bg"
+                        android:visibility="invisible" />
+
+                    <View
+                        android:id="@+id/f2_fault"
+                        android:layout_width="27dp"
+                        android:layout_height="18dp"
+                        android:layout_marginLeft="41dp"
+                        android:layout_marginTop="15dp"
+                        android:background="@drawable/fault_show" />
+
+                    <View
+                        android:id="@+id/f2_v"
+                        android:layout_width="25dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="70dp"
+                        android:background="@drawable/voltage_show" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="100dp"
+                    android:layout_height="165dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="23dp"
+                    android:layout_marginRight="52dp">
+
+                    <View
+                        android:id="@+id/f2_tired_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/f2_tired_bg"
+                        android:visibility="invisible" />
+
+                    <View
+                        android:id="@+id/f2_t"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/temperature_show" />
+
+                    <View
+                        android:id="@+id/f2_tired"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="54dp"
+                        android:layout_marginTop="70dp"
+                        android:background="@drawable/tired_show" />
+
+                </FrameLayout>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000">
+
+        <View
+            android:id="@+id/step1"
+            android:layout_width="202dp"
+            android:layout_height="61dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="-12dp"
+            android:layout_marginBottom="37dp"
+            android:background="@drawable/step1" />
+
+
+        <RelativeLayout
+            android:layout_width="502dp"
+            android:layout_height="316dp"
+            android:layout_centerInParent="true">
+
+            <View
+                android:id="@+id/step2"
+                android:layout_width="201dp"
+                android:layout_height="116dp"
+                android:background="@drawable/step2"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</FrameLayout>

@@ -36,6 +36,7 @@ import com.mapbar.hamster.core.ProtocolUtils;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.HUD_GUID;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_STATUS;
 
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
@@ -111,48 +112,57 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.message:
                 // 判断HUD类型跳转对应设置界面
                 if (null != obdStatusInfo) {
-                    switch (obdStatusInfo.getHudType()) {
-                        case 0x02:
-                            PageManager.go(new M2SettingPage());
-                            break;
-                        case 0x03:
-                            PageManager.go(new M3SettingPage());
-                            break;
-                        case 0x04:
-                            PageManager.go(new M4SettingPage());
-                            break;
-                        case 0x22:
-                            PageManager.go(new F2SettingPage());
-                            break;
-                        case 0x23:
-                            PageManager.go(new F3SettingPage());
-                            break;
-                        case 0x24:
-                            PageManager.go(new F4SettingPage());
-                            break;
-                        case 0x25:
-                            PageManager.go(new F5SettingPage());
-                            break;
-                        case 0x26:
-                            PageManager.go(new F6SettingPage());
-                            break;
-                        case 0x43:
-                            PageManager.go(new P3SettingPage());
-                            break;
-                        case 0x44:
-                            PageManager.go(new P4SettingPage());
-                            break;
-                        case 0x45:
-                            PageManager.go(new P5SettingPage());
-                            break;
-                        case 0x46:
-                            PageManager.go(new P6SettingPage());
-                            break;
-                        case 0x47:
-                            PageManager.go(new P7SettingPage());
-                            break;
-                        default:
-                            break;
+                    if (HUD_GUID.get()) {
+                        switch (obdStatusInfo.getHudType()) {
+                            case 0x02:
+                                PageManager.go(new M2SettingPage());
+                                break;
+                            case 0x03:
+                                PageManager.go(new M3SettingPage());
+                                break;
+                            case 0x04:
+                                PageManager.go(new M4SettingPage());
+                                break;
+                            case 0x22:
+                                PageManager.go(new F2SettingPage());
+                                break;
+                            case 0x23:
+                                PageManager.go(new F3SettingPage());
+                                break;
+                            case 0x24:
+                                PageManager.go(new F4SettingPage());
+                                break;
+                            case 0x25:
+                                PageManager.go(new F5SettingPage());
+                                break;
+                            case 0x26:
+                                PageManager.go(new F6SettingPage());
+                                break;
+                            case 0x43:
+                                PageManager.go(new P3SettingPage());
+                                break;
+                            case 0x44:
+                                PageManager.go(new P4SettingPage());
+                                break;
+                            case 0x45:
+                                PageManager.go(new P5SettingPage());
+                                break;
+                            case 0x46:
+                                PageManager.go(new P6SettingPage());
+                                break;
+                            case 0x47:
+                                PageManager.go(new P7SettingPage());
+                                break;
+                            default:
+                                break;
+                        }
+
+                    } else {
+                        HUDGuidPage guidPage = new HUDGuidPage();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("hudType", obdStatusInfo.getHudType());
+                        guidPage.setDate(bundle);
+                        PageManager.go(guidPage);
                     }
                 }
                 break;
