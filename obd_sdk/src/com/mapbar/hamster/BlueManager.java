@@ -77,6 +77,7 @@ public class BlueManager {
     private static final int MSG_HUD_STATUS_INFO = 180; // HUD区域属性
     private static final int MSG_HUD_WARM_STATUS_INFO = 181; // HUD区域警告属性
     private static final int MSG_HUD_PARAMS_INFO = 182; // HUD参数属性
+    private static final int MSG_FM_STATUS_INFO = 183; // FM参数属性
 
 
     private static final int MSG_VERIFY = 2;
@@ -1098,6 +1099,18 @@ public class BlueManager {
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
+            } else if (content[0] == 0x0C) {
+                if (content[1] == 01) {
+                    FMStatus fmStatus = new FMStatus();
+                    fmStatus.setEnable(content[4] == 1);
+                    fmStatus.setRate((content[5] * 256 + content[6]));
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_FM_STATUS_INFO;
+                    bundle.putSerializable("FMStatus", fmStatus);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                }
             } else if (content[0] == 0x3E) {
                 if (content[1] == 01) {
                     Message message = mHandler.obtainMessage();
@@ -1506,6 +1519,15 @@ public class BlueManager {
                         public void run() {
                             Log.d("OBDEvent.MSG_HUD_PARAMS_INFO");
                             notifyBleCallBackListener(OBDEvent.HUD_PARAMS_INFO, bundle.getSerializable("HUDParams"));
+                        }
+                    });
+                    break;
+                case MSG_FM_STATUS_INFO:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("OBDEvent.MSG_FM_STATUS_INFO");
+                            notifyBleCallBackListener(OBDEvent.FM_PARAMS_INFO, bundle.getSerializable("FMStatus"));
                         }
                     });
                     break;

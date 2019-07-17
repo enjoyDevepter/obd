@@ -59,6 +59,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     private View messageV;
     @ViewInject(R.id.hud)
     private View hudV;
+    @ViewInject(R.id.fm)
+    private View fmView;
     private OBDStatusInfo obdStatusInfo;
     private boolean showLane;
 
@@ -76,6 +78,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
         dashV.setOnClickListener(this);
         messageV.setOnClickListener(this);
         hudV.setOnClickListener(this);
+        fmView.setOnClickListener(this);
         title.setText("汽车卫士");
         ImmersionBar.with(MainActivity.getInstance())
                 .fitsSystemWindows(true)
@@ -451,6 +454,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                 });
                 AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
+                break;
+            case R.id.fm:
+                PageManager.go(new FMPage());
                 break;
             default:
                 break;

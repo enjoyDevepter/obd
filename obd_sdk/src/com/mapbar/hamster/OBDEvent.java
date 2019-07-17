@@ -142,6 +142,7 @@ public class OBDEvent {
     public static final int HUD_STATUS_INFO = 310; // HUD设置属性信息
     public static final int HUD_WARM_STATUS_INFO = 320; // HUD预警设置属性信息
     public static final int HUD_PARAMS_INFO = 330; // HUD参数设置属性信息
+    public static final int FM_PARAMS_INFO = 340; // FM参数设置属性信息
 
 
 }

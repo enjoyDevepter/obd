@@ -532,6 +532,47 @@ public class ProtocolUtils {
     }
 
     /**
+     * 设置FM参数
+     *
+     * @return
+     */
+    public static byte[] setFMParams(boolean open, int value) {
+        Log.d("Protocol setFMParams ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8C;
+        result[2] = 01;
+        if (open) {
+            result[3] = 01;
+        } else {
+            result[3] = 00;
+        }
+        result[4] = (byte) ((value >> 8) & 0xFF);
+        result[5] = (byte) (value & 0xFF);
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    /**
+     * 查询FM参数
+     *
+     * @return
+     */
+    public static byte[] getFMParams(boolean open, int value) {
+        Log.d("Protocol setFMParams ===");
+        byte[] result = new byte[8];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) 0x8C;
+        result[2] = 01;
+        result[3] = 02;
+        result[4] = (byte) ((value >> 8) & 0xFF);
+        result[5] = (byte) (value & 0xFF);
+        result[6] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5]);
+        result[7] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+    /**
      * 设置HUD参数
      *
      * @return
