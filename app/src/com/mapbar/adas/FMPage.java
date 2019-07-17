@@ -11,6 +11,8 @@ import com.contrarywind.view.WheelView;
 import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
+import com.mapbar.adas.utils.CustomDialog;
+import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.FMStatus;
@@ -21,6 +23,8 @@ import com.miyuan.obd.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.FM_GUID;
 
 
 @PageSetting(contentViewId = R.layout.fm_layout, toHistory = false)
@@ -49,6 +53,10 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
     @ViewInject(R.id.confirm)
     private View confirmV;
     private FMStatus fmStatus;
+
+
+    private CustomDialog dialog;
+
 
     @Override
     public void onResume() {
@@ -240,6 +248,33 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
 
         BlueManager.getInstance().addBleCallBackListener(this);
         BlueManager.getInstance().send(ProtocolUtils.getFMParams(true, 0));
+
+        if (!FM_GUID.get()) {
+            showDailog();
+        }
+    }
+
+    private void showDailog() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        final View confirm = view.findViewById(R.id.confirm);
+                        confirm.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                FM_GUID.set(true);
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_fm)
+                .setCancelOutside(false)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
     }
 
 

@@ -35,4 +35,6 @@ public class SettingPreferencesConfig {
     public static final IntPreferences TIRE_STATUS = new IntPreferences(SHARED_PREFERENCES_INIT, "tire_status", 0);
 
     public static final BooleanPreferences HUD_GUID = new BooleanPreferences(SHARED_PREFERENCES_INIT, "hud_guid", false);
+
+    public static final BooleanPreferences FM_GUID = new BooleanPreferences(SHARED_PREFERENCES_INIT, "fm_guid", false);
 }
