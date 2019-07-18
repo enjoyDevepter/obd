@@ -61,22 +61,21 @@ android {
     }
 
     dependencies {
-        compile fileTree(include: ['*.jar'], dir: 'libs')
-        compile project(path: ':core')
-        compile project(path: ':zxing_lib')
-        compile project(path: ':obd_sdk')
-        compile 'com.android.support:multidex:1.0.1'
-        compile 'org.simple:androideventbus:1.0.5.1'
-        compile 'com.alibaba:fastjson:1.2.47'
-        compile 'com.gyf.barlibrary:barlibrary:2.3.0'
-        compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
-        compile 'me.jessyan:rxerrorhandler:2.1.1'
-        compile 'com.contrarywind:Android-PickerView:4.1.8'
-        compile 'io.reactivex.rxjava2:rxjava:2.1.12'
-        compile 'com.jungly:gridPasswordView:0.3'
-        compile 'com.android.support:recyclerview-v7:27.1.1'
-        compile 'com.amap.api:navi-3dmap:latest.integration'
-        compile 'com.amap.api:location:latest.integration'
-        compile 'com.amap.api:search:latest.integration'
+        api fileTree(include: ['*.jar'], dir: 'libs')
+        api project(path: ':core')
+        api project(path: ':obd_sdk')
+        api 'com.android.support:multidex:1.0.1'
+        api 'org.simple:androideventbus:1.0.5.1'
+        api 'com.alibaba:fastjson:1.2.47'
+        api 'com.gyf.barlibrary:barlibrary:2.3.0'
+        api 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+        api 'me.jessyan:rxerrorhandler:2.1.1'
+        api 'com.contrarywind:Android-PickerView:4.1.8'
+        api 'io.reactivex.rxjava2:rxjava:2.1.12'
+        api 'com.jungly:gridPasswordView:0.3'
+        api 'com.android.support:recyclerview-v7:27.1.1'
+        api 'com.amap.api:navi-3dmap:latest.integration'
+        api 'com.amap.api:location:latest.integration'
+        api 'com.amap.api:search:latest.integration'
     }
 }

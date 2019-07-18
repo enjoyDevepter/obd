@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="44dp"
             android:layout_weight="1"
-            android:background="@color/transparent"
+            android:background="@android:color/transparent"
             android:hint="请输入手机号码"
             android:inputType="number"
             android:paddingLeft="10dp"

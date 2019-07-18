@@ -1,6 +1,5 @@
 package com.mapbar.adas;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
@@ -9,7 +8,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.client.android.CaptureActivity;
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
@@ -92,8 +90,8 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                 check();
                 break;
             case R.id.scan:
-                Intent intent = new Intent(GlobalUtil.getMainActivity(), CaptureActivity.class);
-                GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
+//                Intent intent = new Intent(GlobalUtil.getMainActivity(), CaptureActivity.class);
+//                GlobalUtil.getMainActivity().startActivityForResult(intent, 0);
                 break;
             case R.id.report:
                 uploadLog();

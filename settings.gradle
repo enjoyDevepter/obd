@@ -1,1 +1,1 @@
-include ':app', ':core','obd_sdk','zxing_lib'
+include ':app', ':core','obd_sdk'

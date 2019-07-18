@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -15,7 +14,6 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.google.zxing.client.android.CaptureActivity;
 import com.gyf.barlibrary.ImmersionBar;
 import com.mapbar.adas.utils.PermissionUtil;
 import com.mapbar.adas.utils.URLUtils;
@@ -58,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;
-    private PowerManager.WakeLock mWakeLock;
     private OBDStatusInfo obdStatusInfo;
 
 
@@ -116,11 +113,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .statusBarDarkFont(true)
                 .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
-
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        if (powerManager != null) {
-            mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "WakeLock");
-        }
     }
 
     @Override
@@ -140,10 +132,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             @Override
             public void onRequestPermissionSuccess() {
                 //request permission success, do something.
-                if (null != mWakeLock) {
-                    mWakeLock.acquire();
-                }
-
                 if (isFirst()) {
                     addTasks();
                 }
@@ -184,9 +172,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onPause() {
         super.onPause();
-        if (null != mWakeLock) {
-            mWakeLock.release();
-        }
     }
 
     public boolean isFirst() {
@@ -237,18 +222,18 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
-            if (data != null) {
-                String result = data.getStringExtra(CaptureActivity.SCANRESULT);
-                if (result != null) {
-                    Bundle bundle = BackStackManager.getInstance().getCurrent().getDate();
-                    if (bundle == null) {
-                        bundle = new Bundle();
-                    }
-                    bundle.putString("sn", result);
-                }
-            }
-        }
+//        if (requestCode == 0) {
+//            if (data != null) {
+//                String result = data.getStringExtra(CaptureActivity.SCANRESULT);
+//                if (result != null) {
+//                    Bundle bundle = BackStackManager.getInstance().getCurrent().getDate();
+//                    if (bundle == null) {
+//                        bundle = new Bundle();
+//                    }
+//                    bundle.putString("sn", result);
+//                }
+//            }
+//        }
     }
 
     @Override
