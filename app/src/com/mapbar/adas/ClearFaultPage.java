@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbar.adas.anno.PageSetting;
 import com.mapbar.adas.anno.ViewInject;
@@ -79,6 +80,8 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
             case R.id.home:
                 PageManager.go(new HomePage());
                 break;
+            default:
+                break;
         }
     }
 
@@ -89,7 +92,11 @@ public class ClearFaultPage extends AppBasePage implements View.OnClickListener,
                 int status = (int) data;
                 if (status == 0) {
                     showSuccessDialog();
+                } else {
+                    Toast.makeText(getContext(), "清除失败！", Toast.LENGTH_LONG).show();
                 }
+                break;
+            default:
                 break;
         }
     }

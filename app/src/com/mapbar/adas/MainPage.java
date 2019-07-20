@@ -254,6 +254,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                         view.findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                under = false;
+                                misinformation = false;
                                 dialog.dismiss();
                                 showResetOne();
                             }
