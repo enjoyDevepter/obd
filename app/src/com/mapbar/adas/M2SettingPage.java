@@ -36,7 +36,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
     View m2_warm_bgV;
     @ViewInject(R.id.fault)
     View faultV;
-    @ViewInject(R.id.temperature)
+    @ViewInject(R.id.temp)
     View temperatureV;
     @ViewInject(R.id.voltage)
     View voltageV;

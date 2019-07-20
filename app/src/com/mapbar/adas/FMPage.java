@@ -348,11 +348,21 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
                 tenWV.setCurrentItem(tenItems.indexOf(rateStr.substring(1, 2)));
                 bitWV.setCurrentItem(bitItems.indexOf(rateStr.substring(2, 3)));
                 centWV.setCurrentItem(centItems.indexOf(rateStr.substring(3, 4)));
-            } else {
+            } else if (rate >= 100) {
                 hundredWV.setCurrentItem(hundredItems.indexOf("0"));
                 tenWV.setCurrentItem(tenItems.indexOf(rateStr.substring(0, 1)));
                 bitWV.setCurrentItem(bitItems.indexOf(rateStr.substring(1, 2)));
                 centWV.setCurrentItem(centItems.indexOf(rateStr.substring(2, 3)));
+            } else if (rate >= 10) {
+                hundredWV.setCurrentItem(hundredItems.indexOf("0"));
+                tenWV.setCurrentItem(tenItems.indexOf("0"));
+                bitWV.setCurrentItem(bitItems.indexOf(rateStr.substring(0, 1)));
+                centWV.setCurrentItem(centItems.indexOf(rateStr.substring(1, 2)));
+            } else {
+                hundredWV.setCurrentItem(hundredItems.indexOf("0"));
+                tenWV.setCurrentItem(tenItems.indexOf("0"));
+                bitWV.setCurrentItem(bitItems.indexOf("0"));
+                centWV.setCurrentItem(centItems.indexOf(rateStr.substring(0, 1)));
             }
         }
     }
