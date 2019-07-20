@@ -42,7 +42,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
     View m3_warm_bg2V;
     @ViewInject(R.id.fault)
     View faultV;
-    @ViewInject(R.id.temperature)
+    @ViewInject(R.id.temp)
     View temperatureV;
     @ViewInject(R.id.voltage)
     View voltageV;
@@ -126,7 +126,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
                 break;
             case R.id.m3_tire:
             case R.id.fault:
-            case R.id.temperature:
+            case R.id.temp:
             case R.id.voltage:
             case R.id.oil:
             case R.id.speed:

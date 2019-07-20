@@ -50,7 +50,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
     View fly_warm_bgV;
     @ViewInject(R.id.fault)
     View faultV;
-    @ViewInject(R.id.temperature)
+    @ViewInject(R.id.temp)
     View temperatureV;
     @ViewInject(R.id.voltage)
     View voltageV;
@@ -141,7 +141,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
                 showNormalDailog(viewId, "发动机转速显示区", hudStatus.isRpmShow());
                 break;
             case R.id.fault:
-            case R.id.temperature:
+            case R.id.temp:
             case R.id.voltage:
             case R.id.speed:
             case R.id.tired:

@@ -1076,6 +1076,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                 case 82: // 乙醇燃料百分比 6
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + " " + */decimalFormat.format((item[1] & 0xff) * 100 / 255f));
                     normalList.add(physicaltem);
+                    break;
                 case 83: // 蒸发冷却系统绝对蒸汽压 6
                     physicaltem.setCurrent(/*HexUtils.byte2HexStr(item[1]) + HexUtils.byte2HexStr(item[2]) + "  " + */decimalFormat.format((HexUtils.byteToShort(new byte[]{item[1], item[2]}) & 0xFFFF) / 200f));
                     normalList.add(physicaltem);

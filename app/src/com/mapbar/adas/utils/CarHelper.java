@@ -65,8 +65,8 @@ public class CarHelper {
             pinyinName = pinyinName.toUpperCase();  // 若包含英文字母则额外再进行大写处理
             contact.setPinyinName(pinyinName);  // pinyinName
 
-            String sortLetters = setupSortLetters(contact.getName());
-            contact.setSortLetters(sortLetters); // sortLetters
+//            String sortLetters = setupSortLetters(contact.getName());
+            contact.setSortLetters(contact.getLetter()); // sortLetters
 
         }
         Collections.sort(contacts);  // 排序

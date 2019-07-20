@@ -114,7 +114,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                 break;
             case R.id.m2_tire:
             case R.id.fault:
-            case R.id.temperature:
+            case R.id.temp:
             case R.id.voltage:
             case R.id.oil:
             case R.id.speed:

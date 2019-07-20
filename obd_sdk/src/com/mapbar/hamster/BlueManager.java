@@ -470,6 +470,7 @@ public class BlueManager {
         while (true) {
             try {
                 byte[] message = queue.take();
+                canGo = false;
                 write(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
