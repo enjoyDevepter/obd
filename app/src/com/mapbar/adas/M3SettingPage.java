@@ -280,7 +280,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(true);
                                 avgOilV.setSelected(false);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x04));
                                 dialog.dismiss();
                             }
                         });
@@ -293,7 +293,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(false);
                                 avgOilV.setSelected(true);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x05));
                                 dialog.dismiss();
                             }
                         });
@@ -511,7 +511,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
             temperatureV.setBackgroundResource(hudWarmStatus.isTemperatureWarmShow() ? R.drawable.temperature_show : R.drawable.temperature_dismiss);
             tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.tired_show : R.drawable.tired_dismiss);
             tireV.setBackgroundResource(hudWarmStatus.isTrieWarmShow() ? R.drawable.tire_show : R.drawable.tire_dismiss);
-            speedV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
+            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
             oilV.setBackgroundResource(hudWarmStatus.isOilWarmShow() ? R.drawable.oil_show : R.drawable.oil_dismiss);
         }
     }

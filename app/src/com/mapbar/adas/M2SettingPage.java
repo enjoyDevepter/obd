@@ -221,7 +221,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(true);
                                 avgOilV.setSelected(false);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x04));
                                 dialog.dismiss();
                             }
                         });
@@ -234,7 +234,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 dismissV.setSelected(false);
                                 oilV.setSelected(false);
                                 avgOilV.setSelected(true);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x05));
                                 dialog.dismiss();
                             }
                         });
