@@ -525,7 +525,7 @@ public class BlueManager {
         canGo = false;
         Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
 
-        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x88 && data[2] == 03) || (data[1] == (byte) 0x90 && data[2] == 01)) { // 未拆封包 或者 心跳包
+        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x88 && data[2] == 03) || (data[1] == (byte) 0x90 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 02) || (data[1] == (byte) 0x90 && data[2] == 03)) { // 未拆封包 或者 心跳包
         } else {
             if ((data[1] == (byte) 0x88 && data[2] == 05)) {
                 COMMAND_TIMEOUT = 15000;
@@ -753,6 +753,7 @@ public class BlueManager {
                             mHandler.sendMessage(message);
                             return;
                         }
+                        obdStatusInfo.setNews(true);
                         obdStatusInfo.setHudType(content[68]);
                         obdStatusInfo.setSupportNavi(content[69] == 1);
                         obdStatusInfo.setSupportFM(content[70] == 1);

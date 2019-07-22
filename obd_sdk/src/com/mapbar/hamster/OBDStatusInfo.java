@@ -19,6 +19,7 @@ public class OBDStatusInfo implements Serializable {
     private int hudType;
     private boolean supportNavi;
     private boolean supportFM;
+    private boolean news;
 
     public byte[] getOrginal() {
         return orginal;
@@ -108,6 +109,14 @@ public class OBDStatusInfo implements Serializable {
         this.supportFM = supportFM;
     }
 
+    public boolean isNews() {
+        return news;
+    }
+
+    public void setNews(boolean news) {
+        this.news = news;
+    }
+
     @Override
     public String toString() {
         return "OBDStatusInfo{" +
@@ -122,6 +131,7 @@ public class OBDStatusInfo implements Serializable {
                 ", hudType=" + hudType +
                 ", supportNavi=" + supportNavi +
                 ", supportFM=" + supportFM +
+                ", news=" + news +
                 '}';
     }
 }

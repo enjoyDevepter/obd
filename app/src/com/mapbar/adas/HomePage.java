@@ -131,7 +131,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.hud_setting:
                 // 判断HUD类型跳转对应设置界面
                 if (null != obdStatusInfo) {
-                    if (obdStatusInfo.getHudType() == 01) {
+                    if (!obdStatusInfo.isNews()) {
                         Toast.makeText(getContext(), "此设备不支持HUD设置", Toast.LENGTH_LONG).show();
                     } else {
                         if (HUD_GUID.get()) {
@@ -191,294 +191,290 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 break;
             case R.id.navi:
                 if (null != obdStatusInfo) {
-                    if (obdStatusInfo.isSupportNavi()) {
-                        BlueManager.getInstance().setNavi(true);
-                        AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
-                            @Override
-                            public void onInitNaviFailure() {
-                                Log.d("onInitNaviFailure");
+                    BlueManager.getInstance().setNavi(true);
+                    AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
+                        @Override
+                        public void onInitNaviFailure() {
+                            Log.d("onInitNaviFailure");
+                        }
+
+                        @Override
+                        public void onInitNaviSuccess() {
+                            Log.d("onInitNaviSuccess");
+                        }
+
+                        @Override
+                        public void onStartNavi(int i) {
+                            Log.d("onStartNavi " + i);
+                        }
+
+                        @Override
+                        public void onTrafficStatusUpdate() {
+
+                        }
+
+                        @Override
+                        public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
+
+                        }
+
+                        @Override
+                        public void onGetNavigationText(int i, String s) {
+
+                        }
+
+                        @Override
+                        public void onGetNavigationText(String s) {
+
+                        }
+
+                        @Override
+                        public void onEndEmulatorNavi() {
+                            Log.d("onEndEmulatorNavi");
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
+                                }
+                            }).start();
+                        }
+
+                        @Override
+                        public void onArriveDestination() {
+                            Log.d("onArriveDestination");
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
+                                }
+                            }).start();
+                        }
+
+                        @Override
+                        public void onCalculateRouteFailure(int i) {
+
+                        }
+
+                        @Override
+                        public void onReCalculateRouteForYaw() {
+
+                        }
+
+                        @Override
+                        public void onReCalculateRouteForTrafficJam() {
+
+                        }
+
+                        @Override
+                        public void onArrivedWayPoint(int i) {
+
+                        }
+
+                        @Override
+                        public void onGpsOpenStatus(boolean b) {
+
+                        }
+
+                        @Override
+                        public void onNaviInfoUpdate(NaviInfo naviInfo) {
+                            int type = 0;
+                            switch (naviInfo.getIconType()) {
+                                case 0:
+                                    break;
+                                case 2:
+                                    type = 5;
+                                    break;
+                                case 3:
+                                    type = 2;
+                                    break;
+                                case 4:
+                                case 51:
+                                    type = 4;
+                                    break;
+                                case 5:
+                                case 52:
+                                    type = 1;
+                                    break;
+                                case 6:
+                                    type = 6;
+                                    break;
+                                case 7:
+                                    type = 3;
+                                    break;
+                                case 8:
+                                    type = 7;
+                                    break;
+                                case 11:
+                                    type = 8;
+                                    break;
+                                default:
+                                    type = 0;
+                                    break;
                             }
+                            BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(type, naviInfo.getCurStepRetainDistance()));
+                        }
 
-                            @Override
-                            public void onInitNaviSuccess() {
-                                Log.d("onInitNaviSuccess");
-                            }
+                        @Override
+                        public void onNaviInfoUpdated(AMapNaviInfo aMapNaviInfo) {
 
-                            @Override
-                            public void onStartNavi(int i) {
-                                Log.d("onStartNavi " + i);
-                            }
+                        }
 
-                            @Override
-                            public void onTrafficStatusUpdate() {
-
-                            }
-
-                            @Override
-                            public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
-
-                            }
-
-                            @Override
-                            public void onGetNavigationText(int i, String s) {
-
-                            }
-
-                            @Override
-                            public void onGetNavigationText(String s) {
-
-                            }
-
-                            @Override
-                            public void onEndEmulatorNavi() {
-                                Log.d("onEndEmulatorNavi");
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
-                                    }
-                                }).start();
-                            }
-
-                            @Override
-                            public void onArriveDestination() {
-                                Log.d("onArriveDestination");
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(0xFF, 0));
-                                    }
-                                }).start();
-                            }
-
-                            @Override
-                            public void onCalculateRouteFailure(int i) {
-
-                            }
-
-                            @Override
-                            public void onReCalculateRouteForYaw() {
-
-                            }
-
-                            @Override
-                            public void onReCalculateRouteForTrafficJam() {
-
-                            }
-
-                            @Override
-                            public void onArrivedWayPoint(int i) {
-
-                            }
-
-                            @Override
-                            public void onGpsOpenStatus(boolean b) {
-
-                            }
-
-                            @Override
-                            public void onNaviInfoUpdate(NaviInfo naviInfo) {
+                        @Override
+                        public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
+                            if (aMapNaviCameraInfos.length > 0) {
                                 int type = 0;
-                                switch (naviInfo.getIconType()) {
-                                    case 0:
-                                        break;
-                                    case 2:
-                                        type = 5;
-                                        break;
-                                    case 3:
-                                        type = 2;
-                                        break;
-                                    case 4:
-                                    case 51:
-                                        type = 4;
-                                        break;
-                                    case 5:
-                                    case 52:
-                                        type = 1;
-                                        break;
-                                    case 6:
+                                switch (aMapNaviCameraInfos[0].getCameraType()) {
+                                    case 0: // 测速
                                         type = 6;
                                         break;
-                                    case 7:
-                                        type = 3;
-                                        break;
-                                    case 8:
+                                    case 1: // 监控摄像
                                         type = 7;
                                         break;
-                                    case 11:
+                                    case 2: // 闯红灯拍照
                                         type = 8;
                                         break;
-                                    default:
+                                    case 3: // 违章拍照
+                                        type = 1;
+                                        break;
+                                    case 4: // 公交专用道摄像头
+                                        type = 2;
+                                        break;
+                                    case 5: // 应急车道拍照
+                                        type = 3;
+                                        break;
+                                    case 6: // 非机动车道(暂未使用)
                                         type = 0;
                                         break;
+                                    case 8: // 区间测速起始
+                                        type = 4;
+                                        break;
+                                    case 9: // 区间测速解除
+                                        type = 5;
+                                        break;
+                                    default:
+                                        break;
                                 }
-                                BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(type, naviInfo.getCurStepRetainDistance()));
+                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getCameraSpeed()));
+                            } else {
+                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
                             }
+                        }
 
-                            @Override
-                            public void onNaviInfoUpdated(AMapNaviInfo aMapNaviInfo) {
+                        @Override
+                        public void updateIntervalCameraInfo(AMapNaviCameraInfo aMapNaviCameraInfo, AMapNaviCameraInfo aMapNaviCameraInfo1, int i) {
 
-                            }
+                        }
 
-                            @Override
-                            public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
-                                if (aMapNaviCameraInfos.length > 0) {
-                                    int type = 0;
-                                    switch (aMapNaviCameraInfos[0].getCameraType()) {
-                                        case 0: // 测速
-                                            type = 6;
-                                            break;
-                                        case 1: // 监控摄像
-                                            type = 7;
-                                            break;
-                                        case 2: // 闯红灯拍照
-                                            type = 8;
-                                            break;
-                                        case 3: // 违章拍照
-                                            type = 1;
-                                            break;
-                                        case 4: // 公交专用道摄像头
-                                            type = 2;
-                                            break;
-                                        case 5: // 应急车道拍照
-                                            type = 3;
-                                            break;
-                                        case 6: // 非机动车道(暂未使用)
-                                            type = 0;
-                                            break;
-                                        case 8: // 区间测速起始
-                                            type = 4;
-                                            break;
-                                        case 9: // 区间测速解除
-                                            type = 5;
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getCameraSpeed()));
-                                } else {
-                                    BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                }
-                            }
+                        @Override
+                        public void onServiceAreaUpdate(AMapServiceAreaInfo[] aMapServiceAreaInfos) {
 
-                            @Override
-                            public void updateIntervalCameraInfo(AMapNaviCameraInfo aMapNaviCameraInfo, AMapNaviCameraInfo aMapNaviCameraInfo1, int i) {
+                        }
 
-                            }
+                        @Override
+                        public void showCross(AMapNaviCross aMapNaviCross) {
 
-                            @Override
-                            public void onServiceAreaUpdate(AMapServiceAreaInfo[] aMapServiceAreaInfos) {
+                        }
 
-                            }
+                        @Override
+                        public void hideCross() {
 
-                            @Override
-                            public void showCross(AMapNaviCross aMapNaviCross) {
+                        }
 
-                            }
+                        @Override
+                        public void showModeCross(AMapModelCross aMapModelCross) {
 
-                            @Override
-                            public void hideCross() {
+                        }
 
-                            }
+                        @Override
+                        public void hideModeCross() {
 
-                            @Override
-                            public void showModeCross(AMapModelCross aMapModelCross) {
+                        }
 
-                            }
-
-                            @Override
-                            public void hideModeCross() {
-
-                            }
-
-                            @Override
-                            public void showLaneInfo(AMapLaneInfo[] aMapLaneInfos, byte[] bytes, byte[] bytes1) {
-                                int enter = 0;
-                                int count = aMapLaneInfos.length;
-                                for (int i = 0; i < aMapLaneInfos.length; i++) {
-                                    if (aMapLaneInfos[i].isRecommended()) {
-                                        enter += Math.pow(2, i);
-                                    }
-                                }
-                                Log.d("aMapLaneInfo  showLaneInfo " + count);
-                                if (!showLane) {
-                                    showLane = true;
-                                    BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter));
+                        @Override
+                        public void showLaneInfo(AMapLaneInfo[] aMapLaneInfos, byte[] bytes, byte[] bytes1) {
+                            int enter = 0;
+                            int count = aMapLaneInfos.length;
+                            for (int i = 0; i < aMapLaneInfos.length; i++) {
+                                if (aMapLaneInfos[i].isRecommended()) {
+                                    enter += Math.pow(2, i);
                                 }
                             }
-
-                            @Override
-                            public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
+                            Log.d("aMapLaneInfo  showLaneInfo " + count);
+                            if (!showLane) {
+                                showLane = true;
+                                BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter));
                             }
+                        }
 
-                            @Override
-                            public void hideLaneInfo() {
-                                Log.d("aMapLaneInfo  hideLaneInfo ");
-                                if (showLane) {
-                                    showLane = false;
-                                    BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
-                                }
+                        @Override
+                        public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
+                        }
+
+                        @Override
+                        public void hideLaneInfo() {
+                            Log.d("aMapLaneInfo  hideLaneInfo ");
+                            if (showLane) {
+                                showLane = false;
+                                BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
                             }
+                        }
 
-                            @Override
-                            public void onCalculateRouteSuccess(int[] ints) {
+                        @Override
+                        public void onCalculateRouteSuccess(int[] ints) {
 
-                            }
+                        }
 
-                            @Override
-                            public void notifyParallelRoad(int i) {
+                        @Override
+                        public void notifyParallelRoad(int i) {
 
-                            }
+                        }
 
-                            @Override
-                            public void OnUpdateTrafficFacility(AMapNaviTrafficFacilityInfo aMapNaviTrafficFacilityInfo) {
+                        @Override
+                        public void OnUpdateTrafficFacility(AMapNaviTrafficFacilityInfo aMapNaviTrafficFacilityInfo) {
 
-                            }
+                        }
 
-                            @Override
-                            public void OnUpdateTrafficFacility(AMapNaviTrafficFacilityInfo[] aMapNaviTrafficFacilityInfos) {
+                        @Override
+                        public void OnUpdateTrafficFacility(AMapNaviTrafficFacilityInfo[] aMapNaviTrafficFacilityInfos) {
 
-                            }
+                        }
 
-                            @Override
-                            public void OnUpdateTrafficFacility(TrafficFacilityInfo trafficFacilityInfo) {
+                        @Override
+                        public void OnUpdateTrafficFacility(TrafficFacilityInfo trafficFacilityInfo) {
 
-                            }
+                        }
 
-                            @Override
-                            public void updateAimlessModeStatistics(AimLessModeStat aimLessModeStat) {
+                        @Override
+                        public void updateAimlessModeStatistics(AimLessModeStat aimLessModeStat) {
 
-                            }
+                        }
 
-                            @Override
-                            public void updateAimlessModeCongestionInfo(AimLessModeCongestionInfo aimLessModeCongestionInfo) {
+                        @Override
+                        public void updateAimlessModeCongestionInfo(AimLessModeCongestionInfo aimLessModeCongestionInfo) {
 
-                            }
+                        }
 
-                            @Override
-                            public void onPlayRing(int i) {
+                        @Override
+                        public void onPlayRing(int i) {
 
-                            }
+                        }
 
-                            @Override
-                            public void onCalculateRouteSuccess(AMapCalcRouteResult aMapCalcRouteResult) {
+                        @Override
+                        public void onCalculateRouteSuccess(AMapCalcRouteResult aMapCalcRouteResult) {
 
-                            }
+                        }
 
-                            @Override
-                            public void onCalculateRouteFailure(AMapCalcRouteResult aMapCalcRouteResult) {
+                        @Override
+                        public void onCalculateRouteFailure(AMapCalcRouteResult aMapCalcRouteResult) {
 
-                            }
+                        }
 
-                            @Override
-                            public void onNaviRouteNotify(AMapNaviRouteNotifyData aMapNaviRouteNotifyData) {
+                        @Override
+                        public void onNaviRouteNotify(AMapNaviRouteNotifyData aMapNaviRouteNotifyData) {
 
-                            }
-                        });
-                        AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
-                    } else {
-                        Toast.makeText(getContext(), "此设备不支持导航", Toast.LENGTH_LONG).show();
-                    }
+                        }
+                    });
+                    AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
                 }
                 break;
             case R.id.fm:
