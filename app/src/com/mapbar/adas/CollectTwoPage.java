@@ -23,6 +23,7 @@ import com.mapbar.hamster.BlueManager;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.core.HexUtils;
 import com.mapbar.hamster.core.ProtocolUtils;
+import com.mapbar.hamster.log.FileLoggingTree;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -427,7 +428,9 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
             builder.addPart(MultipartBody.Part.createFormData("serialNumber", getDate().getString("sn")))
                     .addPart(MultipartBody.Part.createFormData("type", "1"));
             for (File file : logs) {
-                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+                if (!file.getName().equals(FileLoggingTree.fileName)) {
+                    builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+                }
             }
             Request request = new Request.Builder()
                     .url(URLUtils.UPDATE_ERROR_FILE)
@@ -454,7 +457,9 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
                                 }
                             });
                             for (File delete : logs) {
-                                delete.delete();
+                                if (!delete.getName().equals(FileLoggingTree.fileName)) {
+                                    delete.delete();
+                                }
                             }
                         }
                     } catch (JSONException e) {

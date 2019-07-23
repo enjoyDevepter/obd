@@ -16,8 +16,7 @@ public class FileLoggingTree extends Timber.Tree {
 
     private File file;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-
+    public static String fileName = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(System.currentTimeMillis()) + ".txt";
 
     public FileLoggingTree(String filePath) {
         File dir = new File(filePath);
@@ -31,7 +30,7 @@ public class FileLoggingTree extends Timber.Tree {
             }
             deleteFile.delete();
         }
-        file = new File(filePath, "/" + sdf.format(System.currentTimeMillis()) + ".txt");
+        file = new File(filePath, "/" + fileName);
         new File(file.getParent()).mkdirs();
     }
 

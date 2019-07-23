@@ -18,7 +18,7 @@ import com.miyuan.obd.R;
 import static com.mapbar.hamster.OBDEvent.HUD_STATUS_INFO;
 import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 
-@PageSetting(contentViewId = R.layout.f3_layout, toHistory = false)
+@PageSetting(contentViewId = R.layout.f3_layout)
 public class F3SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;

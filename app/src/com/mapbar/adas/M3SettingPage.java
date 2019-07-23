@@ -18,7 +18,7 @@ import com.miyuan.obd.R;
 import static com.mapbar.hamster.OBDEvent.HUD_STATUS_INFO;
 import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 
-@PageSetting(contentViewId = R.layout.m3_layout, toHistory = false)
+@PageSetting(contentViewId = R.layout.m3_layout)
 public class M3SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;
@@ -497,7 +497,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
                     multifunctionalV.setBackgroundResource(R.drawable.m3_multifunctional_avg_oil_show);
                     break;
                 case 0x08:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_voltage_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.m3_multifunctional_voltage_show);
                     break;
                 default:
                     break;

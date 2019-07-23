@@ -18,7 +18,7 @@ import com.miyuan.obd.R;
 import static com.mapbar.hamster.OBDEvent.HUD_STATUS_INFO;
 import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 
-@PageSetting(contentViewId = R.layout.m2_layout, toHistory = false)
+@PageSetting(contentViewId = R.layout.m2_layout)
 public class M2SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
     @ViewInject(R.id.setting)
     TextView settingV;
@@ -432,7 +432,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                     multifunctionalV.setBackgroundResource(R.drawable.multifunctional_speed_show);
                     break;
                 case 0x04:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_oil_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.m2_multifunctional_oil_show);
                     break;
                 case 0x05:
                     multifunctionalV.setBackgroundResource(R.drawable.multifunctional_avg_oil_show);
@@ -450,7 +450,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
             temperatureV.setBackgroundResource(hudWarmStatus.isTemperatureWarmShow() ? R.drawable.temperature_show : R.drawable.temperature_dismiss);
             tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.tired_show : R.drawable.tired_dismiss);
             tireV.setBackgroundResource(hudWarmStatus.isTrieWarmShow() ? R.drawable.tire_show : R.drawable.tire_dismiss);
-            speedV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
+            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
             oilV.setBackgroundResource(hudWarmStatus.isOilWarmShow() ? R.drawable.oil_show : R.drawable.oil_dismiss);
         }
     }

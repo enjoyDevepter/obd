@@ -13,6 +13,7 @@ import com.mapbar.adas.anno.ViewInject;
 import com.mapbar.adas.utils.CustomDialog;
 import com.mapbar.adas.utils.OBDUtils;
 import com.mapbar.adas.utils.URLUtils;
+import com.mapbar.hamster.log.FileLoggingTree;
 import com.mapbar.hamster.log.Log;
 import com.miyuan.obd.R;
 
@@ -205,7 +206,9 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
             builder.addPart(MultipartBody.Part.createFormData("serialNumber", sn.toString()))
                     .addPart(MultipartBody.Part.createFormData("type", "1"));
             for (File file : logs) {
-                builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+                if (!file.getName().equals(FileLoggingTree.fileName)) {
+                    builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+                }
             }
             Request request = new Request.Builder()
                     .url(URLUtils.UPDATE_ERROR_FILE)
@@ -232,7 +235,9 @@ public class AuthPage extends AppBasePage implements View.OnClickListener {
                                 }
                             });
                             for (File delete : logs) {
-                                delete.delete();
+                                if (!delete.getName().equals(FileLoggingTree.fileName)) {
+                                    delete.delete();
+                                }
                             }
                         }
                     } catch (JSONException e) {
