@@ -68,7 +68,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
-        android:text="车速(Km/h)"
+        android:text="车速(km/h)"
         android:textColor="#FFFFFFFF"
         android:textSize="15sp" />
 

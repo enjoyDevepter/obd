@@ -176,11 +176,11 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
                             case 0x00:
                                 dismissV.setSelected(true);
                                 break;
-                            case 0x01:
-                                tempV.setSelected(true);
-                                break;
                             case 0x03:
                                 speedV.setSelected(true);
+                                break;
+                            case 0x04:
+                                tempV.setSelected(true);
                                 break;
                             case 0x05:
                                 oilV.setSelected(true);
@@ -224,7 +224,7 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
                                 tempV.setSelected(true);
                                 dismissV.setSelected(false);
                                 oilV.setSelected(false);
-                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x01));
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x04));
                                 dialog.dismiss();
                             }
                         });
@@ -525,14 +525,14 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
                 case 0x00:
                     multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_dismiss);
                     break;
-                case 0x01:
-                    multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_c);
+                case 0x04:
+                    multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_oil);
                     break;
                 case 0x03:
                     multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_s);
                     break;
                 case 0x05:
-                    multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_o);
+                    multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_avg_oil);
                     break;
                 case 0x08:
                     multifunctionalV.setBackgroundResource(R.drawable.ff_multifunctional_v);

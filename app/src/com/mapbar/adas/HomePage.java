@@ -355,7 +355,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                     default:
                                         break;
                                 }
-                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getCameraSpeed()));
+                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getDistance()));
                             } else {
                                 BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
                             }

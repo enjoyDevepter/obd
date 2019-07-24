@@ -445,13 +445,13 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
             }
         }
         if (null != hudWarmStatus) {
-            faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.fault_show : R.drawable.fault_dismiss);
-            voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.voltage_show : R.drawable.voltage_dismiss);
-            temperatureV.setBackgroundResource(hudWarmStatus.isTemperatureWarmShow() ? R.drawable.temperature_show : R.drawable.temperature_dismiss);
-            tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.tired_show : R.drawable.tired_dismiss);
+            faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.m2_fault_show : R.drawable.m2_fault_dismiss);
+            voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.m2_voltage_show : R.drawable.m2_voltage_dismiss);
+            temperatureV.setBackgroundResource(hudWarmStatus.isTemperatureWarmShow() ? R.drawable.m2_temperature_show : R.drawable.tm2_emperature_dismiss);
+            tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.m2_tired_show : R.drawable.m2_tired_dismiss);
             tireV.setBackgroundResource(hudWarmStatus.isTrieWarmShow() ? R.drawable.tire_show : R.drawable.tire_dismiss);
-            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
-            oilV.setBackgroundResource(hudWarmStatus.isOilWarmShow() ? R.drawable.oil_show : R.drawable.oil_dismiss);
+            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.m2_speed_show : R.drawable.m2_speed_dismiss);
+            oilV.setBackgroundResource(hudWarmStatus.isOilWarmShow() ? R.drawable.m2_oil_show : R.drawable.m2_oil_dismiss);
         }
     }
 

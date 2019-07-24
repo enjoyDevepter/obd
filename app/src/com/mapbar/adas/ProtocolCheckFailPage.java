@@ -99,6 +99,9 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
             case OBDEvent.NO_PARAM: // 删除参数逻辑
                 confirmV.setEnabled(true);
                 obdStatusInfo = (OBDStatusInfo) data;

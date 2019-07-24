@@ -139,7 +139,7 @@
             android:layout_width="465dp"
             android:layout_height="232dp"
             android:layout_marginTop="36dp"
-            android:background="@drawable/multifunctional_speed_show" />
+            android:background="@drawable/m2_multifunctional_oil_show" />
 
     </RelativeLayout>
 
