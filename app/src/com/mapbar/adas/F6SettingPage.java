@@ -36,6 +36,8 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
     View multifunctionalV;
     @ViewInject(R.id.ff_warm_bg)
     View ff_warm_bgV;
+    @ViewInject(R.id.warm)
+    View warmV;
     @ViewInject(R.id.fault)
     View faultV;
     @ViewInject(R.id.voltage)
@@ -78,6 +80,7 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
         ff_tireV.setOnClickListener(this);
         multifunctionalV.setOnClickListener(this);
         faultV.setOnClickListener(this);
+        warmV.setOnClickListener(this);
         voltageV.setOnClickListener(this);
         speedV.setOnClickListener(this);
         tiredV.setOnClickListener(this);
@@ -148,6 +151,7 @@ public class F6SettingPage extends AppBasePage implements View.OnClickListener, 
             case R.id.ff_oil_l:
                 showNormalDailog(viewId, "剩余燃油显示区", hudStatus.isRemainderOilShow());
                 break;
+            case R.id.warm:
             case R.id.fault:
             case R.id.tired:
             case R.id.voltage:

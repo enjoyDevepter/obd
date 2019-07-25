@@ -44,7 +44,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
-        android:text="水温(℃)"
+        android:text="瞬时油耗(L/h)"
         android:textColor="#FFFFFFFF"
         android:textSize="15sp" />
 

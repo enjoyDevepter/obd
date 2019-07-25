@@ -283,9 +283,13 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 case 0:
                                     break;
                                 case 2:
+                                case 21:
+                                case 25:
                                     type = 5;
                                     break;
                                 case 3:
+                                case 26:
+                                case 22:
                                     type = 2;
                                     break;
                                 case 4:
@@ -303,6 +307,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                     type = 3;
                                     break;
                                 case 8:
+                                case 28:
                                     type = 7;
                                     break;
                                 case 11:

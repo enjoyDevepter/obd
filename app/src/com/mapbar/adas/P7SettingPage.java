@@ -526,7 +526,7 @@ public class P7SettingPage extends AppBasePage implements View.OnClickListener, 
         if (null != hudStatus) {
             remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.da_remaining_show : R.drawable.da_remaining_dismiss);
             tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_temp_show : R.drawable.da_temp_dismiss);
-            da_speedV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.da_speed_show : R.drawable.da_speed_dismiss);
+            da_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.da_speed_show : R.drawable.da_speed_dismiss);
             da_mileV.setBackgroundResource(hudStatus.isMileShow() ? R.drawable.da_mile_show : R.drawable.da_mile_dismiss);
             da_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.da_rpm_show : R.drawable.da_rpm_dismiss);
             da_oilV.setBackgroundResource(hudStatus.isOilShow() ? R.drawable.da_oil_show : R.drawable.da_oil_dismiss);
@@ -537,7 +537,7 @@ public class P7SettingPage extends AppBasePage implements View.OnClickListener, 
                     multifunctionalV.setBackgroundResource(R.drawable.multifunctional_dismiss);
                     break;
                 case 0x01:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_temp_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.p7_multifunctional_temp_show);
                     break;
                 case 0x04:
                     multifunctionalV.setBackgroundResource(R.drawable.multifunctional_l_show);
@@ -546,7 +546,7 @@ public class P7SettingPage extends AppBasePage implements View.OnClickListener, 
                     multifunctionalV.setBackgroundResource(R.drawable.multifunctional_oil_show);
                     break;
                 case 0x08:
-                    multifunctionalV.setBackgroundResource(R.drawable.multifunctional_voltage_show);
+                    multifunctionalV.setBackgroundResource(R.drawable.p7_multifunctional_voltage_show);
                     break;
                 default:
                     break;

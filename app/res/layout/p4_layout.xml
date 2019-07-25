@@ -172,7 +172,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="21dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/fault_show" />
+                android:background="@drawable/m2_fault_show" />
 
             <View
                 android:id="@+id/voltage"
@@ -180,7 +180,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="57dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/voltage_show" />
+                android:background="@drawable/m2_voltage_show" />
 
             <View
                 android:id="@+id/speed"
@@ -188,7 +188,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="86dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/speed_show" />
+                android:background="@drawable/m2_speed_show" />
 
             <View
                 android:id="@+id/tired"
@@ -196,7 +196,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="121dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/tired_show" />
+                android:background="@drawable/m2_tired_show" />
 
         </FrameLayout>
     </RelativeLayout>

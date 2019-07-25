@@ -75,6 +75,7 @@
 
 
                 <FrameLayout
+                    android:id="@+id/warm"
                     android:layout_width="136dp"
                     android:layout_height="39dp"
                     android:layout_marginLeft="93dp"

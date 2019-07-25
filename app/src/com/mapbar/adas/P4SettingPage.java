@@ -536,10 +536,10 @@ public class P4SettingPage extends AppBasePage implements View.OnClickListener, 
             }
         }
         if (null != hudWarmStatus) {
-            faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.fault_show : R.drawable.fault_dismiss);
-            voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.voltage_show : R.drawable.voltage_dismiss);
-            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
-            tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.tired_show : R.drawable.tired_dismiss);
+            faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.m2_fault_show : R.drawable.m2_fault_dismiss);
+            voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.m2_voltage_show : R.drawable.m2_voltage_dismiss);
+            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.m2_speed_show : R.drawable.m2_speed_dismiss);
+            tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.m2_tired_show : R.drawable.m2_tired_dismiss);
         }
     }
 }
