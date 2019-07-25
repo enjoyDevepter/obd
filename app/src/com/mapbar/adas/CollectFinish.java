@@ -33,7 +33,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@PageSetting(contentViewId = R.layout.collect_finish_layout)
+@PageSetting(contentViewId = R.layout.collect_finish_layout, toHistory = false)
 public class CollectFinish extends AppBasePage implements View.OnClickListener, BleCallBackListener {
 
     @ViewInject(R.id.title)

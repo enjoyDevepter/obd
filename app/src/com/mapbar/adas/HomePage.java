@@ -102,7 +102,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 .statusBarDarkFont(true)
                 .statusBarColor(MainActivity.getInstance().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : R.color.main_title_color)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
-
         BlueManager.getInstance().setNavi(false);
     }
 

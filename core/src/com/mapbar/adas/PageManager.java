@@ -62,7 +62,6 @@ public class PageManager {
         page.show();
     }
 
-
     /**
      * 结束指定的Activity
      */
