@@ -177,6 +177,7 @@
 
         <!-- 预警一-->
         <FrameLayout
+            android:id="@+id/warm1"
             android:layout_width="84dp"
             android:layout_height="109dp"
             android:layout_alignParentBottom="true"
@@ -209,6 +210,7 @@
 
         <!-- 预警二-->
         <FrameLayout
+            android:id="@+id/warm2"
             android:layout_width="94dp"
             android:layout_height="109dp"
             android:layout_alignParentRight="true"
@@ -254,7 +256,7 @@
         android:layout_marginBottom="36dp"
         android:background="@drawable/setting_bg"
         android:gravity="center"
-        android:text="设置"
+        android:text="界面"
         android:textColor="#FFFEFEFE"
         android:textSize="14sp" />
 
@@ -267,7 +269,7 @@
         android:layout_marginBottom="80dp"
         android:background="@drawable/setting_bg"
         android:gravity="center"
-        android:text="参数"
+        android:text="设置"
         android:textColor="#FFFEFEFE"
         android:textSize="14sp" />
 

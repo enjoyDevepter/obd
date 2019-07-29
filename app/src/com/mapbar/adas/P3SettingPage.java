@@ -52,6 +52,10 @@ public class P3SettingPage extends AppBasePage implements View.OnClickListener, 
     View f3_speed_bgV;
     @ViewInject(R.id.f3_speed)
     View f3_speedV;
+    @ViewInject(R.id.warm1)
+    View warm1V;
+    @ViewInject(R.id.warm1)
+    View warm2V;
     @ViewInject(R.id.f3_warm_bg1)
     View f3_warm_bg1V;
     @ViewInject(R.id.fault)
@@ -85,10 +89,8 @@ public class P3SettingPage extends AppBasePage implements View.OnClickListener, 
         f3_remainingV.setOnClickListener(this);
         f3_tempV.setOnClickListener(this);
         f3_speedV.setOnClickListener(this);
-        faultV.setOnClickListener(this);
-        voltageV.setOnClickListener(this);
-        speedV.setOnClickListener(this);
-        tiredV.setOnClickListener(this);
+        warm1V.setOnClickListener(this);
+        warm2V.setOnClickListener(this);
     }
 
 
@@ -104,7 +106,7 @@ public class P3SettingPage extends AppBasePage implements View.OnClickListener, 
         switch (v.getId()) {
             case R.id.setting:
                 if (choice) {
-                    settingV.setText("设置");
+                    settingV.setText("界面");
                 } else {
                     settingV.setText("完成");
                 }
@@ -153,10 +155,8 @@ public class P3SettingPage extends AppBasePage implements View.OnClickListener, 
             case R.id.f3_temp:
                 showNormalDailog(viewId, "水温显示区", hudStatus.isTempShow());
                 break;
-            case R.id.fault:
-            case R.id.voltage:
-            case R.id.speed:
-            case R.id.tired:
+            case R.id.warm1:
+            case R.id.warm2:
                 showWarm();
                 break;
             case R.id.f3_speed:

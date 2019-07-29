@@ -91,7 +91,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
         switch (v.getId()) {
             case R.id.setting:
                 if (choice) {
-                    settingV.setText("设置");
+                    settingV.setText("界面");
                 } else {
                     settingV.setText("完成");
                 }

@@ -30,7 +30,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="38dp"
-                android:background="@drawable/multifunctional_voltage_show" />
+                android:background="@drawable/multifunctional_l_show" />
 
         </FrameLayout>
         <!-- 剩余燃油-->
@@ -242,7 +242,7 @@
         android:layout_marginBottom="36dp"
         android:background="@drawable/setting_bg"
         android:gravity="center"
-        android:text="设置"
+        android:text="界面"
         android:textColor="#FFFEFEFE"
         android:textSize="14sp" />
 
@@ -255,7 +255,7 @@
         android:layout_marginBottom="80dp"
         android:background="@drawable/setting_bg"
         android:gravity="center"
-        android:text="参数"
+        android:text="设置"
         android:textColor="#FFFEFEFE"
         android:textSize="14sp" />
 </RelativeLayout>
