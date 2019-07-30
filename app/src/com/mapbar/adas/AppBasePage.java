@@ -31,6 +31,10 @@ public abstract class AppBasePage extends FragmentPage {
         super.onResume();
         if (!isOPen(MainActivity.getInstance())) {
             showGpsDialog();
+        } else {
+            if (null != dialog && dialog.isVisible()) {
+                dialog.dismiss();
+            }
         }
     }
 

@@ -110,24 +110,24 @@ public class DBManager {
         try {
             String table = "code";
             Cursor cursor = sqliteDB.rawQuery("select * from " + table + " where id = ?", new String[]{code});
+            FaultCode codeItem = new FaultCode();
+            codeItem.setId(code);
             while (cursor.moveToNext()) {
-                String id = cursor.getString(cursor.getColumnIndex("id"));
                 String suit = cursor.getString(cursor.getColumnIndex("suit"));
                 String desc_ch = cursor.getString(cursor.getColumnIndex("desc_ch"));
                 String desc_en = cursor.getString(cursor.getColumnIndex("desc_en"));
                 String detail = cursor.getString(cursor.getColumnIndex("detail"));
                 String system = cursor.getString(cursor.getColumnIndex("system"));
-                FaultCode codeItem = new FaultCode();
-                codeItem.setId(id);
                 codeItem.setSuit(suit);
                 codeItem.setDesc_ch(desc_ch);
                 codeItem.setDesc_en(desc_en);
                 codeItem.setDetail(detail);
                 codeItem.setSystem(system);
-                codes.add(codeItem);
             }
+            codes.add(codeItem);
             cursor.close();
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
         }
         return codes;

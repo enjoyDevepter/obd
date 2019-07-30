@@ -114,11 +114,11 @@
 
 
             <FrameLayout
-                android:layout_width="136dp"
-                android:layout_height="39dp"
+                android:layout_width="138dp"
+                android:layout_height="34dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="2dp"
-                android:layout_marginTop="53dp">
+                android:layout_marginTop="60dp">
 
                 <View
                     android:id="@+id/da_warm_bg"
@@ -132,7 +132,7 @@
                     android:layout_width="24dp"
                     android:layout_height="17dp"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="13dp"
                     android:background="@drawable/fault_show" />
 
                 <View
@@ -140,7 +140,7 @@
                     android:layout_width="23dp"
                     android:layout_height="17dp"
                     android:layout_marginLeft="42dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="13dp"
                     android:background="@drawable/voltage_show" />
 
                 <View
@@ -148,7 +148,7 @@
                     android:layout_width="24dp"
                     android:layout_height="13dp"
                     android:layout_marginLeft="76dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="15dp"
                     android:background="@drawable/speed_show" />
 
                 <View
@@ -156,7 +156,7 @@
                     android:layout_width="18dp"
                     android:layout_height="17dp"
                     android:layout_marginLeft="114dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="13dp"
                     android:background="@drawable/tired_show" />
 
             </FrameLayout>

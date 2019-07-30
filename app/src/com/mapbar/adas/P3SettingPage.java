@@ -138,7 +138,7 @@ public class P3SettingPage extends AppBasePage implements View.OnClickListener, 
         }
         switch (viewId) {
             case R.id.f3_oil:
-                showNormalDailog(viewId, "油耗显示区", hudStatus.isOilShow());
+                showNormalDailog(viewId, "瞬时油耗显示区", hudStatus.isOilShow());
                 break;
             case R.id.f3_tire:
                 showNormalDailog(viewId, "胎压显示区", hudStatus.isTireShow());

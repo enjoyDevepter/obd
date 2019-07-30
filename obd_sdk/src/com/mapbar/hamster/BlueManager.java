@@ -327,9 +327,9 @@ public class BlueManager {
             return;
         }
 
-        if (!mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.enable();
-        }
+//        if (!mBluetoothAdapter.isEnabled()) {
+//            mBluetoothAdapter.enable();
+//        }
 
         mWorkerThread = new HandlerThread(BlueManager.class.getSimpleName());
         mWorkerThread.start();

@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 return true;
             }
         });
-        splashView.setBackgroundResource(R.drawable.splash);
+        splashView.setBackgroundResource(android.R.color.transparent);
         rootViewGroup.addView(splashView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -185,9 +185,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private void addTasks() {
         TaskManager.getInstance()
 //                .addTask(new SDInitTask())
-                .addTask(new DisclaimerTask())
+                .addTask(new DisclaimerTask());
 //                .addTask(new LocationCheckTask())
-                .addTask(new UpdateTask());
+//                .addTask(new UpdateTask());
         TaskManager.getInstance().next();
     }
 
@@ -222,18 +222,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == 0) {
-//            if (data != null) {
-//                String result = data.getStringExtra(CaptureActivity.SCANRESULT);
-//                if (result != null) {
-//                    Bundle bundle = BackStackManager.getInstance().getCurrent().getDate();
-//                    if (bundle == null) {
-//                        bundle = new Bundle();
-//                    }
-//                    bundle.putString("sn", result);
-//                }
-//            }
-//        }
     }
 
     @Override

@@ -84,7 +84,34 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+                GlobalUtil.getHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                                .setViewListener(new CustomDialog.ViewListener() {
+                                    @Override
+                                    public void bindView(View view) {
+                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
+                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
+                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
+                                        final View confirm = view.findViewById(R.id.confirm);
+                                        confirm.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                                verify();
+                                            }
+                                        });
+                                    }
+                                })
+                                .setLayoutRes(R.layout.dailog_common_warm)
+                                .setCancelOutside(false)
+                                .setDimAmount(0.5f)
+                                .isCenter(true)
+                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                                .show();
+                    }
+                });
                 Log.d("getOBDStatus fail " + e.getMessage());
             }
 
