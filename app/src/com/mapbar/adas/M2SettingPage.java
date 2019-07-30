@@ -254,144 +254,158 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                     @Override
                     public void bindView(View view) {
 
-                        View tire_showV = view.findViewById(R.id.tire_show);
+                        final View tire_showV = view.findViewById(R.id.tire_show);
+                        final View tire_dismissV = view.findViewById(R.id.tire_dismiss);
                         tire_showV.setSelected(hudWarmStatus.isTrieWarmShow());
                         tire_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x05, 1));
-                                dialog.dismiss();
+                                tire_showV.setSelected(true);
+                                tire_dismissV.setSelected(false);
                             }
                         });
 
-                        View tire_dismissV = view.findViewById(R.id.tire_dismiss);
                         tire_dismissV.setSelected(!hudWarmStatus.isTrieWarmShow());
                         tire_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x05, 0));
-                                dialog.dismiss();
+                                tire_showV.setSelected(false);
+                                tire_dismissV.setSelected(true);
                             }
                         });
 
-                        View fault_showV = view.findViewById(R.id.fault_show);
+                        final View fault_showV = view.findViewById(R.id.fault_show);
+                        final View fault_dismissV = view.findViewById(R.id.fault_dismiss);
                         fault_showV.setSelected(hudWarmStatus.isFaultWarmShow());
                         fault_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x07, 1));
-                                dialog.dismiss();
+                                fault_showV.setSelected(true);
+                                fault_dismissV.setSelected(false);
                             }
                         });
 
-                        View fault_dismissV = view.findViewById(R.id.fault_dismiss);
                         fault_dismissV.setSelected(!hudWarmStatus.isFaultWarmShow());
                         fault_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x07, 0));
-                                dialog.dismiss();
+                                fault_showV.setSelected(false);
+                                fault_dismissV.setSelected(true);
                             }
                         });
 
-                        View voltage_showV = view.findViewById(R.id.voltage_show);
+                        final View voltage_showV = view.findViewById(R.id.voltage_show);
+                        final View voltage_dismissV = view.findViewById(R.id.voltage_dismiss);
                         voltage_showV.setSelected(hudWarmStatus.isVoltageWarmShow());
                         voltage_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x02, 1));
-                                dialog.dismiss();
+                                voltage_showV.setSelected(true);
+                                voltage_dismissV.setSelected(false);
                             }
                         });
 
-                        View voltage_dismissV = view.findViewById(R.id.voltage_dismiss);
                         voltage_dismissV.setSelected(!hudWarmStatus.isVoltageWarmShow());
                         voltage_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x02, 0));
-                                dialog.dismiss();
+                                voltage_showV.setSelected(false);
+                                voltage_dismissV.setSelected(true);
                             }
                         });
 
-                        View temp_showV = view.findViewById(R.id.temp_show);
+                        final View temp_showV = view.findViewById(R.id.temp_show);
+                        final View temp_dismissV = view.findViewById(R.id.temp_dismiss);
                         temp_showV.setSelected(hudWarmStatus.isTemperatureWarmShow());
                         temp_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x01, 1));
-                                dialog.dismiss();
+                                temp_showV.setSelected(true);
+                                temp_dismissV.setSelected(false);
                             }
                         });
 
-                        View temp_dismissV = view.findViewById(R.id.temp_dismiss);
                         temp_dismissV.setSelected(!hudWarmStatus.isTemperatureWarmShow());
                         temp_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x01, 0));
-                                dialog.dismiss();
+                                temp_showV.setSelected(false);
+                                temp_dismissV.setSelected(true);
                             }
                         });
 
-                        View tried_showV = view.findViewById(R.id.tried_show);
+                        final View tried_showV = view.findViewById(R.id.tried_show);
+                        final View tried_dismissV = view.findViewById(R.id.tried_dismiss);
                         tried_showV.setSelected(hudWarmStatus.isTiredWarmShow());
                         tried_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x06, 1));
-                                dialog.dismiss();
+                                tried_showV.setSelected(true);
+                                tried_dismissV.setSelected(false);
                             }
                         });
 
-                        View tried_dismissV = view.findViewById(R.id.tried_dismiss);
                         tried_dismissV.setSelected(!hudWarmStatus.isTiredWarmShow());
                         tried_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x06, 0));
-                                dialog.dismiss();
+                                tried_showV.setSelected(false);
+                                tried_dismissV.setSelected(true);
                             }
                         });
 
 
-                        View speed_showV = view.findViewById(R.id.speed_show);
+                        final View speed_showV = view.findViewById(R.id.speed_show);
+                        final View speed_dismissV = view.findViewById(R.id.speed_dismiss);
                         speed_showV.setSelected(hudWarmStatus.isSpeedWarmShow());
                         speed_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 1));
-                                dialog.dismiss();
+                                speed_showV.setSelected(true);
+                                speed_dismissV.setSelected(false);
                             }
                         });
 
-                        View speed_dismissV = view.findViewById(R.id.speed_dismiss);
                         speed_dismissV.setSelected(!hudWarmStatus.isSpeedWarmShow());
                         speed_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 0));
-                                dialog.dismiss();
+                                speed_showV.setSelected(false);
+                                speed_dismissV.setSelected(true);
                             }
                         });
 
-                        View oil_showV = view.findViewById(R.id.oil_show);
+                        final View oil_showV = view.findViewById(R.id.oil_show);
+                        final View oil_dismissV = view.findViewById(R.id.oil_dismiss);
                         oil_showV.setSelected(hudWarmStatus.isOilWarmShow());
                         oil_showV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x03, 1));
-                                dialog.dismiss();
+                                oil_showV.setSelected(true);
+                                oil_dismissV.setSelected(false);
                             }
                         });
 
-                        View oil_dismissV = view.findViewById(R.id.oil_dismiss);
                         oil_dismissV.setSelected(!hudWarmStatus.isOilWarmShow());
                         oil_dismissV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x03, 0));
-                                dialog.dismiss();
+                                oil_showV.setSelected(false);
+                                oil_dismissV.setSelected(true);
                             }
                         });
                     }
@@ -399,6 +413,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                 .setLayoutRes(R.layout.m4_setting_warm_dailog)
                 .setDimAmount(0.5f)
                 .isCenter(true)
+                .setCancelOutside(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.m4_warm_dailog_width))
                 .setHeight(OBDUtils.getDimens(getContext(), R.dimen.m4_warm_dailog_height))
                 .show();

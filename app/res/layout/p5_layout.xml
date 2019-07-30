@@ -116,6 +116,7 @@
             <FrameLayout
                 android:layout_width="138dp"
                 android:layout_height="34dp"
+                android:id="@+id/warm"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="60dp">

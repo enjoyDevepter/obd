@@ -144,6 +144,7 @@
                 android:background="@drawable/fly_multifunctional_voltage_show" />
 
             <FrameLayout
+                android:id="@+id/warm"
                 android:layout_width="139dp"
                 android:layout_height="48dp"
                 android:layout_marginLeft="98dp"

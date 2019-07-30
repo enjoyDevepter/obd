@@ -179,6 +179,7 @@
 
         <!-- 预警一-->
         <FrameLayout
+            android:id="@+id/warm1"
             android:layout_width="84dp"
             android:layout_height="109dp"
             android:layout_alignParentBottom="true"
@@ -211,6 +212,7 @@
 
         <!-- 预警二-->
         <FrameLayout
+            android:id="@+id/warm2"
             android:layout_width="94dp"
             android:layout_height="109dp"
             android:layout_alignParentRight="true"
