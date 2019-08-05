@@ -16,6 +16,13 @@ import com.mapbar.hamster.HUDParams;
 import com.mapbar.hamster.core.ProtocolUtils;
 import com.miyuan.obd.R;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.BICYCLE_LANE;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.BUS;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.CAMERA_SPEED;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.EMERGENCY;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.LIGHT;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.SURVEILLANCE_CAMERA;
 import static com.mapbar.hamster.OBDEvent.HUD_PARAMS_INFO;
 
 @PageSetting(contentViewId = R.layout.hud_setting_layout, toHistory = false)
@@ -54,6 +61,21 @@ public class HUDSettingPage extends AppBasePage implements View.OnClickListener,
     private ViewGroup highModeVG;
     @ViewInject(R.id.naviMode)
     private ViewGroup naviModeVG;
+    @ViewInject(R.id.camera)
+    private TextView camearTV;
+    @ViewInject(R.id.bicycle_lane)
+    private TextView bicycleLaneTV;
+    @ViewInject(R.id.surveillance_camera)
+    private TextView surveillanceCameraTV;
+    @ViewInject(R.id.illegal_photography)
+    private TextView illegalPhotographyTV;
+    @ViewInject(R.id.light_camera)
+    private TextView lightCameraTV;
+    @ViewInject(R.id.emergency)
+    private TextView emergencyTV;
+    @ViewInject(R.id.bus)
+    private TextView busTV;
+
     private HUDParams params;
     @Override
     public void onResume() {
@@ -150,6 +172,62 @@ public class HUDSettingPage extends AppBasePage implements View.OnClickListener,
             @Override
             public void onRightClick(int value) {
                 BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x03, value));
+            }
+        });
+        camearTV.setSelected(CAMERA_SPEED.get());
+        camearTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CAMERA_SPEED.set(!CAMERA_SPEED.get());
+                camearTV.setSelected(CAMERA_SPEED.get());
+            }
+        });
+        bicycleLaneTV.setSelected(BICYCLE_LANE.get());
+        bicycleLaneTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BICYCLE_LANE.set(!BICYCLE_LANE.get());
+                bicycleLaneTV.setSelected(BICYCLE_LANE.get());
+            }
+        });
+        surveillanceCameraTV.setSelected(SURVEILLANCE_CAMERA.get());
+        surveillanceCameraTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SURVEILLANCE_CAMERA.set(!SURVEILLANCE_CAMERA.get());
+                surveillanceCameraTV.setSelected(SURVEILLANCE_CAMERA.get());
+            }
+        });
+        illegalPhotographyTV.setSelected(ILLEGAL_PHOTOGRAPHY.get());
+        illegalPhotographyTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ILLEGAL_PHOTOGRAPHY.set(!ILLEGAL_PHOTOGRAPHY.get());
+                illegalPhotographyTV.setSelected(ILLEGAL_PHOTOGRAPHY.get());
+            }
+        });
+        lightCameraTV.setSelected(LIGHT.get());
+        lightCameraTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LIGHT.set(!LIGHT.get());
+                lightCameraTV.setSelected(LIGHT.get());
+            }
+        });
+        emergencyTV.setSelected(EMERGENCY.get());
+        emergencyTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EMERGENCY.set(!EMERGENCY.get());
+                emergencyTV.setSelected(EMERGENCY.get());
+            }
+        });
+        busTV.setSelected(BUS.get());
+        busTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BUS.set(!BUS.get());
+                busTV.setSelected(BUS.get());
             }
         });
     }
