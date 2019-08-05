@@ -37,4 +37,13 @@ public class SettingPreferencesConfig {
     public static final BooleanPreferences HUD_GUID = new BooleanPreferences(SHARED_PREFERENCES_INIT, "hud_guid", false);
 
     public static final BooleanPreferences FM_GUID = new BooleanPreferences(SHARED_PREFERENCES_INIT, "fm_guid", false);
+
+    public static final BooleanPreferences CAMERA_SPEED = new BooleanPreferences(SHARED_PREFERENCES_INIT, "camera_speed", true);
+
+    public static final BooleanPreferences BICYCLE_LANE = new BooleanPreferences(SHARED_PREFERENCES_INIT, "bicycle_lane", false);
+    public static final BooleanPreferences SURVEILLANCE_CAMERA = new BooleanPreferences(SHARED_PREFERENCES_INIT, "surveillance_camera", false);
+    public static final BooleanPreferences ILLEGAL_PHOTOGRAPHY = new BooleanPreferences(SHARED_PREFERENCES_INIT, "illegal_photography", false);
+    public static final BooleanPreferences LIGHT = new BooleanPreferences(SHARED_PREFERENCES_INIT, "light", false);
+    public static final BooleanPreferences EMERGENCY = new BooleanPreferences(SHARED_PREFERENCES_INIT, "emergency", false);
+    public static final BooleanPreferences BUS = new BooleanPreferences(SHARED_PREFERENCES_INIT, "bus", false);
 }

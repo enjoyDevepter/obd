@@ -249,6 +249,14 @@
     </RelativeLayout>
 
 
+    <View
+        android:id="@+id/back"
+        android:layout_width="27dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/hud_back" />
+
     <TextView
         android:id="@+id/setting"
         android:layout_width="46dp"

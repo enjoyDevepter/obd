@@ -20,6 +20,8 @@ import static com.mapbar.hamster.OBDEvent.HUD_WARM_STATUS_INFO;
 
 @PageSetting(contentViewId = R.layout.m3_layout)
 public class M3SettingPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+    @ViewInject(R.id.back)
+    View backV;
     @ViewInject(R.id.setting)
     TextView settingV;
     @ViewInject(R.id.params)
@@ -65,6 +67,7 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
         BlueManager.getInstance().addBleCallBackListener(this);
         BlueManager.getInstance().send(ProtocolUtils.getHUDStatus());
         BlueManager.getInstance().send(ProtocolUtils.getHUDWarmStatus());
+        backV.setOnClickListener(this);
         settingV.setOnClickListener(this);
         paramsV.setOnClickListener(this);
         multifunctionalV.setOnClickListener(this);
@@ -104,6 +107,9 @@ public class M3SettingPage extends AppBasePage implements View.OnClickListener, 
                 break;
             case R.id.params:
                 PageManager.go(new HUDSettingPage());
+                break;
+            case R.id.back:
+                PageManager.back();
                 break;
             default:
                 if (choice) {

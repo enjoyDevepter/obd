@@ -53,7 +53,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.BICYCLE_LANE;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.BUS;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.CAMERA_SPEED;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.EMERGENCY;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.HUD_GUID;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.LIGHT;
+import static com.mapbar.adas.preferences.SettingPreferencesConfig.SURVEILLANCE_CAMERA;
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_STATUS;
 
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
@@ -327,41 +334,59 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         @Override
                         public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
                             if (aMapNaviCameraInfos.length > 0) {
-                                int type = 0;
                                 switch (aMapNaviCameraInfos[0].getCameraType()) {
                                     case 0: // 测速
-                                        type = 6;
+                                        if (CAMERA_SPEED.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, aMapNaviCameraInfos[0].getCameraSpeed()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     case 1: // 监控摄像
-                                        type = 7;
+                                        if (SURVEILLANCE_CAMERA.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, aMapNaviCameraInfos[0].getDistance()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     case 2: // 闯红灯拍照
-                                        type = 8;
+                                        if (LIGHT.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, aMapNaviCameraInfos[0].getDistance()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     case 3: // 违章拍照
-                                        type = 1;
+                                        if (ILLEGAL_PHOTOGRAPHY.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, aMapNaviCameraInfos[0].getDistance()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     case 4: // 公交专用道摄像头
-                                        type = 2;
+                                        if (BUS.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, aMapNaviCameraInfos[0].getDistance()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     case 5: // 应急车道拍照
-                                        type = 3;
+                                        if (EMERGENCY.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, aMapNaviCameraInfos[0].getDistance()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     case 6: // 非机动车道(暂未使用)
-                                        type = 0;
-                                        break;
-                                    case 8: // 区间测速起始
-                                        type = 4;
-                                        break;
-                                    case 9: // 区间测速解除
-                                        type = 5;
+                                        if (BICYCLE_LANE.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, aMapNaviCameraInfos[0].getDistance()));
+                                        } else {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                        }
                                         break;
                                     default:
                                         break;
                                 }
-                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, type, type == 6 ? aMapNaviCameraInfos[0].getCameraSpeed() : aMapNaviCameraInfos[0].getDistance()));
-                            } else {
-                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
                             }
                         }
 

@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
+    <View
+        android:id="@+id/back"
+        android:layout_width="27dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/hud_back" />
+
     <RelativeLayout
         android:layout_width="574dp"
         android:layout_height="312dp"
@@ -94,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/ling_speed_bg"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
             <View
                 android:id="@+id/da_speed"
@@ -114,12 +122,11 @@
 
 
             <FrameLayout
-                android:layout_width="138dp"
-                android:layout_height="34dp"
                 android:id="@+id/warm"
+                android:layout_width="134dp"
+                android:layout_height="34dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="60dp">
+                android:layout_marginTop="65dp">
 
                 <View
                     android:id="@+id/da_warm_bg"
@@ -131,33 +138,33 @@
                 <View
                     android:id="@+id/fault"
                     android:layout_width="24dp"
-                    android:layout_height="17dp"
+                    android:layout_height="16dp"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="13dp"
+                    android:layout_marginTop="15dp"
                     android:background="@drawable/fault_show" />
 
                 <View
                     android:id="@+id/voltage"
                     android:layout_width="23dp"
-                    android:layout_height="17dp"
+                    android:layout_height="16dp"
                     android:layout_marginLeft="42dp"
-                    android:layout_marginTop="13dp"
+                    android:layout_marginTop="15dp"
                     android:background="@drawable/voltage_show" />
 
                 <View
                     android:id="@+id/speed"
                     android:layout_width="24dp"
-                    android:layout_height="13dp"
+                    android:layout_height="12dp"
                     android:layout_marginLeft="76dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="17dp"
                     android:background="@drawable/speed_show" />
 
                 <View
                     android:id="@+id/tired"
                     android:layout_width="18dp"
-                    android:layout_height="17dp"
+                    android:layout_height="16dp"
                     android:layout_marginLeft="114dp"
-                    android:layout_marginTop="13dp"
+                    android:layout_marginTop="15dp"
                     android:background="@drawable/tired_show" />
 
             </FrameLayout>

@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
+    <View
+        android:id="@+id/back"
+        android:layout_width="27dp"
+        android:layout_height="25dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/hud_back" />
+
     <RelativeLayout
         android:layout_width="552dp"
         android:layout_height="334dp"
