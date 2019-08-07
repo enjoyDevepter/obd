@@ -101,8 +101,8 @@
                 android:id="@+id/da_speed_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/ling_speed_bg"
-                android:visibility="visible" />
+                android:background="@drawable/p5_speed_bg"
+                android:visibility="invisible" />
 
             <View
                 android:id="@+id/da_speed"
@@ -116,7 +116,7 @@
                 android:id="@+id/da_mile"
                 android:layout_width="158dp"
                 android:layout_height="107dp"
-                android:layout_marginLeft="66dp"
+                android:layout_marginLeft="60dp"
                 android:layout_marginTop="99dp"
                 android:background="@drawable/da_mile_show" />
 

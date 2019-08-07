@@ -103,7 +103,7 @@ public class SettingItem extends RelativeLayout implements View.OnClickListener 
     public void updateContent(String value) {
         contentTV.setText(value);
 
-        int index = content.indexOf(Integer.valueOf((String) contentTV.getText()));
+        int index = content.indexOf(contentTV.getText());
         if (index == 0) {
             subtractIconV.setBackgroundResource(R.drawable.subtract_dis);
         } else if (index == content.size() - 1) {

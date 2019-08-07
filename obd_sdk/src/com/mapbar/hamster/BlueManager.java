@@ -454,8 +454,12 @@ public class BlueManager {
             return;
         }
 
-        byte[] last = instructList.pollLast();
-        if (last != null && data[1] == last[1] && data[2] == last[2] && data[1] != 0x90) {
+        byte[] last = instructList.peekLast();
+        if (last != null && data[1] == last[1] && data[2] == last[2] /*&& data[1] != 0x90*/) {
+            if (data[1] == 0x90) {
+                instructList.pollLast();
+                instructList.addLast(data);
+            }
             Log.d("instructList has one ");
             return;
         }
@@ -525,7 +529,10 @@ public class BlueManager {
         canGo = false;
         Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
 
-        if (split || (data[1] == (byte) 0x89 && data[2] == 01) /*|| (data[1] == (byte) 0x88 && data[2] == 03) */ || (data[1] == (byte) 0x90 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 02) || (data[1] == (byte) 0x90 && data[2] == 03)) { // 未拆封包 或者 心跳包
+        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 02) || (data[1] == (byte) 0x90 && data[2] == 03)) { // 未拆封包 或者 心跳包
+            if (!split) {
+                canGo = true;
+            }
         } else {
             if ((data[1] == (byte) 0x88 && data[2] == 05)) {
                 COMMAND_TIMEOUT = 15000;

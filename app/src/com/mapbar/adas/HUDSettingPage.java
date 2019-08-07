@@ -77,6 +77,7 @@ public class HUDSettingPage extends AppBasePage implements View.OnClickListener,
     private TextView busTV;
 
     private HUDParams params;
+
     @Override
     public void onResume() {
         super.onResume();
@@ -284,16 +285,8 @@ public class HUDSettingPage extends AppBasePage implements View.OnClickListener,
     }
 
     private void updateUI() {
-        if (params.getLight() == 0) {
-            lightST.updateContent("自动");
-        } else {
-            lightST.updateContent(String.valueOf(params.getLight()));
-        }
-        if (params.getVolume() == 0) {
-            volumeST.updateContent("静音");
-        } else {
-            volumeST.updateContent(String.valueOf(params.getVolume()));
-        }
+        lightST.updateContent(String.valueOf(params.getLight()));
+        volumeST.updateContent(String.valueOf(params.getVolume()));
         tempWarmST.updateContent(String.valueOf(params.getTempWarm()));
         overSpeedST.updateContent(String.valueOf(params.getOverSpeed()));
         speedCalibrationST.updateContent(String.valueOf(params.getSpeedCalibration()));

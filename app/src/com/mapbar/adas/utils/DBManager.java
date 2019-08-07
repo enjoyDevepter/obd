@@ -110,24 +110,29 @@ public class DBManager {
         try {
             String table = "code";
             Cursor cursor = sqliteDB.rawQuery("select * from " + table + " where id = ?", new String[]{code});
-            FaultCode codeItem = new FaultCode();
-            codeItem.setId(code);
-            while (cursor.moveToNext()) {
-                String suit = cursor.getString(cursor.getColumnIndex("suit"));
-                String desc_ch = cursor.getString(cursor.getColumnIndex("desc_ch"));
-                String desc_en = cursor.getString(cursor.getColumnIndex("desc_en"));
-                String detail = cursor.getString(cursor.getColumnIndex("detail"));
-                String system = cursor.getString(cursor.getColumnIndex("system"));
-                codeItem.setSuit(suit);
-                codeItem.setDesc_ch(desc_ch);
-                codeItem.setDesc_en(desc_en);
-                codeItem.setDetail(detail);
-                codeItem.setSystem(system);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    FaultCode codeItem = new FaultCode();
+                    codeItem.setId(code);
+                    String suit = cursor.getString(cursor.getColumnIndex("suit"));
+                    String desc_ch = cursor.getString(cursor.getColumnIndex("desc_ch"));
+                    String desc_en = cursor.getString(cursor.getColumnIndex("desc_en"));
+                    String detail = cursor.getString(cursor.getColumnIndex("detail"));
+                    String system = cursor.getString(cursor.getColumnIndex("system"));
+                    codeItem.setSuit(suit);
+                    codeItem.setDesc_ch(desc_ch);
+                    codeItem.setDesc_en(desc_en);
+                    codeItem.setDetail(detail);
+                    codeItem.setSystem(system);
+                    codes.add(codeItem);
+                } while (cursor.moveToNext());
+            } else {
+                FaultCode codeItem = new FaultCode();
+                codeItem.setId(code);
+                codes.add(codeItem);
             }
-            codes.add(codeItem);
             cursor.close();
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return codes;
