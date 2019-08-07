@@ -115,7 +115,7 @@ public class CollectFinish extends AppBasePage implements View.OnClickListener, 
                 if (noSupport) {
                     PageManager.finishActivity(MainActivity.getInstance());
                 } else {
-                    PageManager.go(new OBDAuthPage());
+                    PageManager.clearHistoryAndGo(new OBDAuthPage());
                 }
                 break;
         }

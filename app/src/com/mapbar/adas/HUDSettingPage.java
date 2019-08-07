@@ -100,135 +100,149 @@ public class HUDSettingPage extends AppBasePage implements View.OnClickListener,
         start2TV.setOnClickListener(this);
         lightST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x01, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x01, "自动".equals(value) ? 0 : Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x01, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x01, Integer.valueOf(value)));
             }
         });
         volumeST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x02, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x02, "静音".equals(value) ? 0 : Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x02, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x02, Integer.valueOf(value)));
             }
         });
         tempWarmST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x04, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x04, Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x04, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x04, Integer.valueOf(value)));
             }
         });
         overSpeedST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x09, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x09, Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x09, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x09, Integer.valueOf(value)));
             }
         });
         speedCalibrationST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x08, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x08, Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x08, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x08, Integer.valueOf(value)));
             }
         });
         mileCalibrationST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0B, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0B, Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0B, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x0B, Integer.valueOf(value)));
             }
         });
         driveTimeST.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onLeftClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x03, value));
+            public void onLeftClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x03, Integer.valueOf(value)));
             }
 
             @Override
-            public void onRightClick(int value) {
-                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x03, value));
+            public void onRightClick(String value) {
+                BlueManager.getInstance().send(ProtocolUtils.setHUDParams(0x03, Integer.valueOf(value)));
             }
         });
         camearTV.setSelected(CAMERA_SPEED.get());
+        camearTV.setTextColor(CAMERA_SPEED.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         camearTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CAMERA_SPEED.set(!CAMERA_SPEED.get());
                 camearTV.setSelected(CAMERA_SPEED.get());
+                camearTV.setTextColor(CAMERA_SPEED.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
         bicycleLaneTV.setSelected(BICYCLE_LANE.get());
+        bicycleLaneTV.setTextColor(BICYCLE_LANE.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         bicycleLaneTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BICYCLE_LANE.set(!BICYCLE_LANE.get());
                 bicycleLaneTV.setSelected(BICYCLE_LANE.get());
+                bicycleLaneTV.setTextColor(BICYCLE_LANE.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
         surveillanceCameraTV.setSelected(SURVEILLANCE_CAMERA.get());
+        surveillanceCameraTV.setTextColor(SURVEILLANCE_CAMERA.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         surveillanceCameraTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SURVEILLANCE_CAMERA.set(!SURVEILLANCE_CAMERA.get());
                 surveillanceCameraTV.setSelected(SURVEILLANCE_CAMERA.get());
+                surveillanceCameraTV.setTextColor(SURVEILLANCE_CAMERA.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
         illegalPhotographyTV.setSelected(ILLEGAL_PHOTOGRAPHY.get());
+        illegalPhotographyTV.setTextColor(ILLEGAL_PHOTOGRAPHY.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         illegalPhotographyTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ILLEGAL_PHOTOGRAPHY.set(!ILLEGAL_PHOTOGRAPHY.get());
                 illegalPhotographyTV.setSelected(ILLEGAL_PHOTOGRAPHY.get());
+                illegalPhotographyTV.setTextColor(ILLEGAL_PHOTOGRAPHY.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
         lightCameraTV.setSelected(LIGHT.get());
+        lightCameraTV.setTextColor(LIGHT.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         lightCameraTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LIGHT.set(!LIGHT.get());
                 lightCameraTV.setSelected(LIGHT.get());
+                lightCameraTV.setTextColor(LIGHT.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
         emergencyTV.setSelected(EMERGENCY.get());
+        emergencyTV.setTextColor(EMERGENCY.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         emergencyTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EMERGENCY.set(!EMERGENCY.get());
                 emergencyTV.setSelected(EMERGENCY.get());
+                emergencyTV.setTextColor(EMERGENCY.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
         busTV.setSelected(BUS.get());
+        busTV.setTextColor(BUS.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
         busTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BUS.set(!BUS.get());
                 busTV.setSelected(BUS.get());
+                busTV.setTextColor(BUS.get() ? Color.parseColor("#FFFFFFFF") : Color.parseColor("#FFBCBCBC"));
             }
         });
     }

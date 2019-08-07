@@ -30,7 +30,7 @@ public class SettingItem extends RelativeLayout implements View.OnClickListener 
     private View addV;
     private View addIconV;
 
-    private List<Integer> content;
+    private List<String> content;
 
     public SettingItem(Context context) {
         this(context, null);
@@ -66,7 +66,7 @@ public class SettingItem extends RelativeLayout implements View.OnClickListener 
         CharSequence[] textArray = array.getTextArray(R.styleable.SettingItemView_content);
         content = new ArrayList<>();
         for (int i = 0; i < textArray.length; i++) {
-            int v = Integer.valueOf((String) textArray[i]);
+            String v = String.valueOf(textArray[i]);
             content.add(v);
         }
         if (content.size() > 0) {
@@ -101,9 +101,11 @@ public class SettingItem extends RelativeLayout implements View.OnClickListener 
     }
 
     public void updateContent(String value) {
-        contentTV.setText(value);
-
-        int index = content.indexOf(contentTV.getText());
+        int index = content.indexOf(value);
+        if (index < 0 || index >= content.size()) {
+            index = 0;
+        }
+        contentTV.setText(content.get(index));
         if (index == 0) {
             subtractIconV.setBackgroundResource(R.drawable.subtract_dis);
         } else if (index == content.size() - 1) {
@@ -120,7 +122,7 @@ public class SettingItem extends RelativeLayout implements View.OnClickListener 
         if (content.size() <= 0 || onItemClickListener == null) {
             return;
         }
-        int value = Integer.valueOf((String) contentTV.getText());
+        String value = String.valueOf(contentTV.getText());
         int index = content.indexOf(value);
         switch (v.getId()) {
             case R.id.subtract:
@@ -129,7 +131,7 @@ public class SettingItem extends RelativeLayout implements View.OnClickListener 
                 }
                 break;
             case R.id.add:
-                if (index < content.size() - 1) {
+                if (index >= 0 && index < content.size() - 1) {
                     onItemClickListener.onRightClick(content.get(index + 1));
                 }
                 break;

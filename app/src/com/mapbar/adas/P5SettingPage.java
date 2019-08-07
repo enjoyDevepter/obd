@@ -85,7 +85,6 @@ public class P5SettingPage extends AppBasePage implements View.OnClickListener, 
         tempV.setOnClickListener(this);
         da_speedV.setOnClickListener(this);
         da_mileV.setOnClickListener(this);
-        da_warm_bgV.setOnClickListener(this);
         pro_rpmV.setOnClickListener(this);
         da_tireV.setOnClickListener(this);
         warmV.setOnClickListener(this);
