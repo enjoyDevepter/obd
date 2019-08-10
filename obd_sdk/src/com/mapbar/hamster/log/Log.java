@@ -23,7 +23,7 @@ public class Log {
 
     public static void d(String message) {
         Timber.tag(TAG);
-        Timber.d(simpleDateFormat.format(new Date()) + "   " + message + "\n");
+        Timber.d("Thread id  " + Thread.currentThread() + "  " + simpleDateFormat.format(new Date()) + "   " + message + "\n");
     }
 }
 

@@ -529,17 +529,21 @@ public class BlueManager {
         canGo = false;
         Log.d("APP->OBD " + HexUtils.byte2HexStr(data));
 
-        if (split || (data[1] == (byte) 0x89 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 02) || (data[1] == (byte) 0x90 && data[2] == 03)) { // 未拆封包 或者 心跳包
+        if (split || (data[1] == (byte) 0x89 && data[2] == 01)) { // 未拆封包 或者 心跳包
             if (!split) {
                 canGo = true;
             }
         } else {
             if ((data[1] == (byte) 0x88 && data[2] == 05)) {
                 COMMAND_TIMEOUT = 15000;
+                timeOutThread.startCommand(true);
+            } else if ((data[1] == (byte) 0x90 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 02) || (data[1] == (byte) 0x90 && data[2] == 03)) {
+                COMMAND_TIMEOUT = 1500;
+                timeOutThread.startCommand(false);
             } else {
                 COMMAND_TIMEOUT = 5000;
+                timeOutThread.startCommand(true);
             }
-            timeOutThread.startCommand(true);
         }
         writeCharacteristic.setValue(data);
         mBluetoothGatt.writeCharacteristic(writeCharacteristic);
@@ -649,7 +653,7 @@ public class BlueManager {
      * @param res
      */
     private void validateAndNotify(byte[] res) {
-        if (!((res[0] == (byte) 0x09 && res[1] == 01) || (res[0] == (byte) 0x08 && res[1] == 03))) {
+        if (!(/*(res[0] == (byte) 0x09 && res[1] == 01) ||*/ (res[0] == (byte) 0x08 && res[1] == 03))) {
             Log.d(" validateAndNotify next ");
             timeOutThread.endCommand();
             byte[] msg = instructList.pollLast();
@@ -1598,6 +1602,11 @@ public class BlueManager {
                                     queue.add(currentProtocol);
                                     currentRepeat++;
                                 }
+                            } else {
+                                canGo = true;
+                                waitForCommand = false;
+                                needRewire = false;
+                                currentRepeat = 0;
                             }
                             Log.d("TimeOutThread notifyAll ");
                             TIMEOUTSYNC.notifyAll();

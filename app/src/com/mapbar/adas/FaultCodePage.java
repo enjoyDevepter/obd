@@ -93,7 +93,7 @@ public class FaultCodePage extends AppBasePage implements View.OnClickListener, 
                 PageManager.go(new ClearFaultPage());
                 break;
             case R.id.home:
-                PageManager.go(new HomePage());
+                PageManager.clearHistoryAndGo(new HomePage());
                 break;
         }
     }

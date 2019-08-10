@@ -1,13 +1,23 @@
 package com.mapbar.adas;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.AmapNaviPage;
@@ -64,7 +74,7 @@ import static com.mapbar.adas.preferences.SettingPreferencesConfig.SURVEILLANCE_
 import static com.mapbar.adas.preferences.SettingPreferencesConfig.TIRE_STATUS;
 
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
-public class HomePage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
+public class HomePage extends AppBasePage implements View.OnClickListener, BleCallBackListener, AMapLocationListener {
     @ViewInject(R.id.back)
     private View back;
     @ViewInject(R.id.title_text)
@@ -87,6 +97,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     private View fmView;
     private OBDStatusInfo obdStatusInfo;
     private boolean showLane;
+
+    private static final String NOTIFICATION_CHANNEL_NAME = "BackgroundLocation";
 
     @Override
     public void onResume() {
@@ -111,6 +123,89 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 .init(); //初始化，默认透明状态栏和黑色导航栏
         BlueManager.getInstance().setNavi(false);
     }
+
+    boolean isCreateChannel = false;
+
+    private void uploadLog() {
+        Log.d("HomePage uploadLog ");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File[] logs = dir.listFiles();
+
+        if (null != logs && logs.length > 0 && null != obdStatusInfo) {
+            MultipartBody.Builder builder = new MultipartBody.Builder();
+            builder.addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
+                    .addPart(MultipartBody.Part.createFormData("type", "1"));
+            for (File file : logs) {
+                if (!file.getName().equals(FileLoggingTree.fileName)) {
+                    builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
+                }
+            }
+            Request request = new Request.Builder()
+                    .url(URLUtils.UPDATE_ERROR_FILE)
+                    .post(builder.build())
+                    .build();
+
+            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("HomePage uploadLog onFailure " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responese = response.body().string();
+                    Log.d("HomePage uploadLog success " + responese);
+                    try {
+                        final JSONObject result = new JSONObject(responese);
+                        if ("000".equals(result.optString("status"))) {
+                            GlobalUtil.getHandler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            for (File delete : logs) {
+                                if (!delete.getName().equals(FileLoggingTree.fileName)) {
+                                    delete.delete();
+                                }
+                            }
+                        }
+                    } catch (JSONException e) {
+                        Log.d("HomePage uploadLog failure " + e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        BlueManager.getInstance().removeCallBackListener(this);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        PageManager.finishActivity(MainActivity.getInstance());
+        return true;
+    }
+
+    @Override
+    public void onEvent(int event, Object data) {
+        switch (event) {
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+            case OBDEvent.NORMAL:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+        }
+    }
+
+    private boolean endNavi;
+    private AMapLocationClient locationClient = null;
+    private AMapLocationClientOption locationOption = null;
+    private NotificationManager notificationManager = null;
 
     @Override
     public void onClick(View v) {
@@ -199,6 +294,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             case R.id.navi:
                 if (null != obdStatusInfo) {
                     BlueManager.getInstance().setNavi(true);
+                    initLocation();
+                    AMapNavi.getInstance(getContext()).setIsUseExtraGPSData(true);
                     AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
                         @Override
                         public void onInitNaviFailure() {
@@ -212,6 +309,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void onStartNavi(int i) {
+                            endNavi = false;
                             Log.d("onStartNavi " + i);
                         }
 
@@ -238,6 +336,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         @Override
                         public void onEndEmulatorNavi() {
                             Log.d("onEndEmulatorNavi");
+                            endNavi = true;
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -249,6 +348,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         @Override
                         public void onArriveDestination() {
                             Log.d("onArriveDestination");
+                            endNavi = true;
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -284,6 +384,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void onNaviInfoUpdate(NaviInfo naviInfo) {
+                            if (endNavi) {
+                                return;
+                            }
                             int type = 0;
                             switch (naviInfo.getIconType()) {
                                 case 0:
@@ -333,6 +436,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
+                            if (endNavi) {
+                                return;
+                            }
                             if (aMapNaviCameraInfos.length > 0) {
                                 switch (aMapNaviCameraInfos[0].getCameraType()) {
                                     case 0: // 测速
@@ -422,6 +528,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showLaneInfo(AMapLaneInfo[] aMapLaneInfos, byte[] bytes, byte[] bytes1) {
+                            if (endNavi) {
+                                return;
+                            }
                             int enter = 0;
                             int count = aMapLaneInfos.length;
                             for (int i = 0; i < aMapLaneInfos.length; i++) {
@@ -442,6 +551,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void hideLaneInfo() {
+                            if (endNavi) {
+                                return;
+                            }
                             Log.d("aMapLaneInfo  hideLaneInfo ");
                             if (showLane) {
                                 showLane = false;
@@ -524,79 +636,86 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
         }
     }
 
-    private void uploadLog() {
-        Log.d("HomePage uploadLog ");
-        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
-        final File[] logs = dir.listFiles();
+    private void initLocation() {
+        //初始化client
+        locationClient = new AMapLocationClient(getContext());
+        locationOption = getDefaultOption();
+        //设置定位参数
+        locationClient.setLocationOption(locationOption);
+        // 设置定位监听
+        locationClient.setLocationListener(this);
 
-        if (null != logs && logs.length > 0 && null != obdStatusInfo) {
-            MultipartBody.Builder builder = new MultipartBody.Builder();
-            builder.addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
-                    .addPart(MultipartBody.Part.createFormData("type", "1"));
-            for (File file : logs) {
-                if (!file.getName().equals(FileLoggingTree.fileName)) {
-                    builder.addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file));
-                }
+        locationClient.enableBackgroundLocation(2001, buildNotification());
+
+        locationClient.startLocation();
+    }
+
+    private Notification buildNotification() {
+
+        Notification.Builder builder = null;
+        Notification notification = null;
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
+            //Android O上对Notification进行了修改，如果设置的targetSDKVersion>=26建议使用此种方式创建通知栏
+            if (null == notificationManager) {
+                notificationManager = (NotificationManager) MainActivity.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             }
-            Request request = new Request.Builder()
-                    .url(URLUtils.UPDATE_ERROR_FILE)
-                    .post(builder.build())
-                    .build();
-
-            GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.d("HomePage uploadLog onFailure " + e.getMessage());
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String responese = response.body().string();
-                    Log.d("HomePage uploadLog success " + responese);
-                    try {
-                        final JSONObject result = new JSONObject(responese);
-                        if ("000".equals(result.optString("status"))) {
-                            GlobalUtil.getHandler().post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getContext(), "上报成功", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            for (File delete : logs) {
-                                if (!delete.getName().equals(FileLoggingTree.fileName)) {
-                                    delete.delete();
-                                }
-                            }
-                        }
-                    } catch (JSONException e) {
-                        Log.d("HomePage uploadLog failure " + e.getMessage());
-                    }
-                }
-            });
+            String channelId = MainActivity.getInstance().getPackageName();
+            if (!isCreateChannel) {
+                NotificationChannel notificationChannel = new NotificationChannel(channelId,
+                        NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+                notificationChannel.enableLights(true);//是否在桌面icon右上角展示小圆点
+                notificationChannel.setLightColor(Color.BLUE); //小圆点颜色
+                notificationChannel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
+                notificationManager.createNotificationChannel(notificationChannel);
+                isCreateChannel = true;
+            }
+            builder = new Notification.Builder(getContext(), channelId);
+        } else {
+            builder = new Notification.Builder(getContext());
         }
-    }
+        builder.setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle("汽车卫士")
+                .setContentText("正在后台运行")
+                .setWhen(System.currentTimeMillis());
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        BlueManager.getInstance().removeCallBackListener(this);
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        PageManager.finishActivity(MainActivity.getInstance());
-        return true;
-    }
-
-    @Override
-    public void onEvent(int event, Object data) {
-        switch (event) {
-            case OBDEvent.AUTHORIZATION_SUCCESS:
-                obdStatusInfo = (OBDStatusInfo) data;
-                break;
-            case OBDEvent.NORMAL:
-                obdStatusInfo = (OBDStatusInfo) data;
-                break;
+        if (android.os.Build.VERSION.SDK_INT >= 16) {
+            notification = builder.build();
+        } else {
+            return builder.getNotification();
         }
+        return notification;
+    }
+
+    private AMapLocationClientOption getDefaultOption() {
+        AMapLocationClientOption mOption = new AMapLocationClientOption();
+        mOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//可选，设置定位模式，可选的模式有高精度、仅设备、仅网络。默认为高精度模式
+        mOption.setGpsFirst(false);//可选，设置是否gps优先，只在高精度模式下有效。默认关闭
+        mOption.setHttpTimeOut(30000);//可选，设置网络请求超时时间。默认为30秒。在仅设备模式下无效
+        mOption.setInterval(1000);//可选，设置定位间隔。默认为2秒
+        mOption.setNeedAddress(true);//可选，设置是否返回逆地理地址信息。默认是true
+        mOption.setOnceLocation(false);//可选，设置是否单次定位。默认是false
+        mOption.setOnceLocationLatest(false);//可选，设置是否等待wifi刷新，默认为false.如果设置为true,会自动变为单次定位，持续定位时不要使用
+        AMapLocationClientOption.setLocationProtocol(AMapLocationClientOption.AMapLocationProtocol.HTTP);//可选， 设置网络请求的协议。可选HTTP或者HTTPS。默认为HTTP
+        mOption.setSensorEnable(false);//可选，设置是否使用传感器。默认是false
+        mOption.setWifiScan(true); //可选，设置是否开启wifi扫描。默认为true，如果设置为false会同时停止主动刷新，停止以后完全依赖于系统刷新，定位位置可能存在误差
+        mOption.setLocationCacheEnable(true); //可选，设置是否使用缓存定位，默认为true
+        return mOption;
+    }
+
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        if (null == aMapLocation) {
+            return;
+        }
+        Log.d("HomePage onLocationChanged ");
+        //设置外部GPS数据
+        Location location = new Location("gps仪器型号");
+        location.setLongitude(aMapLocation.getLongitude());
+        location.setLatitude(aMapLocation.getLatitude());
+        location.setSpeed(aMapLocation.getSpeed());
+        location.setAccuracy(aMapLocation.getAccuracy());
+        location.setBearing(aMapLocation.getBearing());
+        location.setTime(aMapLocation.getTime());
+        AMapNavi.getInstance(getContext()).setExtraGPSData(2, location);
     }
 }

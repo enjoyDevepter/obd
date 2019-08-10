@@ -154,8 +154,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
             }
         }).build());
-
-
     }
 
 
@@ -167,11 +165,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         MainActivity.INSTANCE = null;
         EventBus.getDefault().unregister(this);
         BlueManager.getInstance().removeCallBackListener(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     public boolean isFirst() {

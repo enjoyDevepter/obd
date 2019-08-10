@@ -110,7 +110,7 @@ public class DBManager {
         try {
             String table = "code";
             Cursor cursor = sqliteDB.rawQuery("select * from " + table + " where id = ?", new String[]{code});
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
                 do {
                     FaultCode codeItem = new FaultCode();
                     codeItem.setId(code);
