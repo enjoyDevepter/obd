@@ -110,6 +110,7 @@ public class BlueManager {
     private boolean isScaning = false;
     private boolean isNavi;
     private volatile boolean canGo = true;
+    private String currentDeviceName;
     private ArrayList<String> scanResult = new ArrayList<>();
     private ArrayList<BleCallBackListener> callBackListeners = new ArrayList<>();
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
@@ -190,6 +191,9 @@ public class BlueManager {
                 readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
 
                 mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
+
+                currentDeviceName = gatt.getDevice().getAddress();
+                canGo = true;
                 Log.d("onServicesDiscovered  success");
             }
         }
@@ -345,6 +349,13 @@ public class BlueManager {
         }
         if (!mBluetoothAdapter.isEnabled()) {
             mBluetoothAdapter.enable();
+        }
+        if (!"".equals(currentDeviceName) && null != currentDeviceName) {
+            Message msg = mHandler.obtainMessage();
+            msg.what = STOP_SCAN_AND_CONNECT;
+            msg.obj = currentDeviceName;
+            mHandler.sendMessage(msg);
+            return;
         }
 
         isScaning = true;
