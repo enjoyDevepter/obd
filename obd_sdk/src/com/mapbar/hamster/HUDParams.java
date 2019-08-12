@@ -1,6 +1,7 @@
 package com.mapbar.hamster;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by guomin on 2018/6/3.
@@ -18,6 +19,7 @@ public class HUDParams implements Serializable {
     private boolean highMode;
     private int mileCalibration;
     private boolean naviMode;
+    private byte[] origin;
 
     public int getLight() {
         return light;
@@ -116,6 +118,14 @@ public class HUDParams implements Serializable {
         this.naviMode = naviMode;
     }
 
+    public byte[] getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(byte[] origin) {
+        this.origin = origin;
+    }
+
     @Override
     public String toString() {
         return "HUDParams{" +
@@ -131,6 +141,7 @@ public class HUDParams implements Serializable {
                 ", highMode=" + highMode +
                 ", mileCalibration=" + mileCalibration +
                 ", naviMode=" + naviMode +
+                ", origin=" + Arrays.toString(origin) +
                 '}';
     }
 }

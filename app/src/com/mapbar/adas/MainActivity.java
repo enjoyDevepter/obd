@@ -1,10 +1,12 @@
 package com.mapbar.adas;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -19,6 +21,8 @@ import com.mapbar.adas.utils.PermissionUtil;
 import com.mapbar.adas.utils.URLUtils;
 import com.mapbar.hamster.BleCallBackListener;
 import com.mapbar.hamster.BlueManager;
+import com.mapbar.hamster.HUDParams;
+import com.mapbar.hamster.HUDWarmStatus;
 import com.mapbar.hamster.OBDEvent;
 import com.mapbar.hamster.OBDStatusInfo;
 import com.mapbar.hamster.core.HexUtils;
@@ -217,6 +221,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Nullable
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle args) {
+        return super.onCreateDialog(id, args);
+    }
+
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
@@ -228,14 +238,109 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 obdStatusInfo = (OBDStatusInfo) data;
                 updateStatusInfo(obdStatusInfo);
                 break;
+            case OBDEvent.AUTHORIZATION:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
             case OBDEvent.ADJUST_SUCCESS:
                 break;
             case OBDEvent.COLLECT_DATA_FOR_CAR:
                 new Thread(new CarRunnable((byte[]) data)).start();
                 break;
+            case OBDEvent.HUD_WARM_STATUS_INFO:
+                updateWarmParams(((HUDWarmStatus) data).getOrigin());
+                break;
+            case OBDEvent.HUD_PARAMS_INFO:
+                updateStateParams(((HUDParams) data).getOrigin());
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 上传盒子预警信息
+     *
+     * @param state
+     */
+    private void updateWarmParams(byte[] state) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("warmParams", HexUtils.formatHexString(state));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("updateWarmParams input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_WARM_PARAMS)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("updateWarmParams failure " + e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("updateWarmParams success " + responese);
+            }
+        });
+
+    }
+
+
+    /**
+     * 上传盒子参数信息
+     *
+     * @param state
+     */
+    private void updateStateParams(byte[] state) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("stateParams", HexUtils.formatHexString(state));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("updateStateParams input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_STATE_PARAMS)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("updateStateParams failure " + e.getMessage());
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("updateStateParams success " + responese);
+            }
+        });
+
     }
 
     /**

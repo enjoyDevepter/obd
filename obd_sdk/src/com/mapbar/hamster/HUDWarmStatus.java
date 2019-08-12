@@ -1,6 +1,7 @@
 package com.mapbar.hamster;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class HUDWarmStatus implements Serializable {
     private boolean temperatureWarmShow;
@@ -10,6 +11,8 @@ public class HUDWarmStatus implements Serializable {
     private boolean trieWarmShow;
     private boolean tiredWarmShow;
     private boolean faultWarmShow;
+    private byte[] origin;
+
 
     public boolean isVoltageWarmShow() {
         return voltageWarmShow;
@@ -67,6 +70,14 @@ public class HUDWarmStatus implements Serializable {
         this.trieWarmShow = trieWarmShow;
     }
 
+    public byte[] getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(byte[] origin) {
+        this.origin = origin;
+    }
+
     @Override
     public String toString() {
         return "HUDWarmStatus{" +
@@ -77,6 +88,7 @@ public class HUDWarmStatus implements Serializable {
                 ", trieWarmShow=" + trieWarmShow +
                 ", tiredWarmShow=" + tiredWarmShow +
                 ", faultWarmShow=" + faultWarmShow +
+                ", origin=" + Arrays.toString(origin) +
                 '}';
     }
 }
