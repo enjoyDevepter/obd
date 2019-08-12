@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", obdStatusInfo.getSn());
-            jsonObject.put("warmParams", HexUtils.formatHexString(state));
+            jsonObject.put("warnParams", HexUtils.formatHexString(state));
         } catch (JSONException e) {
             e.printStackTrace();
         }
