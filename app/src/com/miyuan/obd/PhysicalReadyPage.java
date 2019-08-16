@@ -20,7 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-@PageSetting(contentViewId = R.layout.physical_ready_layout)
+@PageSetting(contentViewId = R.layout.physical_ready_layout, toHistory = false)
 public class PhysicalReadyPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
 
     @ViewInject(R.id.title)
