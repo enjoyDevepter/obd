@@ -38,7 +38,7 @@
 
         </LinearLayout>
 
-        <com.mapbar.adas.view.IndexSideBar
+        <com.miyuan.obd.view.IndexSideBar
             android:id="@+id/index_letter"
             android:layout_width="24dp"
             android:layout_height="match_parent"

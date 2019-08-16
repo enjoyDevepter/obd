@@ -141,7 +141,7 @@
                         android:textColor="#02fff6"
                         android:textSize="12sp" />
 
-                    <com.mapbar.adas.view.TextViewFontLcdEx
+                    <com.miyuan.obd.view.TextViewFontLcdEx
                         android:id="@+id/surplusOil"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -177,7 +177,7 @@
                         android:layout_marginBottom="@dimen/layout_marginBottom"
                         android:orientation="horizontal">
 
-                        <com.mapbar.adas.view.TextViewFontLcdEx
+                        <com.miyuan.obd.view.TextViewFontLcdEx
                             android:id="@+id/tve_rpm"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -234,7 +234,7 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
-                            <com.mapbar.adas.view.TextViewFontLcdEx
+                            <com.miyuan.obd.view.TextViewFontLcdEx
                                 android:id="@+id/tve_speed"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -269,7 +269,7 @@
                         android:background="@drawable/dashboard"
                         android:orientation="horizontal" />
 
-                    <com.mapbar.adas.view.ClipProgress
+                    <com.miyuan.obd.view.ClipProgress
                         android:id="@+id/arcview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -336,7 +336,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center_horizontal">
 
-                                <com.mapbar.adas.view.TextViewFontLcdEx
+                                <com.miyuan.obd.view.TextViewFontLcdEx
                                     android:id="@+id/tv_shunshi_consumption"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -348,7 +348,7 @@
                             <!-- fengexian -->
 
                             <!-- 油资 -->
-                            <com.mapbar.adas.view.TextViewFontLcdEx
+                            <com.miyuan.obd.view.TextViewFontLcdEx
                                 android:id="@+id/tv_cost2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

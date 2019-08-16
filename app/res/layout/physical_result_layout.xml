@@ -32,7 +32,7 @@
                 android:layout_height="6dp"
                 android:background="#FFF4F4F4" />
 
-            <com.mapbar.adas.view.CustomExpandableListView
+            <com.miyuan.obd.view.CustomExpandableListView
                 android:id="@+id/errorlistView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
                 android:layout_height="6dp"
                 android:background="#FFF4F4F4" />
 
-            <com.mapbar.adas.view.CustomExpandableListView
+            <com.miyuan.obd.view.CustomExpandableListView
                 android:id="@+id/normallistView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

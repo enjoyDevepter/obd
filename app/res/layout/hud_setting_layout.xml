@@ -63,7 +63,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/light"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -73,7 +73,7 @@
                 app:subTitleType="one"
                 app:title="亮度" />
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/volume"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -83,7 +83,7 @@
                 app:subTitleType="one"
                 app:title="音量" />
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/tempWarm"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -94,7 +94,7 @@
                 app:title="水温报警"
                 app:unit="℃" />
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/overSpeed"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -105,7 +105,7 @@
                 app:title="超速报警"
                 app:unit="km/h" />
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/speedCalibration"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -116,7 +116,7 @@
                 app:title="车速校准"
                 app:unit="%" />
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/mileCalibration"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -127,7 +127,7 @@
                 app:title="里程校准"
                 app:unit="%" />
 
-            <com.mapbar.adas.view.SettingItem
+            <com.miyuan.obd.view.SettingItem
                 android:id="@+id/driveTime"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"

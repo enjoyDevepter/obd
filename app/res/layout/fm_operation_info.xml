@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/tittle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/title_color"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/back"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/back" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="58dp"
+            android:text="如何手动设置频点"
+            android:textColor="@color/title"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/report"
+            android:layout_width="44dp"
+            android:layout_height="18dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="9dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/report_bg"
+            android:gravity="center"
+            android:text="上报错误"
+            android:textColor="#FFB0B0AF"
+            android:textSize="8dp"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/home"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/home_back" />
+
+        <TextView
+            android:id="@+id/info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="10dp"
+            android:text="使用帮助"
+            android:textColor="#FF008AFF"
+            android:textSize="15sp" />
+
+        <View
+            android:layout_width="57dp"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="42dp"
+            android:layout_marginBottom="5dp"
+            android:background="#FF008AFF" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        android:text="请先搜索车辆电台列表，并查看这些电台对应的频点，在接下来的APP界面中输入一个与这些频点不能重复的频点。\n允许的范围为：87.5~108\n\n按照上面方法设置成功后，重新搜索车载电台列表，这时候你就能看到刚才设置的这个电台了，并调到这个频点的电台。\n\n这时候，手机里的声音就可以从车载音箱里发出来了。\n\n如果有杂音，需要重复上面的步骤，并换一个新的频点试一下。有的频点会有干扰。"
+        android:textColor="#FF000000"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/confirm"
+        android:layout_width="300dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/btn_bg"
+        android:gravity="center"
+        android:text="下一步"
+        android:textColor="#ffffffff"
+        android:textSize="18sp"
+        android:visibility="visible" />
+
+</LinearLayout>

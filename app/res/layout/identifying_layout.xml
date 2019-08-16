@@ -173,7 +173,7 @@
      </LinearLayout>-->
 
 
-    <com.mapbar.adas.view.CustomInputView
+    <com.miyuan.obd.view.CustomInputView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

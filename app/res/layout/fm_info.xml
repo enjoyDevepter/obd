@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/tittle_layout"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/title_color"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/back"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/back" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="58dp"
+            android:text="安装引导一"
+            android:textColor="@color/title"
+            android:textSize="@dimen/title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/report"
+            android:layout_width="44dp"
+            android:layout_height="18dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="9dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/report_bg"
+            android:gravity="center"
+            android:text="上报错误"
+            android:textColor="#FFB0B0AF"
+            android:textSize="8dp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        android:text="1、首次使用：需要用手机连接蓝牙HUD-FM ；连接成功一次之后，以后会自动连接。\n\n2、什么时候需要关闭FM？如果您不想通过车载音箱播放手机里的声音，需要及时关闭FM，否则当手机蓝牙和FM蓝牙连接之后，手机是没有声音的。\n\n3、如何关闭FM蓝牙？\n第一步：打开手机蓝牙设置，找到蓝牙列表。\n第二步：手动断开下面的蓝牙  HUD-FM\n\n关闭后，您的手机声音将无法通过车载音箱播放了。\n\n4、为什么有杂音？"
+        android:textColor="#FF000000"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/confirm"
+        android:layout_width="300dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/btn_bg"
+        android:gravity="center"
+        android:text="我知道了"
+        android:textColor="#ffffffff"
+        android:textSize="18sp"
+        android:visibility="visible" />
+
+</LinearLayout>
