@@ -327,15 +327,15 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
                     normalList.add(physicaltem);
                     break;
                 case 14: // 点火提前角 2
-                    physicaltem.setCurrent(String.valueOf((item[1] & 0xff) / 2 - 64));
-                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
-//                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + "  " + String.valueOf((item[1] & 0xff) / 2f - 64));
-                    status[1] = physicaltem.getStyle() != 1 ? status[1] : false;
-                    if (physicaltem.getStyle() == 1) {
-                        errorPhysicalList.add(physicaltem);
-                    } else {
-                        normalList.add(physicaltem);
-                    }
+//                    physicaltem.setCurrent(String.valueOf((item[1] & 0xff) / 2 - 64));
+//                    physicaltem.setStyle((physicaltem.getMin() <= Double.valueOf(physicaltem.getCurrent()) && Double.valueOf(physicaltem.getCurrent()) <= physicaltem.getMax()) ? 0 : 1);
+////                    physicaltem.setCurrent(HexUtils.byte2HexStr(item[1]) + "  " + String.valueOf((item[1] & 0xff) / 2f - 64));
+//                    status[1] = physicaltem.getStyle() != 1 ? status[1] : false;
+//                    if (physicaltem.getStyle() == 1) {
+//                        errorPhysicalList.add(physicaltem);
+//                    } else {
+//                        normalList.add(physicaltem);
+//                    }
                     break;
                 case 15: // 进气温度 6
                     physicaltem.setCurrent(String.valueOf((item[1] & 0xff) - 40));

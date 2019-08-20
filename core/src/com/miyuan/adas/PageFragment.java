@@ -1,9 +1,10 @@
 package com.miyuan.adas;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.miyuan.hamster.log.Log;
 
 public class PageFragment extends BaseFragment {
 
@@ -14,7 +15,7 @@ public class PageFragment extends BaseFragment {
 
     @Override
     protected View realCreateView(LayoutInflater inflater, ViewGroup container, boolean attachToRoot) {
-        Log.e("page", "realCreateView=--page===" + page);
+        Log.d("realCreateView=--page===" + page);
         if (page == null) {
             return container;
         }
@@ -28,7 +29,7 @@ public class PageFragment extends BaseFragment {
     }
 
     public void setPage(FragmentPage page) {
-        Log.e("page", "setPage=" + page.getClass().getName());
+        Log.d("setPage=" + page.getClass().getName());
         this.page = page;
         setTransparent(page.isTransparent());
         registLifeCycleListener(page);

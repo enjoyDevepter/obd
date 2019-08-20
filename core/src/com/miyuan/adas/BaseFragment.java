@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.miyuan.hamster.log.Log;
+
 /**
  * @author guomin Fragment基类
  */
@@ -28,7 +30,7 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        System.out.println("=====onConfigurationChanged=====");
+        Log.d("=====onConfigurationChanged=====");
         super.onConfigurationChanged(newConfig);
         lifeCycleListener.onConfigurationChanged(newConfig);
     }
@@ -37,13 +39,13 @@ public abstract class BaseFragment extends Fragment {
     public void onAttach(Activity activity) {
         this.activity = (FragmentActivity) activity;
         super.onAttach(activity);
-        System.out.println("=====onAttach=====");
+        Log.d("=====onAttach=====");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("=====onCreate=====");
+        Log.d("=====onCreate=====");
     }
 
     @Override
@@ -59,7 +61,7 @@ public abstract class BaseFragment extends Fragment {
         } else {
             container.setBackgroundColor(0xfff2f2f2);
         }
-        System.out.println("=====onCreateView=====");
+        Log.d("=====onCreateView=====");
         return realCreateView(inflater, container, false);
     }
 
@@ -71,41 +73,41 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        System.out.println("=====onActivityCreated=====");
+        Log.d("=====onActivityCreated=====");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        System.out.println("=====onStart=====");
+        Log.d("=====onStart=====");
         lifeCycleListener.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("=====onResume=====");
+        Log.d("=====onResume=====");
         lifeCycleListener.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("=====onPause=====");
+        Log.d("=====onPause=====");
         lifeCycleListener.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        System.out.println("=====onStop=====");
+        Log.d("=====onStop=====");
         lifeCycleListener.onStop();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        System.out.println("=====onDestroyView=====");
+        Log.d("=====onDestroyView=====");
         realDestroyView();
     }
 
@@ -114,7 +116,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.out.println("=====onDestroy=====");
+        Log.d("=====onDestroy=====");
         lifeCycleListener.onDestroy();
         lifeCycleListener = null;
     }
@@ -122,13 +124,13 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        System.out.println("=====onDetach=====");
+        Log.d("=====onDetach=====");
         setDetach(true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        System.out.println("=====onSaveInstanceState=====");
+        Log.d("=====onSaveInstanceState=====");
     }
 
     public void registLifeCycleListener(ILifeCycleListener lifeCycleListener) {

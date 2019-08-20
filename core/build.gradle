@@ -39,6 +39,7 @@ android {
 
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
+    api project(path: ':obd_sdk')
     api 'com.squareup.okhttp3:okhttp:3.8.0'
     api 'com.android.support:appcompat-v7:27.1.1'
 }

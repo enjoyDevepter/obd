@@ -60,6 +60,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -195,31 +196,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
         return true;
     }
 
-    @Override
-    public void onEvent(int event, Object data) {
-        switch (event) {
-            case OBDEvent.AUTHORIZATION_SUCCESS:
-                obdStatusInfo = (OBDStatusInfo) data;
-                break;
-            case OBDEvent.NORMAL:
-                obdStatusInfo = (OBDStatusInfo) data;
-                break;
-            case OBDEvent.FM_PARAMS_INFO:
-                FMStatus fmStatus = (FMStatus) data;
-                if (null != dialog && !dialog.isHidden()) {
-                    dialog.dismiss();
-                }
-                if (fmStatus.isEnable()) {
-                    PageManager.go(new FMInfoPage());
-                } else {
-                    // 提示打开FM
-                    showFMDialog();
-                }
-                break;
-            default:
-                break;
-        }
-    }
+    private boolean ishowCamera;
 
     private void showFMDialog() {
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
@@ -254,6 +231,35 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = null;
     private NotificationManager notificationManager = null;
+
+    @Override
+    public void onEvent(int event, Object data) {
+        switch (event) {
+            case OBDEvent.AUTHORIZATION:
+            case OBDEvent.AUTHORIZATION_SUCCESS:
+            case OBDEvent.AUTHORIZATION_FAIL:
+            case OBDEvent.NO_PARAM:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+            case OBDEvent.NORMAL:
+                obdStatusInfo = (OBDStatusInfo) data;
+                break;
+            case OBDEvent.FM_PARAMS_INFO:
+                FMStatus fmStatus = (FMStatus) data;
+                if (null != dialog && !dialog.isHidden()) {
+                    dialog.dismiss();
+                }
+                if (fmStatus.isEnable()) {
+                    PageManager.go(new FMInfoPage());
+                } else {
+                    // 提示打开FM
+                    showFMDialog();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -346,9 +352,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         return;
                     }
                     BlueManager.getInstance().setNavi(true);
-                    initLocation();
                     initTimer();
-                    AMapNavi.getInstance(getContext()).setIsUseExtraGPSData(true);
+//                    AMapNavi.getInstance(getContext()).setIsUseExtraGPSData(true);
                     AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
                         @Override
                         public void onInitNaviFailure() {
@@ -495,60 +500,60 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             if (endNavi) {
                                 return;
                             }
-                            if (aMapNaviCameraInfos.length > 0) {
-                                switch (aMapNaviCameraInfos[0].getCameraType()) {
-                                    case 0: // 测速
-                                        if (SettingPreferencesConfig.CAMERA_SPEED.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, aMapNaviCameraInfos[0].getCameraSpeed()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    case 1: // 监控摄像
-                                        if (SettingPreferencesConfig.SURVEILLANCE_CAMERA.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, aMapNaviCameraInfos[0].getDistance()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    case 2: // 闯红灯拍照
-                                        if (SettingPreferencesConfig.LIGHT.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, aMapNaviCameraInfos[0].getDistance()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    case 3: // 违章拍照
-                                        if (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, aMapNaviCameraInfos[0].getDistance()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    case 4: // 公交专用道摄像头
-                                        if (SettingPreferencesConfig.BUS.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, aMapNaviCameraInfos[0].getDistance()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    case 5: // 应急车道拍照
-                                        if (SettingPreferencesConfig.EMERGENCY.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, aMapNaviCameraInfos[0].getDistance()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    case 6: // 非机动车道(暂未使用)
-                                        if (SettingPreferencesConfig.BICYCLE_LANE.get()) {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, aMapNaviCameraInfos[0].getDistance()));
-                                        } else {
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
-                                        }
-                                        break;
-                                    default:
-                                        break;
+                            if (showCamera(aMapNaviCameraInfos)) {
+                                if (ishowCamera) {
+                                    return;
                                 }
+                                Log.d("updateCameraInfo  ishowCamera");
+                                ishowCamera = true;
+                                for (AMapNaviCameraInfo cameraInfo : aMapNaviCameraInfos) {
+                                    switch (cameraInfo.getCameraType()) {
+                                        case 0: // 测速
+                                            if (SettingPreferencesConfig.CAMERA_SPEED.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, aMapNaviCameraInfos[0].getCameraSpeed()));
+                                            }
+                                            break;
+                                        case 1: // 监控摄像
+                                            if (SettingPreferencesConfig.SURVEILLANCE_CAMERA.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, aMapNaviCameraInfos[0].getDistance()));
+                                            }
+                                            break;
+                                        case 2: // 闯红灯拍照
+                                            if (SettingPreferencesConfig.LIGHT.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, aMapNaviCameraInfos[0].getDistance()));
+                                            }
+                                            break;
+                                        case 3: // 违章拍照
+                                            if (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, aMapNaviCameraInfos[0].getDistance()));
+                                            }
+                                            break;
+                                        case 4: // 公交专用道摄像头
+                                            if (SettingPreferencesConfig.BUS.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, aMapNaviCameraInfos[0].getDistance()));
+                                            }
+                                            break;
+                                        case 5: // 应急车道拍照
+                                            if (SettingPreferencesConfig.EMERGENCY.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, aMapNaviCameraInfos[0].getDistance()));
+                                            }
+                                            break;
+                                        case 6: // 非机动车道(暂未使用)
+                                            if (SettingPreferencesConfig.BICYCLE_LANE.get()) {
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, aMapNaviCameraInfos[0].getDistance()));
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            } else {
+                                if (!ishowCamera) {
+                                    return;
+                                }
+                                ishowCamera = false;
+                                Log.d("updateCameraInfo  dismiss");
+                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
                             }
                         }
 
@@ -691,6 +696,25 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             default:
                 break;
         }
+    }
+
+    private boolean showCamera(AMapNaviCameraInfo[] cameraInfos) {
+        if (null != cameraInfos && cameraInfos.length > 0) {
+            ArrayList<Integer> types = new ArrayList<>();
+            for (AMapNaviCameraInfo cameraInfo : cameraInfos) {
+                types.add(cameraInfo.getCameraType());
+            }
+            if ((SettingPreferencesConfig.CAMERA_SPEED.get() && types.contains(0))
+                    || ((SettingPreferencesConfig.SURVEILLANCE_CAMERA.get() && types.contains(1))
+                    || (SettingPreferencesConfig.LIGHT.get() && types.contains(2))
+                    || (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get() && types.contains(3))
+                    || (SettingPreferencesConfig.BUS.get() && types.contains(4))
+                    || (SettingPreferencesConfig.EMERGENCY.get() && types.contains(5))
+                    || (SettingPreferencesConfig.BICYCLE_LANE.get() && types.contains(6)))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void showConFirm(final String conent) {

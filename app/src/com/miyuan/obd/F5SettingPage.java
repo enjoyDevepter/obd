@@ -27,7 +27,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
     TextView settingV;
     @ViewInject(R.id.params)
     TextView paramsV;
-    @ViewInject(R.id.multifunctional)
+    @ViewInject(R.id.fly_multifunctional)
     View multifunctionalV;
     @ViewInject(R.id.fly_tire_bg)
     View fly_tire_bgV;

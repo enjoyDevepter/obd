@@ -647,7 +647,7 @@ public class ProtocolUtils {
      * @return
      */
     public static byte[] getLineInfo(boolean show, int count, int enter) {
-        Log.d("Protocol getTurnInfo ===");
+        Log.d("Protocol getLineInfo ===");
         byte[] result = new byte[8];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x90;
@@ -668,7 +668,7 @@ public class ProtocolUtils {
      * @return
      */
     public static byte[] getCameraInfo(boolean show, int type, int distance) {
-        Log.d("Protocol getTurnInfo ===");
+        Log.d("Protocol getCameraInfo ===");
         byte[] result = new byte[9];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x90;
