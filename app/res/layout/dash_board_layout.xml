@@ -266,7 +266,6 @@
                         android:id="@+id/arcview_m"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/dashboard"
                         android:orientation="horizontal" />
 
                     <com.miyuan.obd.view.ClipProgress

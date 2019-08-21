@@ -1079,6 +1079,7 @@ public class BlueManager {
                                 break;
                         }
                     }
+                    params.setOrigin(content);
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_HUD_PARAMS_INFO;
@@ -1116,6 +1117,7 @@ public class BlueManager {
                                 break;
                         }
                     }
+                    warmStatus.setOrigin(content);
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_HUD_WARM_STATUS_INFO;
