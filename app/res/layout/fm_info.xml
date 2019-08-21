@@ -54,28 +54,42 @@
 
     </FrameLayout>
 
-    <TextView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="25dp"
-        android:text="1、首次使用：需要用手机连接蓝牙HUD-FM ；连接成功一次之后，以后会自动连接。\n\n2、什么时候需要关闭FM？如果您不想通过车载音箱播放手机里的声音，需要及时关闭FM，否则当手机蓝牙和FM蓝牙连接之后，手机是没有声音的。\n\n3、如何关闭FM蓝牙？\n第一步：打开手机蓝牙设置，找到蓝牙列表。\n第二步：手动断开下面的蓝牙  HUD-FM\n\n关闭后，您的手机声音将无法通过车载音箱播放了。\n\n4、为什么有杂音？"
-        android:textColor="#FF000000"
-        android:textSize="15sp" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/confirm"
-        android:layout_width="300dp"
-        android:layout_height="44dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/btn_bg"
-        android:gravity="center"
-        android:text="我知道了"
-        android:textColor="#ffffffff"
-        android:textSize="18sp"
-        android:visibility="visible" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="25dp"
+                android:text="1、首次使用：需要用手机连接蓝牙HUD-FM，连接成功一次之后，以后会自动连接。\n\n2、如何关闭FM？\n点击APP页面上的“关闭FM”按钮即可。\n关闭后，您的手机声音将无法通过车载音箱播放了。\n\n3、什么时候需要关闭FM？\n如果您不想通过车载音箱播放手机里的声音，需要及时关闭FM，否则当手机蓝牙和FM蓝牙连接之后，手机是没有声音的。\n\n4、为什么有杂音？\n蓝牙FM的原理是通过音频蓝牙把手机上的声音传给FM芯片上，FM芯片再通过FM发射把声音发射到车载收音机上。这个过程，HUD设备上的FM芯片就相当于一个小型电台发射站。当这个“小型电台发射站”的频点与当地FM电台频点重复时就会互相干扰，进而产生杂音。\n解决方法：通过手机APP的FM设置功能，换一个频点或者按提示手动设置频点。\n\n5、使用FM后手机为什么没有声音了？\n答：当启用FM功能后，手机的声音会通过音频蓝牙传到FM芯片上，这个过程和手机连接蓝牙耳机的原理是一样的，因此启用FM功能后手机会没有声音。\n\n6、为什么连接后车载音箱还是没有声音？\n请检查手机蓝牙是否有连接HUD-FM蓝牙；\n请检查手机APP频点是否和车载FM频点一致；\n请确保频点范围为87.5~108.0；\n请调大手机音量和车载音箱音量。\n"
+                android:textColor="#FF000000"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/confirm"
+                android:layout_width="300dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginBottom="30dp"
+                android:background="@drawable/btn_bg"
+                android:gravity="center"
+                android:text="我知道了"
+                android:textColor="#ffffffff"
+                android:textSize="18sp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
 
 </LinearLayout>

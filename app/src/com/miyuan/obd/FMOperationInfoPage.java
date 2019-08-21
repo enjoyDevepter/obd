@@ -8,7 +8,7 @@ import com.miyuan.adas.anno.PageSetting;
 import com.miyuan.adas.anno.ViewInject;
 
 
-@PageSetting(contentViewId = R.layout.fm_operation_info, toHistory = false)
+@PageSetting(contentViewId = R.layout.fm_operation_info)
 public class FMOperationInfoPage extends AppBasePage implements View.OnClickListener {
 
     @ViewInject(R.id.back)

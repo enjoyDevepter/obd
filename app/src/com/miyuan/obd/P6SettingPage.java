@@ -91,7 +91,6 @@ public class P6SettingPage extends AppBasePage implements View.OnClickListener, 
         lily_tempV.setOnClickListener(this);
         da_speedV.setOnClickListener(this);
         da_mileV.setOnClickListener(this);
-        da_warm_bgV.setOnClickListener(this);
         da_rpmV.setOnClickListener(this);
         da_oilV.setOnClickListener(this);
         da_tireV.setOnClickListener(this);
