@@ -191,7 +191,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 break;
             case OBDEvent.PARAM_UPDATE_SUCCESS:
                 obdStatusInfo = (OBDStatusInfo) data;
-                notifyUpdateSuccess();
+                notifyUpdateSuccess(false);
                 break;
             case OBDEvent.PARAM_UPDATE_FAIL:
                 break;
@@ -516,8 +516,8 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     /**
      * 通知服务器固件升级完成
      */
-    private void notifyUpdateSuccess() {
-        if (!needNotifyParamsSuccess) {
+    private void notifyUpdateSuccess(boolean force) {
+        if (!needNotifyParamsSuccess && !force) {
             return;
         }
 
@@ -530,7 +530,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
             e.printStackTrace();
         }
 
-        Log.d("notifyUpdateSuccess input " + jsonObject.toString());
+        Log.d("notifyUpdateSuccess  " + force + " input " + jsonObject.toString());
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
@@ -662,6 +662,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                                     checkOBDVersion();
                                     break;
                                 case 2:
+                                    notifyUpdateSuccess(true);
                                     PageManager.go(new HomePage());
                                     break;
                             }

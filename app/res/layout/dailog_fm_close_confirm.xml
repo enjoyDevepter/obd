@@ -28,7 +28,7 @@
         android:background="@drawable/btn_bg"
         android:gravity="center"
         android:text="我知道了"
-        android:textColor="#ff3D424C"
+        android:textColor="@android:color/white"
         android:textSize="16sp" />
 
 </LinearLayout>
