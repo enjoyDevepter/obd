@@ -214,9 +214,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     private void addTasks() {
         TaskManager.getInstance()
 //                .addTask(new SDInitTask())
-                .addTask(new DisclaimerTask());
+                .addTask(new DisclaimerTask())
 //                .addTask(new LocationCheckTask())
-//                .addTask(new UpdateTask());
+                .addTask(new UpdateTask());
         TaskManager.getInstance().next();
     }
 
