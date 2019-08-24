@@ -206,8 +206,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                BlueManager.getInstance().send(ProtocolUtils.setFMParams(true));
                                 dialog.dismiss();
+                                showOpenProgressDailog();
+                                BlueManager.getInstance().send(ProtocolUtils.setFMParams(true));
                             }
                         });
                         view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
@@ -696,6 +697,24 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             default:
                 break;
         }
+    }
+
+    private void showOpenProgressDailog() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        TextView infoTV = view.findViewById(R.id.info);
+                        infoTV.setText("正在开启，请稍等...");
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_fm_progress)
+                .setCancelOutside(false)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
     }
 
     private boolean showCamera(AMapNaviCameraInfo[] cameraInfos) {

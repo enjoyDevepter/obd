@@ -27,7 +27,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
     TextView settingV;
     @ViewInject(R.id.params)
     TextView paramsV;
-    @ViewInject(R.id.fly_multifunctional)
+    @ViewInject(R.id.multifunctional)
     View multifunctionalV;
     @ViewInject(R.id.fly_tire_bg)
     View fly_tire_bgV;
@@ -177,7 +177,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
                             public void onClick(View v) {
                                 switch (type) {
                                     case R.id.fly_oil:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 01));
+                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 01));
                                         break;
                                     case R.id.fly_tire:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 01));
@@ -202,7 +202,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
                             public void onClick(View v) {
                                 switch (type) {
                                     case R.id.fly_oil:
-                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x04, 00));
+                                        BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 00));
                                         break;
                                     case R.id.fly_tire:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x0B, 00));

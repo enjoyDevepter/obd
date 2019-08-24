@@ -95,7 +95,7 @@
                 android:id="@+id/f3_temp_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/f3_temp_bg"
+                android:background="@drawable/f4_temp_bg"
                 android:visibility="invisible" />
 
             <View
@@ -103,8 +103,8 @@
                 android:layout_width="94dp"
                 android:layout_height="48dp"
                 android:layout_marginLeft="13dp"
-                android:layout_marginTop="9dp"
-                android:background="@drawable/f3_temp_show" />
+                android:layout_marginTop="8dp"
+                android:background="@drawable/f4_temp_show" />
         </FrameLayout>
 
 
@@ -155,7 +155,7 @@
 
         <FrameLayout
             android:layout_width="166dp"
-            android:layout_height="47dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginLeft="18dp">
 
@@ -164,7 +164,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/p4_warm_bg"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
             <View
                 android:id="@+id/fault"
@@ -172,7 +172,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="21dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/fault_show" />
+                android:background="@drawable/m2_fault_show" />
 
             <View
                 android:id="@+id/voltage"
@@ -180,7 +180,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="57dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/voltage_show" />
+                android:background="@drawable/m2_voltage_show" />
 
             <View
                 android:id="@+id/speed"
@@ -188,7 +188,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="86dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/speed_show" />
+                android:background="@drawable/m2_speed_show" />
 
             <View
                 android:id="@+id/tired"
@@ -196,7 +196,7 @@
                 android:layout_height="21dp"
                 android:layout_marginLeft="121dp"
                 android:layout_marginTop="21dp"
-                android:background="@drawable/tired_show" />
+                android:background="@drawable/m2_tired_show" />
 
         </FrameLayout>
     </RelativeLayout>

@@ -288,13 +288,13 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
                                     case R.id.f3_remaining:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 01));
                                         break;
-                                    case R.id.f3_rpm:
+                                    case R.id.p4_rpm:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x02, 01));
                                         break;
                                     case R.id.f3_temp:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 01));
                                         break;
-                                    case R.id.f3_speed:
+                                    case R.id.p4_speed:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x03, 01));
                                         break;
                                     default:
@@ -319,13 +319,13 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
                                     case R.id.f3_remaining:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x07, 00));
                                         break;
-                                    case R.id.f3_rpm:
+                                    case R.id.p4_rpm:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x02, 00));
                                         break;
                                     case R.id.f3_temp:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x01, 00));
                                         break;
-                                    case R.id.f3_speed:
+                                    case R.id.p4_speed:
                                         BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x03, 00));
                                         break;
                                     default:
@@ -535,7 +535,7 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
             f3_remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.f3_remaining_show : R.drawable.f3_remaining_dismiss);
             p4_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.p4_rpm_show : R.drawable.p4_rpm_dismiss);
             p4_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.p4_speed_show : R.drawable.p4_speed_dismiss);
-            f3_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f3_temp_show : R.drawable.f3_temp_dismiss);
+            f3_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f4_temp_show : R.drawable.f4_temp_dismiss);
 
             switch (hudStatus.getMultifunctionalOneType()) {
                 case 0x00:
@@ -558,10 +558,10 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
             }
         }
         if (null != hudWarmStatus) {
-            faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.fault_show : R.drawable.fault_dismiss);
-            voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.voltage_show : R.drawable.voltage_dismiss);
-            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.speed_show : R.drawable.speed_dismiss);
-            tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.tired_show : R.drawable.tired_dismiss);
+            faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.m2_fault_show : R.drawable.m2_fault_dismiss);
+            voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.m2_voltage_show : R.drawable.m2_voltage_dismiss);
+            speedV.setBackgroundResource(hudWarmStatus.isSpeedWarmShow() ? R.drawable.m2_speed_show : R.drawable.m2_speed_dismiss);
+            tiredV.setBackgroundResource(hudWarmStatus.isTiredWarmShow() ? R.drawable.m2_tired_show : R.drawable.m2_tired_dismiss);
         }
     }
 }

@@ -127,6 +127,7 @@ public class FMSetPage extends AppBasePage implements View.OnClickListener, BleC
                     return;
                 }
                 set = true;
+                showProgressDailog();
                 BlueManager.getInstance().send(ProtocolUtils.setFMParams(rateTemp));
                 break;
             case R.id.home:
@@ -237,6 +238,22 @@ public class FMSetPage extends AppBasePage implements View.OnClickListener, BleC
         }
     }
 
+    private void showProgressDailog() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_fm_progress)
+                .setCancelOutside(false)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
+    }
+
     private void showSuccessDailog(final String rate) {
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                 .setViewListener(new CustomDialog.ViewListener() {
@@ -265,7 +282,7 @@ public class FMSetPage extends AppBasePage implements View.OnClickListener, BleC
     private void updateUI() {
         int rate = fmStatus.getRate();
         String rateStr = String.valueOf(rate);
-        if (rate > 1000) {
+        if (rate >= 1000) {
             rateStr = rateStr.substring(0, 3) + "." + rateStr.substring(3);
         } else {
             rateStr = rateStr.substring(0, 2) + "." + rateStr.substring(2);

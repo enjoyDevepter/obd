@@ -63,21 +63,16 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
         BlueManager.getInstance().send(ProtocolUtils.getFMParams());
     }
 
-    private void showSetDailog() {
+    private void showCloseProgress() {
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
-                        final View confirm = view.findViewById(R.id.confirm);
-                        confirm.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
+                        TextView infoTV = view.findViewById(R.id.info);
+                        infoTV.setText("正在关闭FM蓝牙\r\n请不要退出APP");
                     }
                 })
-                .setLayoutRes(R.layout.dailog_fm_close)
+                .setLayoutRes(R.layout.dailog_fm_progress)
                 .setCancelOutside(false)
                 .setDimAmount(0.5f)
                 .isCenter(true)
@@ -100,6 +95,8 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
                         view.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                dialog.dismiss();
+                                showCloseProgress();
                                 BlueManager.getInstance().send(ProtocolUtils.setFMParams(false));
                             }
                         });
@@ -111,6 +108,24 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
                 .isCenter(true)
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
                 .show();
+    }
+
+    private void showProgressDailog() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        TextView infoTV = view.findViewById(R.id.info);
+                        infoTV.setText("正在换台，请稍等...");
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_fm_progress)
+                .setCancelOutside(false)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
     }
 
     private void showCloseConfirm() {
@@ -157,7 +172,7 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
                     rate = rates[RATE_INDEX.get() + 1];
                     RATE_INDEX.set(RATE_INDEX.get() + 1);
                 }
-                showSetDailog();
+                showProgressDailog();
                 rate = rate.replace(".", "");
                 BlueManager.getInstance().send(ProtocolUtils.setFMParams(Integer.valueOf(rate)));
                 break;
@@ -201,7 +216,7 @@ public class FMPage extends AppBasePage implements View.OnClickListener, BleCall
     private void updateUI() {
         int rate = fmStatus.getRate();
         String rateStr = String.valueOf(rate);
-        if (rate > 1000) {
+        if (rate >= 1000) {
             rateTV.setText(rateStr.substring(0, 3) + "." + rateStr.substring(3));
         } else {
             rateTV.setText(rateStr.substring(0, 2) + "." + rateStr.substring(2));

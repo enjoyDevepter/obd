@@ -144,7 +144,7 @@
                 android:background="@drawable/fly_speed_show" />
 
             <View
-                android:id="@+id/fly_multifunctional"
+                android:id="@+id/multifunctional"
                 android:layout_width="185dp"
                 android:layout_height="125dp"
                 android:layout_marginLeft="76dp"
