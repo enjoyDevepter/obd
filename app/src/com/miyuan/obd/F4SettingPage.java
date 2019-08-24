@@ -535,7 +535,7 @@ public class F4SettingPage extends AppBasePage implements View.OnClickListener, 
             f3_remainingV.setBackgroundResource(hudStatus.isRemainderOilShow() ? R.drawable.f3_remaining_show : R.drawable.f3_remaining_dismiss);
             p4_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.p4_rpm_show : R.drawable.p4_rpm_dismiss);
             p4_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.p4_speed_show : R.drawable.p4_speed_dismiss);
-            f3_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f4_temp_show : R.drawable.f4_temp_dismiss);
+            f3_tempV.setBackgroundResource(hudStatus.isTempShow() ? R.drawable.f4_temp_show : R.drawable.f4_temp_disimss);
 
             switch (hudStatus.getMultifunctionalOneType()) {
                 case 0x00:

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/m4_ultifunctional_dailog_width"
+    android:layout_height="@dimen/m4_ultifunctional_dailog_height"
+    android:background="@drawable/hud_setting_bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:text="多功能显示区"
+        android:textColor="#ff42484B"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:background="#ff707070" />
+
+    <TextView
+        android:id="@+id/voltage"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="电压(V)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/temp"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="水温(℃)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/oil"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="瞬时油耗(L/h)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/avg_oil"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="平均油耗(L/100km)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/speed"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="车速(km/h)"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/dismiss"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="隐藏"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp" />
+</LinearLayout>
