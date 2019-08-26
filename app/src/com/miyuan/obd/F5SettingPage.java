@@ -142,7 +142,7 @@ public class F5SettingPage extends AppBasePage implements View.OnClickListener, 
                 showNormalDailog(viewId, "胎压显示区", hudStatus.isTireShow());
                 break;
             case R.id.fly_oil:
-                showNormalDailog(viewId, "油耗显示区", hudStatus.isOilShow());
+                showNormalDailog(viewId, "油耗显示区", hudStatus.isRemainderOilShow());
                 break;
             case R.id.fly_speed:
                 showNormalDailog(viewId, "车速显示区", hudStatus.isSpeedShow());
