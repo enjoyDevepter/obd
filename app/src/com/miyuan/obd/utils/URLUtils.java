@@ -23,6 +23,7 @@ public class URLUtils {
     public static final String TIRE_CHECK = HOST + "service/box/checkTPMS";
     public static final String CLEAR_PARAM = HOST + "service/paramTemp/addParamTemp";
     public static final String GET_USER_INFO = HOST + "service/box/getUserInfo";
+    public static final String RIGHT_CHECK = HOST + "service/box/getSNRight";
     public static final String UPDATE_TIRE = HOST + "service/data/uploadData";
     public static final String UPDATE_ERROR_FILE = HOST + "service/data/uploadFile";
     public static final String UPDATE_STATUS = HOST + "service/data/check";

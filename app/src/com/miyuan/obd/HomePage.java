@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -66,6 +67,7 @@ import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.Request;
@@ -228,6 +230,44 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
     }
 
+
+    private OBDRightInfo obdRightInfo;
+
+    private void checkOBDRight() {
+        if (null == obdStatusInfo) {
+            return;
+        }
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("checkOBDRight input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.RIGHT_CHECK)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("checkOBDRight failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("checkOBDRight success " + responese);
+                obdRightInfo = JSON.parseObject(responese, OBDRightInfo.class);
+            }
+        });
+    }
     private boolean endNavi;
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = null;
@@ -241,9 +281,11 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.AUTHORIZATION_FAIL:
             case OBDEvent.NO_PARAM:
                 obdStatusInfo = (OBDStatusInfo) data;
+                checkOBDRight();
                 break;
             case OBDEvent.NORMAL:
                 obdStatusInfo = (OBDStatusInfo) data;
+                checkOBDRight();
                 break;
             case OBDEvent.FM_PARAMS_INFO:
                 FMStatus fmStatus = (FMStatus) data;
@@ -277,10 +319,18 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.fault:
-                PageManager.go(new FaultReadyPage());
+                if (null != obdRightInfo && obdRightInfo.iSupportCheck()) {
+                    PageManager.go(new FaultReadyPage());
+                } else {
+                    showConFirm("当前设备不支持故障码检测!");
+                }
                 break;
             case R.id.physical:
-                PageManager.go(new PhysicalReadyPage());
+                if (null != obdRightInfo && obdRightInfo.iSupportCheck()) {
+                    PageManager.go(new PhysicalReadyPage());
+                } else {
+                    showConFirm("当前设备不支持体检！");
+                }
                 break;
             case R.id.dash:
                 PageManager.go(new DashBoardPage());
@@ -354,7 +404,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                     BlueManager.getInstance().setNavi(true);
                     initTimer();
-//                    AMapNavi.getInstance(getContext()).setIsUseExtraGPSData(true);
+                    initLocation();
+                    AMapNavi.getInstance(getContext()).setIsUseExtraGPSData(true);
                     AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
                         @Override
                         public void onInitNaviFailure() {
@@ -682,14 +733,19 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.fm:
-                if (null != obdStatusInfo) {
-                    if (obdStatusInfo.isSupportFM()) {
-                        //是否打开FM
-                        BlueManager.getInstance().send(ProtocolUtils.getFMParams());
-                    } else {
-                        showConFirm("当前设备不支持FM!");
-                    }
+                if (null != obdRightInfo && obdRightInfo.iSupportFM()) {
+                    BlueManager.getInstance().send(ProtocolUtils.getFMParams());
+                } else {
+                    showConFirm("当前设备不支持FM!");
                 }
+//                if (null != obdStatusInfo) {
+//                    if (obdStatusInfo.isSupportFM()) {
+//                        //是否打开FM
+//                        BlueManager.getInstance().send(ProtocolUtils.getFMParams());
+//                    } else {
+//                        showConFirm("当前设备不支持FM!");
+//                    }
+//                }
                 break;
             case R.id.report:
                 uploadLog();
