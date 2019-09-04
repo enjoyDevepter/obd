@@ -102,7 +102,7 @@
                 android:id="@+id/f3_temp_bg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/f3_temp_bg"
+                android:background="@drawable/p4_temp_bg"
                 android:visibility="invisible" />
 
             <View

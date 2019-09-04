@@ -733,19 +733,19 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.fm:
-                if (null != obdRightInfo && obdRightInfo.iSupportFM()) {
-                    BlueManager.getInstance().send(ProtocolUtils.getFMParams());
-                } else {
-                    showConFirm("当前设备不支持FM!");
-                }
-//                if (null != obdStatusInfo) {
-//                    if (obdStatusInfo.isSupportFM()) {
-//                        //是否打开FM
-//                        BlueManager.getInstance().send(ProtocolUtils.getFMParams());
-//                    } else {
-//                        showConFirm("当前设备不支持FM!");
-//                    }
+//                if (null != obdRightInfo && obdRightInfo.iSupportFM()) {
+//                    BlueManager.getInstance().send(ProtocolUtils.getFMParams());
+//                } else {
+//                    showConFirm("当前设备不支持FM!");
 //                }
+                if (null != obdStatusInfo) {
+                    if (obdStatusInfo.isSupportFM()) {
+                        //是否打开FM
+                        BlueManager.getInstance().send(ProtocolUtils.getFMParams());
+                    } else {
+                        showConFirm("当前设备不支持FM!");
+                    }
+                }
                 break;
             case R.id.report:
                 uploadLog();

@@ -69,6 +69,7 @@
 
         <!-- 预警 -->
         <FrameLayout
+            android:id="@+id/warm"
             android:layout_width="282dp"
             android:layout_height="77dp"
             android:layout_alignParentBottom="true">

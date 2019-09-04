@@ -39,6 +39,8 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
     View m2_warm_bgV;
     @ViewInject(R.id.fault)
     View faultV;
+    @ViewInject(R.id.warm)
+    View warmV;
     @ViewInject(R.id.temp)
     View temperatureV;
     @ViewInject(R.id.voltage)
@@ -67,12 +69,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
         paramsV.setOnClickListener(this);
         multifunctionalV.setOnClickListener(this);
         tireV.setOnClickListener(this);
-        faultV.setOnClickListener(this);
-        temperatureV.setOnClickListener(this);
-        voltageV.setOnClickListener(this);
-        oilV.setOnClickListener(this);
-        speedV.setOnClickListener(this);
-        tiredV.setOnClickListener(this);
+        warmV.setOnClickListener(this);
     }
 
 
@@ -120,12 +117,7 @@ public class M2SettingPage extends AppBasePage implements View.OnClickListener, 
                 showMultifunctional();
                 break;
             case R.id.m2_tire:
-            case R.id.fault:
-            case R.id.temp:
-            case R.id.voltage:
-            case R.id.oil:
-            case R.id.speed:
-            case R.id.tired:
+            case R.id.warm:
                 showWarm();
                 break;
             default:

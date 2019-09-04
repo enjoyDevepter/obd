@@ -2,6 +2,7 @@ package com.miyuan.hamster.log;
 
 import android.os.Environment;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -18,7 +19,7 @@ public class Log {
 
     static {
         Timber.plant(new Timber.DebugTree());
-        Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + "/obd"));
+        Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log"));
     }
 
     public static void d(String message) {
