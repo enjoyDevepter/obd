@@ -52,22 +52,22 @@
             android:orientation="horizontal">
 
             <FrameLayout
-                android:layout_width="176dp"
+                android:layout_width="179dp"
                 android:layout_height="match_parent">
 
                 <View
                     android:id="@+id/f2_oil_bg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/f2_oil_bg"
+                    android:background="@drawable/f2_oil_bg1"
                     android:visibility="invisible" />
 
                 <View
                     android:id="@+id/f2_oil"
-                    android:layout_width="140dp"
+                    android:layout_width="137dp"
                     android:layout_height="68dp"
-                    android:layout_gravity="center_horizontal|bottom"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginTop="40dp"
                     android:background="@drawable/f2_oil_show" />
             </FrameLayout>
 
@@ -90,18 +90,18 @@
                     android:layout_gravity="bottom"
                     android:layout_marginLeft="9dp"
                     android:layout_marginBottom="8dp"
-                    android:background="@drawable/f2_tire_show" />
+                    android:background="@drawable/f2_tire_show1" />
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="236dp"
+                android:layout_width="252dp"
                 android:layout_height="match_parent">
 
                 <View
                     android:id="@+id/f2_voltage_bg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/f2_voltage_bg"
+                    android:background="@drawable/f2_voltage_bg1"
                     android:visibility="invisible" />
 
                 <View
@@ -141,16 +141,15 @@
 
                     <View
                         android:id="@+id/f2_engineload"
-                        android:layout_width="71dp"
-                        android:layout_height="121dp"
+                        android:layout_width="67dp"
+                        android:layout_height="130dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/f2_engineload_show" />
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="280dp"
+                    android:layout_width="281dp"
                     android:layout_height="match_parent">
 
                     <View
@@ -162,10 +161,10 @@
 
                     <View
                         android:id="@+id/f2_rpm"
-                        android:layout_width="268dp"
-                        android:layout_height="124dp"
+                        android:layout_width="263dp"
+                        android:layout_height="122dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/f2_rpm_show" />
 
                     <View
@@ -180,7 +179,7 @@
                 </FrameLayout>
 
                 <FrameLayout
-                    android:layout_width="111dp"
+                    android:layout_width="125dp"
                     android:layout_height="match_parent">
 
                     <View
@@ -233,7 +232,7 @@
             </FrameLayout>
 
             <FrameLayout
-                android:layout_width="100dp"
+                android:layout_width="112dp"
                 android:layout_height="165dp"
                 android:layout_alignParentRight="true"
                 android:layout_gravity="right"

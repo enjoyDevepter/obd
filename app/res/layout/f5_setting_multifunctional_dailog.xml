@@ -41,7 +41,7 @@
         android:layout_width="148dp"
         android:layout_height="26dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="水温(℃)"

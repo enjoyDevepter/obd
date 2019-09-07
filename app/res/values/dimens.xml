@@ -11,10 +11,10 @@
     <dimen name="hud_normal_dailog_height">180dp</dimen>
 
     <dimen name="f2_ultifunctional_dailog_width">@dimen/hud_dailog_width</dimen>
-    <dimen name="f2_ultifunctional_dailog_height">280dp</dimen>
+    <dimen name="f2_ultifunctional_dailog_height">294dp</dimen>
 
     <dimen name="f2_warm_dailog_width">@dimen/hud_dailog_width</dimen>
-    <dimen name="f2_warm_dailog_height">276dp</dimen>
+    <dimen name="f2_warm_dailog_height">310dp</dimen>
 
     <dimen name="m4_warm_dailog_width">@dimen/hud_dailog_width</dimen>
     <dimen name="m4_warm_dailog_height">350dp</dimen>

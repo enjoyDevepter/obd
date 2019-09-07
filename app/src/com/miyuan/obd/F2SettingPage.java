@@ -180,6 +180,8 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                         final View voltageV = view.findViewById(R.id.voltage);
                         final View tpmV = view.findViewById(R.id.tpm);
                         final View tempV = view.findViewById(R.id.temp);
+                        final View timeV = view.findViewById(R.id.time);
+                        final View mileV = view.findViewById(R.id.mile);
                         final View dismissV = view.findViewById(R.id.dismiss);
                         switch (hudStatus.getMultifunctionalOneType()) {
                             case 0x00:
@@ -194,6 +196,12 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                             case 0x08:
                                 voltageV.setSelected(true);
                                 break;
+                            case 0x09:
+                                timeV.setSelected(true);
+                                break;
+                            case 0x0A:
+                                mileV.setSelected(true);
+                                break;
                             default:
                                 break;
                         }
@@ -203,6 +211,8 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 voltageV.setSelected(true);
                                 tpmV.setSelected(false);
                                 tempV.setSelected(false);
+                                timeV.setSelected(false);
+                                mileV.setSelected(false);
                                 dismissV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x08));
                                 dialog.dismiss();
@@ -215,6 +225,8 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 voltageV.setSelected(false);
                                 tpmV.setSelected(true);
                                 tempV.setSelected(false);
+                                timeV.setSelected(false);
+                                mileV.setSelected(false);
                                 dismissV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x02));
                                 dialog.dismiss();
@@ -226,8 +238,36 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 voltageV.setSelected(false);
                                 tpmV.setSelected(false);
                                 tempV.setSelected(true);
+                                timeV.setSelected(false);
+                                mileV.setSelected(false);
                                 dismissV.setSelected(false);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x01));
+                                dialog.dismiss();
+                            }
+                        });
+                        timeV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                voltageV.setSelected(false);
+                                tpmV.setSelected(false);
+                                tempV.setSelected(false);
+                                timeV.setSelected(true);
+                                mileV.setSelected(false);
+                                dismissV.setSelected(false);
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x09));
+                                dialog.dismiss();
+                            }
+                        });
+                        mileV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                voltageV.setSelected(false);
+                                tpmV.setSelected(false);
+                                tempV.setSelected(false);
+                                timeV.setSelected(false);
+                                mileV.setSelected(true);
+                                dismissV.setSelected(false);
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 0x0A));
                                 dialog.dismiss();
                             }
                         });
@@ -237,6 +277,8 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 voltageV.setSelected(false);
                                 tpmV.setSelected(false);
                                 tempV.setSelected(false);
+                                timeV.setSelected(false);
+                                mileV.setSelected(false);
                                 dismissV.setSelected(true);
                                 BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x21, 00));
                                 dialog.dismiss();
@@ -445,6 +487,27 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                                 tire_dismissV.setSelected(true);
                             }
                         });
+                        final View speed_showV = view.findViewById(R.id.speed_show);
+                        final View speed_dismissV = view.findViewById(R.id.speed_dismiss);
+                        speed_showV.setSelected(hudWarmStatus.isSpeedWarmShow());
+                        speed_showV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 1));
+                                speed_showV.setSelected(true);
+                                speed_dismissV.setSelected(false);
+                            }
+                        });
+
+                        speed_dismissV.setSelected(!hudWarmStatus.isSpeedWarmShow());
+                        speed_dismissV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                BlueManager.getInstance().send(ProtocolUtils.setHUDWarmStatus(0x04, 0));
+                                speed_showV.setSelected(false);
+                                speed_dismissV.setSelected(true);
+                            }
+                        });
                     }
                 })
                 .setLayoutRes(R.layout.f2_setting_warm_dailog)
@@ -474,7 +537,7 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
     private void updateUI() {
         if (null != hudStatus) {
             f2_oilV.setBackgroundResource(hudStatus.isOilShow() ? R.drawable.f2_oil_show : R.drawable.f2_oil_dismiss);
-            f2_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.f2_tire_show : R.drawable.f2_tire_dismiss);
+            f2_tireV.setBackgroundResource(hudStatus.isTireShow() ? R.drawable.f2_tire_show1 : R.drawable.f2_tire_dismiss1);
             f2_engineloadV.setBackgroundResource(hudStatus.isEngineloadShow() ? R.drawable.f2_engineload_show : R.drawable.f2_engineload_dismiss);
             f2_rpmV.setBackgroundResource(hudStatus.isRpmShow() ? R.drawable.f2_rpm_show : R.drawable.f2_rpm_dismiss);
             f2_speedV.setBackgroundResource(hudStatus.isSpeedShow() ? R.drawable.f2_speed_show : R.drawable.f2_speed_dismiss);
@@ -492,6 +555,12 @@ public class F2SettingPage extends AppBasePage implements View.OnClickListener, 
                     break;
                 case 0x08:
                     f2_voltageV.setBackgroundResource(R.drawable.f2_voltage_v_show);
+                    break;
+                case 0x09:
+                    f2_voltageV.setBackgroundResource(R.drawable.f2_time_r_show);
+                    break;
+                case 0x0A:
+                    f2_voltageV.setBackgroundResource(R.drawable.f2_mile_r_show);
                     break;
                 default:
                     break;

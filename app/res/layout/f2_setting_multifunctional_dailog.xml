@@ -11,8 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="19dp"
-        android:layout_marginBottom="19dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
         android:text="多功能显示区"
         android:textColor="#ff42484B"
         android:textSize="18sp" />
@@ -27,9 +27,9 @@
     <TextView
         android:id="@+id/voltage"
         android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="26dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="电压(V)"
@@ -39,9 +39,9 @@
     <TextView
         android:id="@+id/tpm"
         android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="26dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="转速(R)"
@@ -51,9 +51,9 @@
     <TextView
         android:id="@+id/temp"
         android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="26dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="水温(℃)"
@@ -61,11 +61,35 @@
         android:textSize="15sp" />
 
     <TextView
+        android:id="@+id/time"
+        android:layout_width="110dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="行驶时长"
+        android:textColor="#FFFFFFFF"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/mile"
+        android:layout_width="110dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/hud_setting_item_bg"
+        android:gravity="center"
+        android:text="行驶里程"
+        android:textColor="#FFFFFFFF"
+        android:textSize="15sp" />
+
+    <TextView
         android:id="@+id/dismiss"
         android:layout_width="110dp"
-        android:layout_height="35dp"
-        android:layout_marginTop="23dp"
+        android:layout_height="26dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
         android:background="@drawable/hud_setting_item_bg"
         android:gravity="center"
         android:text="隐藏"
