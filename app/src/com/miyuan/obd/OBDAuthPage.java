@@ -831,7 +831,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
     private void uploadLog() {
         Log.d("OBDAuthPage uploadLog ");
-        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log");
         final File[] logs = dir.listFiles();
 
         if (null != logs && logs.length > 0 && null != obdStatusInfo) {

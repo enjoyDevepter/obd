@@ -129,6 +129,7 @@ public class DBManager {
             } else {
                 FaultCode codeItem = new FaultCode();
                 codeItem.setId(code);
+                codeItem.setSuit("该故障码暂无详细解释，请咨询4S店或维修厂。");
                 codes.add(codeItem);
             }
             cursor.close();

@@ -159,7 +159,7 @@ public class OBDActivatePage extends AppBasePage implements View.OnClickListener
 
     private void uploadLog() {
         Log.d("OBDActivatePage uploadLog ");
-        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log");
         final File[] logs = dir.listFiles();
 
         if (null != logs && logs.length > 0) {

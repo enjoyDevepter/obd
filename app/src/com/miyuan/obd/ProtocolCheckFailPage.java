@@ -293,7 +293,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
             return;
         }
         Log.d("ProtocolCheckFailPage uploadLog ");
-        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log");
         final File[] logs = dir.listFiles();
 
         if (null != logs && logs.length > 0) {

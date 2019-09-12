@@ -421,7 +421,7 @@ public class CollectTwoPage extends AppBasePage implements LocationListener, Ble
 
     private void uploadLog() {
         Log.d("CollectTwoPage uploadLog ");
-        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd");
+        final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log");
         final File[] logs = dir.listFiles();
 
         if (null != logs && logs.length > 0) {
