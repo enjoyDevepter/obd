@@ -7,47 +7,57 @@
 
     <include layout="@layout/tittle_layout" />
 
-    <TextView
-        android:id="@+id/info"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="@dimen/common_margin_lr"
-        android:layout_marginRight="@dimen/common_margin_lr"
-        android:layout_marginTop="20dp"
-        android:text="第一步：提速至20km/h;\n第二步：掉头；\n第三步：缓慢提速至60km/h以上并保持直线行驶若干分钟，直至校准完成！\n\n注意：请不要急加速或急减速！\n\n请在安全行驶的前提下操作！\n校准完成后APP会语音提示您！"
-        android:textColor="@color/text_color"
-        android:textSize="@dimen/title_size" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/common_margin_lr"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="@dimen/common_margin_lr"
+                android:text="第一步：提速至20km/h;\n第二步：掉头；\n第三步：缓慢提速至60km/h以上并保持直线行驶若干分钟，直至校准完成！\n\n注意：请不要急加速或急减速！\n\n请在安全行驶的前提下操作！\n校准完成后APP会语音提示您！"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/title_size" />
 
 
-    <TextView
-        android:id="@+id/confirm"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="@dimen/common_margin_lr"
-        android:layout_marginRight="@dimen/common_margin_lr"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/btn_bg"
-        android:gravity="center"
-        android:text="马上开始"
-        android:textColor="#ffffffff"
-        android:textSize="18sp" />
+            <TextView
+                android:id="@+id/confirm"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/common_margin_lr"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="@dimen/common_margin_lr"
+                android:background="@drawable/btn_bg"
+                android:gravity="center"
+                android:text="马上开始"
+                android:textColor="#ffffffff"
+                android:textSize="18sp" />
 
 
-    <TextView
-        android:id="@+id/cancel"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="@dimen/common_margin_lr"
-        android:layout_marginRight="@dimen/common_margin_lr"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/go_back_bg"
-        android:gravity="center"
-        android:text="以后再说，退出APP"
-        android:textColor="#ff000000"
-        android:textSize="18sp" />
-
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/common_margin_lr"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="@dimen/common_margin_lr"
+                android:background="@drawable/go_back_bg"
+                android:gravity="center"
+                android:text="以后再说，退出APP"
+                android:textColor="#ff000000"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>
