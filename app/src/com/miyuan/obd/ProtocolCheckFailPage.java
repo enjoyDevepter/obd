@@ -1,5 +1,8 @@
 package com.miyuan.obd;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +41,8 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.protocol_check_fail_layout, toHistory = false)
 public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
@@ -266,7 +271,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.report:
-                uploadLog();
+                showLogDailog();
                 break;
             case R.id.confirm:
                 if (times >= 2) {
@@ -286,6 +291,44 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                 }
                 break;
         }
+    }
+
+    private void showLogDailog() {
+        GlobalUtil.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.sn))).setText(SN.get());
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        uploadLog();
+                                    }
+                                });
+                                view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //获取剪贴板管理器
+                                        ClipboardManager cm = (ClipboardManager) GlobalUtil.getMainActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        // 创建普通字符型ClipData
+                                        ClipData mClipData = ClipData.newPlainText("Label", SN.get());
+                                        // 将ClipData内容放到系统剪贴板里。
+                                        cm.setPrimaryClip(mClipData);
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.log_dailog)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
+            }
+        });
     }
 
     private void uploadLog() {

@@ -1,5 +1,8 @@
 package com.miyuan.obd;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +16,8 @@ import com.miyuan.adas.anno.PageSetting;
 import com.miyuan.adas.anno.ViewInject;
 import com.miyuan.hamster.log.FileLoggingTree;
 import com.miyuan.hamster.log.Log;
+import com.miyuan.obd.utils.CustomDialog;
+import com.miyuan.obd.utils.OBDUtils;
 import com.miyuan.obd.utils.URLUtils;
 
 import org.json.JSONException;
@@ -28,6 +33,8 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.confirm_car_layout)
 public class ConfirmCarPage extends AppBasePage implements View.OnClickListener {
@@ -62,6 +69,8 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
         }
     }
 
+    private CustomDialog dialog;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -70,7 +79,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
                 PageManager.back();
                 break;
             case R.id.report:
-                uploadLog();
+                showLogDailog();
                 break;
             case R.id.next:
                 if (times >= 2) {
@@ -89,6 +98,44 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
             default:
                 break;
         }
+    }
+
+    private void showLogDailog() {
+        GlobalUtil.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.sn))).setText(SN.get());
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        uploadLog();
+                                    }
+                                });
+                                view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //获取剪贴板管理器
+                                        ClipboardManager cm = (ClipboardManager) GlobalUtil.getMainActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        // 创建普通字符型ClipData
+                                        ClipData mClipData = ClipData.newPlainText("Label", SN.get());
+                                        // 将ClipData内容放到系统剪贴板里。
+                                        cm.setPrimaryClip(mClipData);
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.log_dailog)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
+            }
+        });
     }
 
     private void uploadLog() {

@@ -3,6 +3,8 @@ package com.miyuan.obd;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -74,6 +76,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class HomePage extends AppBasePage implements View.OnClickListener, BleCallBackListener, AMapLocationListener {
     @ViewInject(R.id.back)
@@ -134,6 +138,43 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
     boolean isCreateChannel = false;
 
+    private void showLogDailog() {
+        GlobalUtil.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.sn))).setText(SN.get());
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        uploadLog();
+                                    }
+                                });
+                                view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //获取剪贴板管理器
+                                        ClipboardManager cm = (ClipboardManager) GlobalUtil.getMainActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        // 创建普通字符型ClipData
+                                        ClipData mClipData = ClipData.newPlainText("Label", SN.get());
+                                        // 将ClipData内容放到系统剪贴板里。
+                                        cm.setPrimaryClip(mClipData);
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.log_dailog)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
+            }
+        });
+    }
     private void uploadLog() {
         Log.d("HomePage uploadLog ");
         final File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log");
@@ -757,7 +798,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.report:
-                uploadLog();
+                showLogDailog();
                 break;
             default:
                 break;

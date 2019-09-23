@@ -2,6 +2,8 @@ package com.miyuan.obd;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -55,6 +57,8 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
@@ -218,7 +222,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 showReset();
                 break;
             case R.id.report:
-                uploadLog();
+                showLogDailog();
                 break;
             case R.id.misinformation:
                 showMisinformation();
@@ -414,6 +418,44 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
                 .show();
 
+    }
+
+    private void showLogDailog() {
+        GlobalUtil.getHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                        .setViewListener(new CustomDialog.ViewListener() {
+                            @Override
+                            public void bindView(View view) {
+                                ((TextView) (view.findViewById(R.id.sn))).setText(SN.get());
+                                view.findViewById(R.id.confirm).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        uploadLog();
+                                    }
+                                });
+                                view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //获取剪贴板管理器
+                                        ClipboardManager cm = (ClipboardManager) GlobalUtil.getMainActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        // 创建普通字符型ClipData
+                                        ClipData mClipData = ClipData.newPlainText("Label", SN.get());
+                                        // 将ClipData内容放到系统剪贴板里。
+                                        cm.setPrimaryClip(mClipData);
+                                    }
+                                });
+                            }
+                        })
+                        .setLayoutRes(R.layout.log_dailog)
+                        .setCancelOutside(false)
+                        .setDimAmount(0.5f)
+                        .isCenter(true)
+                        .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                        .show();
+            }
+        });
     }
 
     private void uploadLog() {
