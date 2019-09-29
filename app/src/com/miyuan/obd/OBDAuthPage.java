@@ -848,6 +848,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                                     @Override
                                     public void onClick(View v) {
                                         uploadLog();
+                                        dialog.dismiss();
                                     }
                                 });
                                 view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {

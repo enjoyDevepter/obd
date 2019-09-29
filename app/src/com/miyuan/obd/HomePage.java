@@ -151,6 +151,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                     @Override
                                     public void onClick(View v) {
                                         uploadLog();
+                                        dialog.dismiss();
                                     }
                                 });
                                 view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {

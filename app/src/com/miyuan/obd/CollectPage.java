@@ -160,6 +160,7 @@ public class CollectPage extends AppBasePage implements View.OnClickListener, Bl
                                     @Override
                                     public void onClick(View v) {
                                         uploadLog();
+                                        dialog.dismiss();
                                     }
                                 });
                                 view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {

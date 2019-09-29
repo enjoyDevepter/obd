@@ -306,6 +306,7 @@ public class ProtocolCheckFailPage extends AppBasePage implements BleCallBackLis
                                     @Override
                                     public void onClick(View v) {
                                         uploadLog();
+                                        dialog.dismiss();
                                     }
                                 });
                                 view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {

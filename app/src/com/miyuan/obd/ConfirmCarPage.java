@@ -113,6 +113,7 @@ public class ConfirmCarPage extends AppBasePage implements View.OnClickListener 
                                     @Override
                                     public void onClick(View v) {
                                         uploadLog();
+                                        dialog.dismiss();
                                     }
                                 });
                                 view.findViewById(R.id.copy).setOnClickListener(new View.OnClickListener() {
