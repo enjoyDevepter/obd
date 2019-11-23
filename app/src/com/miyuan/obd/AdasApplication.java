@@ -1,15 +1,19 @@
 package com.miyuan.obd;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.view.WindowManager;
 
 import com.miyuan.adas.GlobalUtil;
-import com.miyuan.obd.log.Log;
-import com.miyuan.obd.log.MapbarStorageUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -24,17 +28,25 @@ public class AdasApplication extends Application {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
                 ex.printStackTrace();
-                String error = Log.toString(ex);
+                String error = format(ex);
                 recordErrorToFile(error);
                 defaultUncaughtExceptionHandler.uncaughtException(thread, ex);
             }
         });
     }
 
+    public static String format(Throwable t) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
+    }
+
     static void recordErrorToFile(String error) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         String fileName = sdf.format(new Date(System.currentTimeMillis()));
-        String dirPath = MapbarStorageUtil.getCurrentValidMapbarPath();
+        String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "obd";
         final File file = new File(dirPath, fileName + "_error.log");
         FileOutputStream fos = null;
         try {
@@ -74,5 +86,42 @@ public class AdasApplication extends Application {
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .build());
+
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+
+            }
+        });
     }
 }

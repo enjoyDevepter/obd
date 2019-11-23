@@ -1,14 +1,12 @@
 package com.miyuan.obd;
 
 import android.app.Dialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -88,12 +86,23 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
 
+    Intent serviceForegroundIntent;
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        ImmersionBar.with(this)
+                .fitsSystemWindows(true)
+                .statusBarDarkFont(true)
+                .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
+                .init(); //初始化，默认透明状态栏和黑色导航栏
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setBackgroundDrawableResource(android.R.color.white);
         super.onCreate(savedInstanceState);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         GlobalUtil.setMainActivity(this);
 
         rootViewGroup = new FrameLayout(this);
@@ -126,13 +135,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        ImmersionBar.with(this)
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -161,42 +165,22 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         }, new RxPermissions(MainActivity.getInstance()), RxErrorHandler.builder().with(MainActivity.getInstance()).responseErrorListener(new ResponseErrorListener() {
             @Override
             public void handleResponseError(Context context, Throwable t) {
-
             }
         }).build());
-    }
-
-    private boolean mBound = false;
-
-    private ForegroundService mService = null;
-    // Monitors the state of the connection to the service.
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            ForegroundService.ForegroundBinder binder = (ForegroundService.ForegroundBinder) service;
-            mService = binder.getService();
-            mBound = true;
+        if (serviceForegroundIntent != null) {
+            stopService(serviceForegroundIntent);
+            serviceForegroundIntent = null;
         }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-            mBound = false;
-        }
-    };
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, ForegroundService.class), mServiceConnection,
-                Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onDestroy() {
         ImmersionBar.with(this).destroy(); //不调用该方法，如果界面bar发生改变，在不关闭app的情况下，退出此界面再进入将记忆最后一次bar改变的状态
         super.onDestroy();
+        if (serviceForegroundIntent != null) {
+            stopService(serviceForegroundIntent);
+            serviceForegroundIntent = null;
+        }
         BlueManager.getInstance().disconnect();
         MainActivity.INSTANCE = null;
         EventBus.getDefault().unregister(this);
@@ -237,6 +221,18 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             } else {
                 PageManager.back();
             }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        serviceForegroundIntent = new Intent(this, LocationService.class);
+        serviceForegroundIntent.putExtra(LocationService.EXTRA_NOTIFICATION_CONTENT, "汽车卫士");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceForegroundIntent);
+        } else {
+            startService(serviceForegroundIntent);
         }
     }
 
@@ -505,12 +501,5 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onStop() {
         super.onStop();
-        if (mBound) {
-            // Unbind from the service. This signals to the service that this activity is no longer
-            // in the foreground, and the service can respond by promoting itself to a foreground
-            // service.
-            unbindService(mServiceConnection);
-            mBound = false;
-        }
     }
 }

@@ -92,9 +92,13 @@ public class BlueManager {
 
 
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
-    private static final String READ_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final String WRITE_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+    private static final String SERVICE_UUID_ONE = "0000ffb0-0000-1000-8000-00805f9b34fb";
+    private static final String WRITE_UUID_ONE = "0000ffb2-0000-1000-8000-00805f9b34fb";
+    private static final String NOTIFY_UUID_ONE = "0000ffb1-0000-1000-8000-00805f9b34fb";
+
     private static final int CONNECTED = 1; // 连接成功
     private static final int DISCONNECTED = 0; // 断开连接
     private static long COMMAND_TIMEOUT = 5000;
@@ -130,7 +134,7 @@ public class BlueManager {
                 return;
             }
             scanResult.add(name);
-            if (name != null && (name.toUpperCase().startsWith("MYOBD") || name.toUpperCase().startsWith("GUARDIAN"))) {
+            if (name != null && (name.toUpperCase().startsWith("MYOBD") || name.toUpperCase().startsWith("GUARDIAN") || name.toUpperCase().startsWith("MAPBAR"))) {
                 Log.d("device.getName()=    " + device.getName() + " device.getAddress()=" + device.getAddress());
                 Message msg = mHandler.obtainMessage();
                 msg.what = STOP_SCAN_AND_CONNECT;
@@ -184,14 +188,21 @@ public class BlueManager {
                 List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
 
                 //2.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
-                BluetoothGattService bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
-//
+                BluetoothGattService bluetoothGattService = null;
+                bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
+
                 //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
-                writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
-                readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
-
+                if (null == bluetoothGattService) {
+                    Log.d("new UUID");
+                    bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID_ONE));
+                    writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID_ONE));
+                    readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID_ONE));
+                } else {
+                    Log.d("old UUID ");
+                    writeCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(WRITE_UUID));
+                    readCharacteristic = bluetoothGattService.getCharacteristic(UUID.fromString(NOTIFY_UUID));
+                }
                 mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
-
                 currentDeviceName = gatt.getDevice().getAddress();
                 canGo = true;
                 Log.d("onServicesDiscovered  success");
