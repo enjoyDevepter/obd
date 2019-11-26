@@ -96,8 +96,8 @@ public class BlueManager {
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
     private static final String SERVICE_UUID_ONE = "0000ffb0-0000-1000-8000-00805f9b34fb";
-    private static final String WRITE_UUID_ONE = "0000ffb2-0000-1000-8000-00805f9b34fb";
-    private static final String NOTIFY_UUID_ONE = "0000ffb1-0000-1000-8000-00805f9b34fb";
+    private static final String WRITE_UUID_ONE = "0000ffb1-0000-1000-8000-00805f9b34fb";
+    private static final String NOTIFY_UUID_ONE = "0000ffb2-0000-1000-8000-00805f9b34fb";
 
     private static final int CONNECTED = 1; // 连接成功
     private static final int DISCONNECTED = 0; // 断开连接
@@ -931,7 +931,7 @@ public class BlueManager {
                         pressureInfo.setStatus(2);
                     } else if (bytes[5] == 1) {
                         pressureInfo.setStatus(3);
-                    } else if (bytes[6] == 1) {
+                    } else if (bytes[4] == 1) {
                         pressureInfo.setStatus(4);
                     } else {
                         pressureInfo.setStatus(0);
