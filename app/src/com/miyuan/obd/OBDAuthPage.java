@@ -193,7 +193,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 break;
             case OBDEvent.NO_PARAM: // 无参数
                 obdStatusInfo = (OBDStatusInfo) data;
-                checkSupportTire();
+                checkTireSupport();
                 break;
             case OBDEvent.PARAM_UPDATE_SUCCESS:
                 obdStatusInfo = (OBDStatusInfo) data;
@@ -585,20 +585,20 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     }
 
 
-    private void checkSupportTire() {
-
-        switch (SettingPreferencesConfig.TIRE_STATUS.get()) {
-            case 0:
-                checkTireSupport();
-                break;
-            case 1:
-                checkOBDVersion();
-                break;
-            case 2:
-                PageManager.go(new HomePage());
-                break;
-        }
-    }
+//    private void checkSupportTire() {
+//
+//        switch (SettingPreferencesConfig.TIRE_STATUS.get()) {
+//            case 0:
+//                checkTireSupport();
+//                break;
+//            case 1:
+//                checkOBDVersion();
+//                break;
+//            case 2:
+//                PageManager.go(new HomePage());
+//                break;
+//        }
+//    }
 
     private void checkTireSupport() {
         JSONObject jsonObject = new JSONObject();
@@ -638,7 +638,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                                             @Override
                                             public void onClick(View v) {
                                                 dialog.dismiss();
-                                                checkSupportTire();
+                                                checkTireSupport();
                                             }
                                         });
                                     }

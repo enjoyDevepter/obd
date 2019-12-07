@@ -6,7 +6,6 @@ import java.util.Arrays;
 /**
  * Created by guomin on 2018/3/7.
  */
-
 public class OBDStatusInfo implements Serializable {
     private String sn;
     private String boxId;

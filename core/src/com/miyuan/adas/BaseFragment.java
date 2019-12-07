@@ -39,13 +39,11 @@ public abstract class BaseFragment extends Fragment {
     public void onAttach(Activity activity) {
         this.activity = (FragmentActivity) activity;
         super.onAttach(activity);
-        Log.d("=====onAttach=====");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("=====onCreate=====");
     }
 
     @Override
@@ -61,7 +59,6 @@ public abstract class BaseFragment extends Fragment {
         } else {
             container.setBackgroundColor(0xfff2f2f2);
         }
-        Log.d("=====onCreateView=====");
         return realCreateView(inflater, container, false);
     }
 
@@ -73,34 +70,29 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d("=====onActivityCreated=====");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("=====onStart=====");
         lifeCycleListener.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("=====onResume=====");
         lifeCycleListener.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("=====onPause=====");
         lifeCycleListener.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d("=====onStop=====");
         lifeCycleListener.onStop();
     }
 

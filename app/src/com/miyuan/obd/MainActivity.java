@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             }
         }).build());
         if (serviceForegroundIntent != null) {
+//            AMapNavi.getInstance(this).setIsUseExtraGPSData(false);
             stopService(serviceForegroundIntent);
             serviceForegroundIntent = null;
         }

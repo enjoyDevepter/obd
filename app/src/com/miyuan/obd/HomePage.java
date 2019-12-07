@@ -447,7 +447,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                     BlueManager.getInstance().setNavi(true);
                     initTimer();
-                    AMapNavi.getInstance(getContext()).addAMapNaviListener(new AMapNaviListener() {
+                    final AMapNavi aMapNavi = AMapNavi.getInstance(getContext());
+                    aMapNavi.addAMapNaviListener(new AMapNaviListener() {
                         @Override
                         public void onInitNaviFailure() {
                             Log.d("onInitNaviFailure");
