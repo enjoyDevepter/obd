@@ -46,6 +46,8 @@ public class SettingPreferencesConfig {
     public static final BooleanPreferences LIGHT = new BooleanPreferences(SHARED_PREFERENCES_INIT, "light", false);
     public static final BooleanPreferences EMERGENCY = new BooleanPreferences(SHARED_PREFERENCES_INIT, "emergency", false);
     public static final BooleanPreferences BUS = new BooleanPreferences(SHARED_PREFERENCES_INIT, "bus", false);
+    public static final BooleanPreferences INTERVALVELOCITYSTART = new BooleanPreferences(SHARED_PREFERENCES_INIT, "intervalvelocitystart", true);
+    public static final BooleanPreferences INTERVALVELOCITYEND = new BooleanPreferences(SHARED_PREFERENCES_INIT, "intervalvelocityend", true);
 
     public static final IntPreferences RATE_INDEX = new IntPreferences(SHARED_PREFERENCES_INIT, "rate_index", 0);
 

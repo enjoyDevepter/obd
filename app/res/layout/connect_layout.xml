@@ -13,8 +13,8 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:lineSpacingExtra="4dp"
-        android:text="请您确认:\n1、已将盒子插入车辆OBD插口上\n2、已打开手机蓝牙"
-        android:textColor="@color/text_color"
+        android:text="请您确认:\n1、请确认车辆已打火\n2、已经将设备与车辆OBD口连接\n3、已经打开手机蓝牙并授权本App使用蓝牙"
+        android:textColor="#FF009488"
         android:textSize="@dimen/text_size" />
 
     <LinearLayout

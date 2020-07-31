@@ -5,15 +5,24 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.miyuan.obd"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 27
         versionCode 1400
         versionName "3.1"
         flavorDimensions "default"
 
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_static'
+            }
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+        }
+
         ndk {
             //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
-            abiFilters "armeabi"
+            abiFilters "armeabi-v7a"
         }
 
         productFlavors {
@@ -81,6 +90,11 @@ android {
         }
     }
 
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
     dependencies {
         api fileTree(include: ['*.jar'], dir: 'libs')
         api project(path: ':core')

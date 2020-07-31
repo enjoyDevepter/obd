@@ -6,6 +6,9 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -57,6 +60,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -100,6 +104,13 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     private CustomDialog dialog;
 
     private Timer heartTimer = new Timer();
+
+
+    static {
+        System.loadLibrary("tools");
+    }
+
+    private byte[] lastBitmap;
 
     @Override
     public void onResume() {
@@ -307,6 +318,36 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     private AMapLocationClientOption locationOption = null;
     private NotificationManager notificationManager = null;
 
+    public native static byte[] convertPicture(byte[] src, byte[] des);
+
+    public static int shortToByteArray1(short i, byte[] data, int offset) {
+        data[offset + 1] = (byte) (i >> 8 & 255);
+        data[offset] = (byte) (i & 255);
+        return offset + 2;
+    }
+
+    public static int RGB888ToRGB565(int rgb8888) {
+        return (rgb8888 >> 19 & 31) << 11 | (rgb8888 >> 10 & 63) << 5 | rgb8888 >> 3 & 31;
+    }
+
+    private void showOpenProgressDailog() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        TextView infoTV = view.findViewById(R.id.info);
+                        infoTV.setText("正在开启，请稍等...");
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_fm_progress)
+                .setCancelOutside(false)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+
+    }
+
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
@@ -316,10 +357,12 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             case OBDEvent.NO_PARAM:
                 obdStatusInfo = (OBDStatusInfo) data;
                 checkOBDRight();
+                Log.d("obdStatusInfo  " + obdStatusInfo);
                 break;
             case OBDEvent.NORMAL:
                 obdStatusInfo = (OBDStatusInfo) data;
                 checkOBDRight();
+                Log.d("obdStatusInfo  " + obdStatusInfo);
                 break;
             case OBDEvent.FM_PARAMS_INFO:
                 FMStatus fmStatus = (FMStatus) data;
@@ -538,10 +581,15 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         }
 
                         @Override
+                        public void onGpsSignalWeak(boolean b) {
+                        }
+
+                        @Override
                         public void onNaviInfoUpdate(NaviInfo naviInfo) {
                             if (endNavi) {
                                 return;
                             }
+                            Log.d("onNaviInfoUpdate  naviInfo " + naviInfo.getCurStepRetainDistance());
                             int type = 0;
                             switch (naviInfo.getIconType()) {
                                 case 0:
@@ -581,12 +629,30 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                     type = 0;
                                     break;
                             }
-                            BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(type, naviInfo.getCurStepRetainDistance()));
+
+                            if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
+                                try {
+                                    byte[] bytes = naviInfo.getNextRoadName().getBytes("GBK");
+                                    Log.d("getTurnInfo2  naviInfo.getPathRetainDistance() " + naviInfo.getPathRetainDistance() + "  " + naviInfo.getPathRetainTime() + "   " + naviInfo.getCurrentRoadName() + "  " + naviInfo.getNextRoadName());
+                                    BlueManager.getInstance().send(ProtocolUtils.getTurnInfo2(type, naviInfo.getCurStepRetainDistance(), naviInfo.getPathRetainDistance(), naviInfo.getPathRetainTime(), bytes));
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                                int naviTpye = naviInfo.getIconType();
+                                // 去除重复图片
+                                if (null != naviInfo.getIconBitmap()) {
+                                    saveMyBitmap(naviInfo.getIconBitmap());
+                                } else {
+                                    Log.d("NO BITMAP " + naviTpye);
+                                    getTurnImage(naviTpye);
+                                }
+                            } else {
+                                BlueManager.getInstance().send(ProtocolUtils.getTurnInfo(type, naviInfo.getCurStepRetainDistance()));
+                            }
                         }
 
                         @Override
                         public void onNaviInfoUpdated(AMapNaviInfo aMapNaviInfo) {
-
                         }
 
                         @Override
@@ -598,44 +664,55 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 if (ishowCamera) {
                                     return;
                                 }
-                                Log.d("updateCameraInfo  ishowCamera");
                                 ishowCamera = true;
                                 for (AMapNaviCameraInfo cameraInfo : aMapNaviCameraInfos) {
                                     switch (cameraInfo.getCameraType()) {
                                         case 0: // 测速
                                             if (SettingPreferencesConfig.CAMERA_SPEED.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, aMapNaviCameraInfos[0].getCameraSpeed()));
+                                                if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
+                                                    BlueManager.getInstance().send(ProtocolUtils.getCameraInfo1(true, 6, cameraInfo.getCameraSpeed(), cameraInfo.getDistance()));
+                                                } else {
+                                                    BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, cameraInfo.getCameraSpeed()));
+                                                }
                                             }
                                             break;
                                         case 1: // 监控摄像
                                             if (SettingPreferencesConfig.SURVEILLANCE_CAMERA.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, aMapNaviCameraInfos[0].getDistance()));
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, cameraInfo.getDistance()));
                                             }
                                             break;
                                         case 2: // 闯红灯拍照
                                             if (SettingPreferencesConfig.LIGHT.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, aMapNaviCameraInfos[0].getDistance()));
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, cameraInfo.getDistance()));
                                             }
                                             break;
                                         case 3: // 违章拍照
                                             if (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, aMapNaviCameraInfos[0].getDistance()));
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, cameraInfo.getDistance()));
                                             }
                                             break;
                                         case 4: // 公交专用道摄像头
                                             if (SettingPreferencesConfig.BUS.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, aMapNaviCameraInfos[0].getDistance()));
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, cameraInfo.getDistance()));
                                             }
                                             break;
                                         case 5: // 应急车道拍照
                                             if (SettingPreferencesConfig.EMERGENCY.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, aMapNaviCameraInfos[0].getDistance()));
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, cameraInfo.getDistance()));
                                             }
                                             break;
                                         case 6: // 非机动车道(暂未使用)
                                             if (SettingPreferencesConfig.BICYCLE_LANE.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, aMapNaviCameraInfos[0].getDistance()));
+                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, cameraInfo.getDistance()));
                                             }
+                                            break;
+                                        case 8: //区间测速开始
+                                            Log.d("updateCameraInfo  INTERVALVELOCITYSTART " + cameraInfo.getAverageSpeed() + "   " + cameraInfo.getAverageSpeed());
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 4, cameraInfo.getAverageSpeed()));
+                                            break;
+                                        case 9:
+                                            Log.d("updateCameraInfo  INTERVALVELOCITYEND " + cameraInfo.getAverageSpeed() + "   " + cameraInfo.getAverageSpeed());
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 5, cameraInfo.getAverageSpeed()));
                                             break;
                                         default:
                                             break;
@@ -663,7 +740,10 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showCross(AMapNaviCross aMapNaviCross) {
-
+                            if (obdStatusInfo.getHudType() == 0x62 /*|| obdStatusInfo.getHudType() == 0x48*/) {
+                                Log.d("showCross");
+                                saveMyBitmap(aMapNaviCross.getBitmap());
+                            }
                         }
 
                         @Override
@@ -673,7 +753,15 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showModeCross(AMapModelCross aMapModelCross) {
-
+                            Log.d("showModeCross");
+//                        AMapModeCrossOverlay overlay = new AMapModeCrossOverlay(getContext(), naviView.getMap());
+//                        overlay.createModelCrossBitMap(aMapModelCross.getPicBuf1(), new AMapModeCrossOverlay.OnCreateBitmapFinish() {
+//                            @Override
+//                            public void onGenerateComplete(Bitmap bitmap, int i) {
+//                                Log.d("showModeCross  onGenerateComplete");
+//                                saveMyBitmap(bitmap);
+//                            }
+//                        });
                         }
 
                         @Override
@@ -688,15 +776,21 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             }
                             int enter = 0;
                             int count = aMapLaneInfos.length;
+                            byte[] laneType = new byte[count];
                             for (int i = 0; i < aMapLaneInfos.length; i++) {
                                 if (aMapLaneInfos[i].isRecommended()) {
                                     enter += Math.pow(2, i);
                                 }
+                                laneType[i] = (byte) aMapLaneInfos[i].getLaneTypeIdArray()[0];
                             }
                             Log.d("aMapLaneInfo  showLaneInfo " + count);
                             if (!showLane) {
                                 showLane = true;
-                                BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter));
+                                if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
+                                    BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter, laneType));
+                                } else {
+                                    BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter));
+                                }
                             }
                         }
 
@@ -712,7 +806,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             Log.d("aMapLaneInfo  hideLaneInfo ");
                             if (showLane) {
                                 showLane = false;
-                                BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0));
+                                BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0, null));
                             }
                         }
 
@@ -771,7 +865,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         }
                     });
-                    AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
+                    AmapNaviPage naviPage = AmapNaviPage.getInstance();
+                    naviPage.showRouteActivity(getContext(), new AmapNaviParams(null), null);
+
                 }
                 break;
             case R.id.fm:
@@ -795,24 +891,154 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             default:
                 break;
         }
+
     }
 
-    private void showOpenProgressDailog() {
-        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                .setViewListener(new CustomDialog.ViewListener() {
-                    @Override
-                    public void bindView(View view) {
-                        TextView infoTV = view.findViewById(R.id.info);
-                        infoTV.setText("正在开启，请稍等...");
-                    }
-                })
-                .setLayoutRes(R.layout.dailog_fm_progress)
-                .setCancelOutside(false)
-                .setDimAmount(0.5f)
-                .isCenter(true)
-                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                .show();
+    private void getTurnImage(int naviTpye) {
+        int resID;
+        switch (naviTpye) {
+            case 1:
+                //返回对应图片资源id
+                resID = R.drawable.sou1_night;
+                break;
+            case 2:
+                //返回对应图片资源id
+                resID = R.drawable.sou2_night;
+                break;
+            case 3:
+                //返回对应图片资源id
+                resID = R.drawable.sou3_night;
+                break;
+            case 4:
+                //返回对应图片资源id
+                resID = R.drawable.sou4_night;
+                break;
+            case 5:
+                //返回对应图片资源id
+                resID = R.drawable.sou5_night;
+                break;
+            case 6:
+                //返回对应图片资源id
+                resID = R.drawable.sou6_night;
+                break;
+            case 7:
+                //返回对应图片资源id
+                resID = R.drawable.sou7_night;
+                break;
+            case 8:
+                //返回对应图片资源id
+                resID = R.drawable.sou8_night;
+                break;
+            case 9:
+                //返回对应图片资源id
+                resID = R.drawable.sou9_night;
+                break;
+            case 10:
+                //返回对应图片资源id
+                resID = R.drawable.sou10_night;
+                break;
+            case 11:
+                //返回对应图片资源id
+                resID = R.drawable.sou11_night;
+                break;
+            case 12:
+                //返回对应图片资源id
+                resID = R.drawable.sou12_night;
+                break;
+            case 13:
+                //返回对应图片资源id
+                resID = R.drawable.sou13_night;
+                break;
+            case 14:
+                //返回对应图片资源id
+                resID = R.drawable.sou14_night;
+                break;
+            case 15:
+                //返回对应图片资源id
+                resID = R.drawable.sou15_night;
+                break;
+            case 16:
+                //返回对应图片资源id
+                resID = R.drawable.sou16_night;
+                break;
+            case 17:
+                //返回对应图片资源id
+                resID = R.drawable.sou17_night;
+                break;
+            case 18:
+                //返回对应图片资源id
+                resID = R.drawable.sou18_night;
+                break;
+            case 19:
+                //返回对应图片资源id
+                resID = R.drawable.sou19_night;
+                break;
+            case 20:
+                //返回对应图片资源id
+                resID = R.drawable.sou20_night;
+                break;
+            default:
+                //返回对应图片资源id
+                resID = R.drawable.sou20_night;
+                break;
 
+        }
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), resID);
+        saveMyBitmap(bitmap);
+    }
+
+    public void saveMyBitmap(Bitmap mBitmap) {
+        if (obdStatusInfo.getHudType() != 0x62) {
+            return;
+        }
+        int width = mBitmap.getWidth();
+        int height = mBitmap.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.postScale(44.0f / width, 44.0f / height);
+        Bitmap newBitmap = Bitmap.createBitmap(mBitmap, 0, 0, width, height, matrix, true);
+        byte[] result = bitmap2RGB(newBitmap);
+        byte[] code = new byte[4096];
+        code = convertPicture(result, code);
+        // 验证图片是否一样
+        if (null != lastBitmap) {
+            for (int i = 0; i < result.length; i++) {
+                if (result[i] != lastBitmap[i]) {
+                    lastBitmap = result;
+                    BlueManager.getInstance().send(ProtocolUtils.getImage(code));
+                    return;
+                }
+            }
+            Log.d("bitmap the same");
+        } else {
+            lastBitmap = result;
+            BlueManager.getInstance().send(ProtocolUtils.getImage(code));
+        }
+
+    }
+
+    public byte[] bitmap2RGB(Bitmap bitmap) {
+
+        if (bitmap == null) {
+            return null;
+        }
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        int[] pixels = new int[width * height];
+
+        byte[] result = new byte[44 * 44 * 2];
+
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for (int i = 0; i < width * height; i++) {
+
+            short rgb565 = (short) RGB888ToRGB565(pixels[i]);
+
+            shortToByteArray1(rgb565, result, i * 2);
+        }
+
+        return result;
     }
 
     private boolean showCamera(AMapNaviCameraInfo[] cameraInfos) {
@@ -821,12 +1047,15 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             for (AMapNaviCameraInfo cameraInfo : cameraInfos) {
                 types.add(cameraInfo.getCameraType());
             }
+            Log.d("cameraInfos types " + types);
             if ((SettingPreferencesConfig.CAMERA_SPEED.get() && types.contains(0))
                     || ((SettingPreferencesConfig.SURVEILLANCE_CAMERA.get() && types.contains(1))
                     || (SettingPreferencesConfig.LIGHT.get() && types.contains(2))
                     || (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get() && types.contains(3))
                     || (SettingPreferencesConfig.BUS.get() && types.contains(4))
                     || (SettingPreferencesConfig.EMERGENCY.get() && types.contains(5))
+                    || (SettingPreferencesConfig.INTERVALVELOCITYSTART.get() && types.contains(8))
+                    || (SettingPreferencesConfig.INTERVALVELOCITYEND.get() && types.contains(9))
                     || (SettingPreferencesConfig.BICYCLE_LANE.get() && types.contains(6)))) {
                 return true;
             }

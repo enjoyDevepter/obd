@@ -134,10 +134,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .init(); //初始化，默认透明状态栏和黑色导航栏
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
     protected void onResume() {

@@ -43,7 +43,7 @@ public class FileLoggingTree extends Timber.Tree {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file, true);
-            fos.write(message.getBytes());
+            fos.write(message.getBytes("UTF-8"));
             fos.flush();
         } catch (IOException e) {
             e.printStackTrace();

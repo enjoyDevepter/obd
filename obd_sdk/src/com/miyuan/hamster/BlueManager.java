@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,8 +31,8 @@ import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,6 +48,7 @@ public class BlueManager {
     public static final String KEY_WRITE_BUNDLE_VALUE = "write_value";
     private static final int STOP_SCAN_AND_CONNECT = 0;
     private static final int MSG_SPLIT_WRITE = 1;
+
     private static final int MSG_OBD_DISCONNECTED = 12;
 
 
@@ -143,6 +145,9 @@ public class BlueManager {
             }
         }
     };
+
+    MediaPlayer player;
+
     private BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -155,6 +160,24 @@ public class BlueManager {
                     canGo = true;
                     connectStatus = CONNECTED;
                     mBluetoothGatt.discoverServices();
+                    if (isNavi) {
+                        if (null != player && player.isPlaying()) {
+                            player.reset();
+                        }
+                        player = MediaPlayer.create(mContext, R.raw.connect);
+                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                if (player != null) {
+                                    player.reset();
+                                    player.release();
+                                    player = null;
+                                }
+                            }
+                        });
+                        player.start();
+                    }
+
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.d("onConnectionStateChange  STATE_DISCONNECTED");
                     connectStatus = DISCONNECTED;
@@ -184,14 +207,10 @@ public class BlueManager {
                         notifyBleCallBackListener(OBDEvent.BLUE_CONNECTED, null);
                     }
                 });
-                //拿到该服务 1,通过UUID拿到指定的服务  2,可以拿到该设备上所有服务的集合
-                List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
+                //1.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
+                BluetoothGattService bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
 
-                //2.通过指定的UUID拿到设备中的服务也可使用在发现服务回调中保存的服务
-                BluetoothGattService bluetoothGattService = null;
-                bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID));
-
-                //3.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
+                //2.通过指定的UUID拿到设备中的服务中的characteristic，也可以使用在发现服务回调中通过遍历服务中信息保存的Characteristic
                 if (null == bluetoothGattService) {
                     Log.d("new UUID");
                     bluetoothGattService = mBluetoothGatt.getService(UUID.fromString(SERVICE_UUID_ONE));
@@ -445,8 +464,6 @@ public class BlueManager {
         if (instructList != null) {
             instructList.clear();
         }
-        Log.d(" disconnect success  queue.size()  " + queue.size() + "  instructList.size() " + instructList.size() + "  canGo  " + canGo);
-
     }
 
     public boolean isConnected() {
@@ -474,6 +491,14 @@ public class BlueManager {
         if (queue.size() == 0 && canGo) {
             queue.add(data);
             return;
+        }
+
+        Iterator<byte[]> it = instructList.iterator();
+        while (it.hasNext()) {
+            byte[] b = it.next();
+            if (b[1] == 0x09 && b[2] == 0x06) {
+                it.remove();
+            }
         }
 
         byte[] last = instructList.peekLast();
@@ -716,7 +741,6 @@ public class BlueManager {
                     obdStatusInfo.setCurrentMatching(content[7] == 01);
                     obdStatusInfo.setBerforeMatching(content[8] == 01);
                     obdStatusInfo.setOrginal(content);
-                    Log.d(obdStatusInfo.toString());
 
                     if (content[content.length - 1] == 1) {
                         Message message = mHandler.obtainMessage();
@@ -1290,6 +1314,21 @@ public class BlueManager {
                 case MSG_OBD_DISCONNECTED:
                     if (isNavi) {
                         Log.d("isNavi MSG_OBD_DISCONNECTED");
+                        if (null != player && player.isPlaying()) {
+                            player.reset();
+                        }
+                        player = MediaPlayer.create(mContext, R.raw.disconnect);
+                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                if (player != null) {
+                                    player.reset();
+                                    player.release();
+                                    player = null;
+                                }
+                            }
+                        });
+                        player.start();
                         startScan();
                     } else {
                         mMainHandler.post(new Runnable() {
@@ -1605,7 +1644,8 @@ public class BlueManager {
                             TIMEOUTSYNC.wait(COMMAND_TIMEOUT);
                             if (needRewire) {
                                 Log.d("TimeOutThread needRewire ");
-                                if (currentRepeat > 2) {
+//                                if (currentRepeat > 2) {
+                                if (currentRepeat > Integer.MAX_VALUE) {
                                     currentRepeat = 0;
                                     mMainHandler.post(new Runnable() {
                                         @Override

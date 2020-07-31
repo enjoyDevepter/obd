@@ -99,7 +99,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d("=====onDestroyView=====");
+//        Log.d("=====onDestroyView=====");
         realDestroyView();
     }
 
@@ -108,7 +108,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("=====onDestroy=====");
+//        Log.d("=====onDestroy=====");
         lifeCycleListener.onDestroy();
         lifeCycleListener = null;
     }
@@ -116,13 +116,13 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d("=====onDetach=====");
+//        Log.d("=====onDetach=====");
         setDetach(true);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.d("=====onSaveInstanceState=====");
+//        Log.d("=====onSaveInstanceState=====");
     }
 
     public void registLifeCycleListener(ILifeCycleListener lifeCycleListener) {
