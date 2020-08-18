@@ -629,10 +629,11 @@ public class ProtocolUtils {
      * @param turnType
      * @return
      */
-    public static byte[] getTurnInfo2(int turnType, int distance, int retainDistance, int retainTime, byte[] roadName) {
+    public static byte[] getTurnInfo2(int turnType, int distance, int retainDistance, int retainTime, byte[] nextRoadName, byte[] exitInfo) {
         Log.d("Protocol getTurnInfo2 ===");
-        int roadLength = null != roadName ? roadName.length : 0;
-        byte[] result = new byte[18 + roadLength];
+        int roadLength = null != nextRoadName ? nextRoadName.length : 0;
+        int exitInfoLength = null != exitInfo ? exitInfo.length : 0;
+        byte[] result = new byte[20 + roadLength + exitInfoLength];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x90;
         result[2] = 01;
@@ -656,14 +657,20 @@ public class ProtocolUtils {
         result[15] = (byte) (roadLength & 0xFF);
         // 当前道路名
         if (roadLength > 0) {
-            System.arraycopy(roadName, 0, result, 16, roadLength);
+            System.arraycopy(nextRoadName, 0, result, 16, roadLength);
+        }
+        // 出口信息长度
+        result[16 + roadLength] = (byte) ((exitInfoLength >> 8) & 0xFF);
+        result[17 + roadLength] = (byte) (exitInfoLength & 0xFF);
+        if (exitInfoLength > 0) {
+            System.arraycopy(exitInfo, 0, result, 18 + roadLength, exitInfoLength);
         }
         byte check = 0;
-        for (int i = 1; i < 16 + roadLength; i++) {
+        for (int i = 1; i < 18 + roadLength + exitInfoLength; i++) {
             check ^= result[i];
         }
-        result[16 + roadLength] = check;
-        result[17 + roadLength] = PROTOCOL_HEAD_TAIL;
+        result[18 + roadLength + exitInfoLength] = check;
+        result[19 + roadLength + exitInfoLength] = PROTOCOL_HEAD_TAIL;
         return result;
     }
 
@@ -733,45 +740,24 @@ public class ProtocolUtils {
 
 
     /**
-     * 电子狗
-     *
-     * @param type
-     * @return
-     */
-    public static byte[] getCameraInfo(boolean show, int type, int distance) {
-        Log.d("Protocol getCameraInfo ===");
-        byte[] result = new byte[9];
-        result[0] = PROTOCOL_HEAD_TAIL;
-        result[1] = (byte) 0x90;
-        result[2] = 03;
-        result[3] = (byte) (show ? 1 : 0);
-        result[4] = (byte) type;
-        result[5] = (byte) ((distance >> 8) & 0xFF);
-        result[6] = (byte) (distance & 0xFF);
-        result[7] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6]);
-        result[8] = PROTOCOL_HEAD_TAIL;
-        return result;
-    }
-
-    /**
      * 电子狗1
      *
      * @param type
      * @return
      */
-    public static byte[] getCameraInfo1(boolean show, int type, int speed, int distance) {
+    public static byte[] getCameraInfo(boolean show, int type, int speed, int averageSpeed, int distance) {
         Log.d("Protocol getCameraInfo ===");
-        byte[] result = new byte[9];
+        byte[] result = new byte[11];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x90;
         result[2] = 03;
         result[3] = (byte) (show ? 1 : 0);
         result[4] = (byte) type;
-        result[5] = (byte) ((speed >> 8) & 0xFF);
-        result[6] = (byte) (speed & 0xFF);
+        result[5] = (byte) (speed & 0xFF);
+        result[6] = (byte) (averageSpeed & 0xFF);
         result[7] = (byte) ((distance >> 8) & 0xFF);
         result[8] = (byte) (distance & 0xFF);
-        result[9] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6]);
+        result[9] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6] ^ result[7] ^ result[8]);
         result[10] = PROTOCOL_HEAD_TAIL;
         return result;
     }

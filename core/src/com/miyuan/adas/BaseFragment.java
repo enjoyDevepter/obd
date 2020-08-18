@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.miyuan.hamster.log.Log;
-
 /**
  * @author guomin Fragment基类
  */
@@ -30,7 +28,6 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        Log.d("=====onConfigurationChanged=====");
         super.onConfigurationChanged(newConfig);
         lifeCycleListener.onConfigurationChanged(newConfig);
     }

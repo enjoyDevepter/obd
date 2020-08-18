@@ -84,6 +84,10 @@ public class HUDGuidPage extends AppBasePage implements View.OnClickListener {
                         case 0x47:
                             PageManager.go(new P7SettingPage());
                             break;
+                        case 0x62:
+                        case 0x48:
+                            PageManager.go(new HUDSettingPage());
+                            break;
                         default:
                             break;
                     }

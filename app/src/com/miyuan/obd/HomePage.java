@@ -62,6 +62,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -241,8 +242,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
         PageManager.finishActivity(MainActivity.getInstance());
         return true;
     }
-
-    private boolean ishowCamera;
 
     private void showFMDialog() {
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
@@ -468,6 +467,10 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 case 0x47:
                                     PageManager.go(new P7SettingPage());
                                     break;
+                                case 0x62:
+                                case 0x48:
+                                    PageManager.go(new HUDSettingPage());
+                                    break;
                                 default:
                                     break;
                             }
@@ -494,18 +497,18 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     aMapNavi.addAMapNaviListener(new AMapNaviListener() {
                         @Override
                         public void onInitNaviFailure() {
-                            Log.d("onInitNaviFailure");
+//                            Log.d("onInitNaviFailure");
                         }
 
                         @Override
                         public void onInitNaviSuccess() {
-                            Log.d("onInitNaviSuccess");
+//                            Log.d("onInitNaviSuccess");
                         }
 
                         @Override
                         public void onStartNavi(int i) {
                             endNavi = false;
-                            Log.d("onStartNavi " + i);
+//                            Log.d("onStartNavi " + i);
                         }
 
                         @Override
@@ -530,7 +533,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void onEndEmulatorNavi() {
-                            Log.d("onEndEmulatorNavi");
+//                            Log.d("onEndEmulatorNavi");
                             endNavi = true;
                             new Thread(new Runnable() {
                                 @Override
@@ -542,7 +545,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void onArriveDestination() {
-                            Log.d("onArriveDestination");
+//                            Log.d("onArriveDestination");
                             endNavi = true;
                             if (heartTimer != null) {
                                 heartTimer.cancel();
@@ -589,7 +592,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             if (endNavi) {
                                 return;
                             }
-                            Log.d("onNaviInfoUpdate  naviInfo " + naviInfo.getCurStepRetainDistance());
+//                            Log.d("onNaviInfoUpdate  naviInfo " + naviInfo.getCurStepRetainDistance());
                             int type = 0;
                             switch (naviInfo.getIconType()) {
                                 case 0:
@@ -633,8 +636,15 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
                                 try {
                                     byte[] bytes = naviInfo.getNextRoadName().getBytes("GBK");
-                                    Log.d("getTurnInfo2  naviInfo.getPathRetainDistance() " + naviInfo.getPathRetainDistance() + "  " + naviInfo.getPathRetainTime() + "   " + naviInfo.getCurrentRoadName() + "  " + naviInfo.getNextRoadName());
-                                    BlueManager.getInstance().send(ProtocolUtils.getTurnInfo2(type, naviInfo.getCurStepRetainDistance(), naviInfo.getPathRetainDistance(), naviInfo.getPathRetainTime(), bytes));
+                                    String[] name = naviInfo.getExitDirectionInfo().getExitNameInfo();
+                                    String[] info = naviInfo.getExitDirectionInfo().getDirectionInfo();
+                                    StringBuilder sb = new StringBuilder();
+                                    if (null != name && name.length > 0) {
+                                        sb.append(name[0]).append(" ").append(info[0]);
+                                    }
+                                    byte[] exits = sb.toString().getBytes("GBK");
+                                    Log.d("getTurnInfo2  naviInfo.getPathRetainDistance() " + naviInfo.getPathRetainDistance() + "  " + naviInfo.getPathRetainTime() + "   " + naviInfo.getCurrentRoadName() + "  " + naviInfo.getNextRoadName() + "  " + Arrays.toString(naviInfo.getExitDirectionInfo().getDirectionInfo()) + "   " + Arrays.toString(naviInfo.getExitDirectionInfo().getExitNameInfo()));
+                                    BlueManager.getInstance().send(ProtocolUtils.getTurnInfo2(type, naviInfo.getCurStepRetainDistance(), naviInfo.getPathRetainDistance(), naviInfo.getPathRetainTime(), bytes, exits));
                                 } catch (UnsupportedEncodingException e) {
                                     e.printStackTrace();
                                 }
@@ -643,7 +653,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 if (null != naviInfo.getIconBitmap()) {
                                     saveMyBitmap(naviInfo.getIconBitmap());
                                 } else {
-                                    Log.d("NO BITMAP " + naviTpye);
+//                                    Log.d("NO BITMAP " + naviTpye);
                                     getTurnImage(naviTpye);
                                 }
                             } else {
@@ -660,71 +670,60 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             if (endNavi) {
                                 return;
                             }
-                            if (showCamera(aMapNaviCameraInfos)) {
-                                if (ishowCamera) {
-                                    return;
-                                }
-                                ishowCamera = true;
-                                for (AMapNaviCameraInfo cameraInfo : aMapNaviCameraInfos) {
-                                    switch (cameraInfo.getCameraType()) {
-                                        case 0: // 测速
-                                            if (SettingPreferencesConfig.CAMERA_SPEED.get()) {
-                                                if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
-                                                    BlueManager.getInstance().send(ProtocolUtils.getCameraInfo1(true, 6, cameraInfo.getCameraSpeed(), cameraInfo.getDistance()));
-                                                } else {
-                                                    BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, cameraInfo.getCameraSpeed()));
-                                                }
-                                            }
-                                            break;
-                                        case 1: // 监控摄像
-                                            if (SettingPreferencesConfig.SURVEILLANCE_CAMERA.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, cameraInfo.getDistance()));
-                                            }
-                                            break;
-                                        case 2: // 闯红灯拍照
-                                            if (SettingPreferencesConfig.LIGHT.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, cameraInfo.getDistance()));
-                                            }
-                                            break;
-                                        case 3: // 违章拍照
-                                            if (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, cameraInfo.getDistance()));
-                                            }
-                                            break;
-                                        case 4: // 公交专用道摄像头
-                                            if (SettingPreferencesConfig.BUS.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, cameraInfo.getDistance()));
-                                            }
-                                            break;
-                                        case 5: // 应急车道拍照
-                                            if (SettingPreferencesConfig.EMERGENCY.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, cameraInfo.getDistance()));
-                                            }
-                                            break;
-                                        case 6: // 非机动车道(暂未使用)
-                                            if (SettingPreferencesConfig.BICYCLE_LANE.get()) {
-                                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, cameraInfo.getDistance()));
-                                            }
-                                            break;
-                                        case 8: //区间测速开始
-                                            Log.d("updateCameraInfo  INTERVALVELOCITYSTART " + cameraInfo.getAverageSpeed() + "   " + cameraInfo.getAverageSpeed());
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 4, cameraInfo.getAverageSpeed()));
-                                            break;
-                                        case 9:
-                                            Log.d("updateCameraInfo  INTERVALVELOCITYEND " + cameraInfo.getAverageSpeed() + "   " + cameraInfo.getAverageSpeed());
-                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 5, cameraInfo.getAverageSpeed()));
-                                            break;
-                                        default:
-                                            break;
-                                    }
+                            int index = showCamera(aMapNaviCameraInfos);
+                            if (index != -1) {
+                                AMapNaviCameraInfo cameraInfo = aMapNaviCameraInfos[index];
+                                Log.d("cameraInfo  " + cameraInfo.getCameraType() + " cameraInfo.getDistance() =  " + cameraInfo.getDistance() + "  cameraInfo.getCameraSpeed() =  " + cameraInfo.getCameraSpeed() + "  cameraInfo.getAverageSpeed() =  " + cameraInfo.getAverageSpeed() + "  cameraInfo.getCameraDistance()=  " + cameraInfo.getCameraDistance());
+                                switch (cameraInfo.getCameraType()) {
+                                    case 0: // 测速
+                                        if (SettingPreferencesConfig.CAMERA_SPEED.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 6, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 1: // 监控摄像
+                                        if (SettingPreferencesConfig.SURVEILLANCE_CAMERA.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 7, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 2: // 闯红灯拍照
+                                        if (SettingPreferencesConfig.LIGHT.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 8, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 3: // 违章拍照
+                                        if (SettingPreferencesConfig.ILLEGAL_PHOTOGRAPHY.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 1, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 4: // 公交专用道摄像头
+                                        if (SettingPreferencesConfig.BUS.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 2, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 5: // 应急车道拍照
+                                        if (SettingPreferencesConfig.EMERGENCY.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 3, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 6: // 非机动车道(暂未使用)
+                                        if (SettingPreferencesConfig.BICYCLE_LANE.get()) {
+                                            BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 0, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        }
+                                        break;
+                                    case 8: //区间测速开始
+//                                            Log.d("updateCameraInfo  INTERVALVELOCITYSTART " + cameraInfo.getAverageSpeed() + "   " + cameraInfo.getAverageSpeed());
+                                        BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 4, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        break;
+                                    case 9:
+//                                            Log.d("updateCameraInfo  INTERVALVELOCITYEND " + cameraInfo.getAverageSpeed() + "   " + cameraInfo.getAverageSpeed());
+                                        BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(true, 5, cameraInfo.getCameraSpeed(), cameraInfo.getAverageSpeed(), cameraInfo.getCameraDistance()));
+                                        break;
+                                    default:
+                                        break;
                                 }
                             } else {
-                                if (!ishowCamera) {
-                                    return;
-                                }
-                                ishowCamera = false;
                                 Log.d("updateCameraInfo  dismiss");
-                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0));
+                                BlueManager.getInstance().send(ProtocolUtils.getCameraInfo(false, 0, 0, 0, 0));
                             }
                         }
 
@@ -740,10 +739,10 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showCross(AMapNaviCross aMapNaviCross) {
-                            if (obdStatusInfo.getHudType() == 0x62 /*|| obdStatusInfo.getHudType() == 0x48*/) {
-                                Log.d("showCross");
-                                saveMyBitmap(aMapNaviCross.getBitmap());
-                            }
+//                            if (obdStatusInfo.getHudType() == 0x62 /*|| obdStatusInfo.getHudType() == 0x48*/) {
+////                                Log.d("showCross");
+//                                saveMyBitmap(aMapNaviCross.getBitmap());
+//                            }
                         }
 
                         @Override
@@ -753,7 +752,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showModeCross(AMapModelCross aMapModelCross) {
-                            Log.d("showModeCross");
+//                            Log.d("showModeCross");
 //                        AMapModeCrossOverlay overlay = new AMapModeCrossOverlay(getContext(), naviView.getMap());
 //                        overlay.createModelCrossBitMap(aMapModelCross.getPicBuf1(), new AMapModeCrossOverlay.OnCreateBitmapFinish() {
 //                            @Override
@@ -781,9 +780,10 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 if (aMapLaneInfos[i].isRecommended()) {
                                     enter += Math.pow(2, i);
                                 }
-                                laneType[i] = (byte) aMapLaneInfos[i].getLaneTypeIdArray()[0];
+                                laneType[i] = (byte) (aMapLaneInfos[i].getLaneTypeIdArray()[0] & 0xFF);
                             }
                             Log.d("aMapLaneInfo  showLaneInfo " + count);
+                            Log.d("aMapLaneInfo  laneType " + Arrays.toString(laneType));
                             if (!showLane) {
                                 showLane = true;
                                 if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
@@ -803,7 +803,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             if (endNavi) {
                                 return;
                             }
-                            Log.d("aMapLaneInfo  hideLaneInfo ");
+//                            Log.d("aMapLaneInfo  hideLaneInfo ");
                             if (showLane) {
                                 showLane = false;
                                 BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0, null));
@@ -1041,12 +1041,16 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
         return result;
     }
 
-    private boolean showCamera(AMapNaviCameraInfo[] cameraInfos) {
+    private int showCamera(AMapNaviCameraInfo[] cameraInfos) {
         if (null != cameraInfos && cameraInfos.length > 0) {
             ArrayList<Integer> types = new ArrayList<>();
-            for (AMapNaviCameraInfo cameraInfo : cameraInfos) {
-                types.add(cameraInfo.getCameraType());
+            int index = 0;
+            for (int i = 1; i < cameraInfos.length; i++) {
+                if (cameraInfos[i].getCameraDistance() < cameraInfos[index].getCameraDistance()) {
+                    index = i;
+                }
             }
+            types.add(cameraInfos[index].getCameraType());
             Log.d("cameraInfos types " + types);
             if ((SettingPreferencesConfig.CAMERA_SPEED.get() && types.contains(0))
                     || ((SettingPreferencesConfig.SURVEILLANCE_CAMERA.get() && types.contains(1))
@@ -1057,10 +1061,10 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     || (SettingPreferencesConfig.INTERVALVELOCITYSTART.get() && types.contains(8))
                     || (SettingPreferencesConfig.INTERVALVELOCITYEND.get() && types.contains(9))
                     || (SettingPreferencesConfig.BICYCLE_LANE.get() && types.contains(6)))) {
-                return true;
+                return index;
             }
         }
-        return false;
+        return -1;
     }
 
     private void showConFirm(final String conent) {

@@ -373,7 +373,7 @@ public class BlueManager {
     }
 
     public synchronized void startScan() {
-        Log.d("startScan  " + isScaning + " mBluetoothAdapter   " + (null == mBluetoothAdapter));
+//        Log.d("startScan  " + isScaning + " mBluetoothAdapter   " + (null == mBluetoothAdapter));
         if (null == mBluetoothAdapter || isScaning) {
             return;
         }
@@ -400,7 +400,7 @@ public class BlueManager {
                 stopScan(false);
             }
         }, 10000);
-        Log.d("startScan   success");
+//        Log.d("startScan   success");
 
     }
 
@@ -408,7 +408,7 @@ public class BlueManager {
         if (null == mBluetoothAdapter || !isScaning) {
             return;
         }
-        Log.d("stopScan  ");
+//        Log.d("stopScan  ");
         isScaning = false;
         if (isNavi && !find) {
             startScan();
@@ -478,7 +478,7 @@ public class BlueManager {
     public synchronized void send(byte[] data) {
         // 判断该指令是否和待发送队列中最后一个指令相同，如果相同则不放入，不相同则加入，判断date中第2、3位是否一致既可
 
-        Log.d("send1  instructList size " + (instructList != null ? instructList.size() : "NULL "));
+//        Log.d("send1  instructList size " + (instructList != null ? instructList.size() : "NULL "));
 
         if (instructList == null) {
             instructList = new LinkedList<>();
@@ -486,7 +486,7 @@ public class BlueManager {
             return;
         }
 
-        Log.d("send1  queue size " + queue.size() + " canGo " + canGo);
+//        Log.d("send1  queue size " + queue.size() + " canGo " + canGo);
 
         if (queue.size() == 0 && canGo) {
             queue.add(data);
@@ -507,10 +507,10 @@ public class BlueManager {
                 instructList.pollLast();
                 instructList.addLast(data);
             }
-            Log.d("instructList has one ");
+//            Log.d("instructList has one ");
             return;
         }
-        Log.d("add to instructList");
+//        Log.d("add to instructList");
         instructList.addLast(data);
     }
 
