@@ -486,11 +486,11 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.navi:
-                if (null != obdStatusInfo) {
-                    if (!obdStatusInfo.isSupportNavi()) {
-                        showConFirm("当前设备不支持导航!");
-                        return;
-                    }
+//                if (null != obdStatusInfo) {
+//                    if (!obdStatusInfo.isSupportNavi()) {
+//                        showConFirm("当前设备不支持导航!");
+//                        return;
+//                    }
                     BlueManager.getInstance().setNavi(true);
                     initTimer();
                     final AMapNavi aMapNavi = AMapNavi.getInstance(getContext());
@@ -868,7 +868,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     AmapNaviPage naviPage = AmapNaviPage.getInstance();
                     naviPage.showRouteActivity(getContext(), new AmapNaviParams(null), null);
 
-                }
+//                }
                 break;
             case R.id.fm:
 //                if (null != obdRightInfo && obdRightInfo.iSupportFM()) {
