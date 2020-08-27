@@ -486,11 +486,11 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                 }
                 break;
             case R.id.navi:
-//                if (null != obdStatusInfo) {
-//                    if (!obdStatusInfo.isSupportNavi()) {
-//                        showConFirm("当前设备不支持导航!");
-//                        return;
-//                    }
+                if (null != obdStatusInfo) {
+                    if (!obdStatusInfo.isSupportNavi()) {
+                        showConFirm("当前设备不支持导航!");
+                        return;
+                    }
                     BlueManager.getInstance().setNavi(true);
                     initTimer();
                     final AMapNavi aMapNavi = AMapNavi.getInstance(getContext());
@@ -581,10 +581,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         @Override
                         public void onGpsOpenStatus(boolean b) {
 
-                        }
-
-                        @Override
-                        public void onGpsSignalWeak(boolean b) {
                         }
 
                         @Override
@@ -739,10 +735,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showCross(AMapNaviCross aMapNaviCross) {
-//                            if (obdStatusInfo.getHudType() == 0x62 /*|| obdStatusInfo.getHudType() == 0x48*/) {
-////                                Log.d("showCross");
-//                                saveMyBitmap(aMapNaviCross.getBitmap());
-//                            }
                         }
 
                         @Override
@@ -752,15 +744,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showModeCross(AMapModelCross aMapModelCross) {
-//                            Log.d("showModeCross");
-//                        AMapModeCrossOverlay overlay = new AMapModeCrossOverlay(getContext(), naviView.getMap());
-//                        overlay.createModelCrossBitMap(aMapModelCross.getPicBuf1(), new AMapModeCrossOverlay.OnCreateBitmapFinish() {
-//                            @Override
-//                            public void onGenerateComplete(Bitmap bitmap, int i) {
-//                                Log.d("showModeCross  onGenerateComplete");
-//                                saveMyBitmap(bitmap);
-//                            }
-//                        });
                         }
 
                         @Override
@@ -865,10 +848,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         }
                     });
-                    AmapNaviPage naviPage = AmapNaviPage.getInstance();
-                    naviPage.showRouteActivity(getContext(), new AmapNaviParams(null), null);
+                    AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
 
-//                }
+                }
                 break;
             case R.id.fm:
 //                if (null != obdRightInfo && obdRightInfo.iSupportFM()) {

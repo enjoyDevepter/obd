@@ -633,44 +633,46 @@ public class ProtocolUtils {
         Log.d("Protocol getTurnInfo2 ===");
         int roadLength = null != nextRoadName ? nextRoadName.length : 0;
         int exitInfoLength = null != exitInfo ? exitInfo.length : 0;
-        byte[] result = new byte[20 + roadLength + exitInfoLength];
+        byte[] result = new byte[22 + roadLength + exitInfoLength];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x90;
         result[2] = 01;
         // 转向类型
         result[3] = (byte) turnType;
         // 转向距离
-        result[4] = (byte) ((distance >> 8) & 0xFF);
-        result[5] = (byte) (distance & 0xFF);
+        result[4] = (byte) ((distance >> 24) & 0xFF);
+        result[5] = (byte) ((distance >> 16) & 0xFF);
+        result[6] = (byte) ((distance >> 8) & 0xFF);
+        result[7] = (byte) (distance & 0xFF);
         // 剩余距离，单位米
-        result[6] = (byte) ((retainDistance >> 24) & 0xFF);
-        result[7] = (byte) ((retainDistance >> 16) & 0xFF);
-        result[8] = (byte) ((retainDistance >> 8) & 0xFF);
-        result[9] = (byte) (retainDistance & 0xFF);
+        result[8] = (byte) ((retainDistance >> 24) & 0xFF);
+        result[9] = (byte) ((retainDistance >> 16) & 0xFF);
+        result[10] = (byte) ((retainDistance >> 8) & 0xFF);
+        result[11] = (byte) (retainDistance & 0xFF);
         // 剩余时间 秒
-        result[10] = (byte) ((retainTime >> 24) & 0xFF);
-        result[11] = (byte) ((retainTime >> 16) & 0xFF);
-        result[12] = (byte) ((retainTime >> 8) & 0xFF);
-        result[13] = (byte) (retainTime & 0xFF);
+        result[12] = (byte) ((retainTime >> 24) & 0xFF);
+        result[13] = (byte) ((retainTime >> 16) & 0xFF);
+        result[14] = (byte) ((retainTime >> 8) & 0xFF);
+        result[15] = (byte) (retainTime & 0xFF);
         // 当前道路名长
-        result[14] = (byte) ((roadLength >> 8) & 0xFF);
-        result[15] = (byte) (roadLength & 0xFF);
+        result[16] = (byte) ((roadLength >> 8) & 0xFF);
+        result[17] = (byte) (roadLength & 0xFF);
         // 当前道路名
         if (roadLength > 0) {
-            System.arraycopy(nextRoadName, 0, result, 16, roadLength);
+            System.arraycopy(nextRoadName, 0, result, 18, roadLength);
         }
         // 出口信息长度
-        result[16 + roadLength] = (byte) ((exitInfoLength >> 8) & 0xFF);
-        result[17 + roadLength] = (byte) (exitInfoLength & 0xFF);
+        result[18 + roadLength] = (byte) ((exitInfoLength >> 8) & 0xFF);
+        result[19 + roadLength] = (byte) (exitInfoLength & 0xFF);
         if (exitInfoLength > 0) {
-            System.arraycopy(exitInfo, 0, result, 18 + roadLength, exitInfoLength);
+            System.arraycopy(exitInfo, 0, result, 20 + roadLength, exitInfoLength);
         }
         byte check = 0;
-        for (int i = 1; i < 18 + roadLength + exitInfoLength; i++) {
+        for (int i = 1; i < 20 + roadLength + exitInfoLength; i++) {
             check ^= result[i];
         }
-        result[18 + roadLength + exitInfoLength] = check;
-        result[19 + roadLength + exitInfoLength] = PROTOCOL_HEAD_TAIL;
+        result[20 + roadLength + exitInfoLength] = check;
+        result[21 + roadLength + exitInfoLength] = PROTOCOL_HEAD_TAIL;
         return result;
     }
 
@@ -747,7 +749,7 @@ public class ProtocolUtils {
      */
     public static byte[] getCameraInfo(boolean show, int type, int speed, int averageSpeed, int distance) {
         Log.d("Protocol getCameraInfo ===");
-        byte[] result = new byte[11];
+        byte[] result = new byte[13];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) 0x90;
         result[2] = 03;
@@ -755,10 +757,12 @@ public class ProtocolUtils {
         result[4] = (byte) type;
         result[5] = (byte) (speed & 0xFF);
         result[6] = (byte) (averageSpeed & 0xFF);
-        result[7] = (byte) ((distance >> 8) & 0xFF);
-        result[8] = (byte) (distance & 0xFF);
-        result[9] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6] ^ result[7] ^ result[8]);
-        result[10] = PROTOCOL_HEAD_TAIL;
+        result[7] = (byte) ((distance >> 24) & 0xFF);
+        result[8] = (byte) ((distance >> 16) & 0xFF);
+        result[9] = (byte) ((distance >> 8) & 0xFF);
+        result[10] = (byte) (distance & 0xFF);
+        result[11] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6] ^ result[7] ^ result[8] ^ result[9] ^ result[10]);
+        result[12] = PROTOCOL_HEAD_TAIL;
         return result;
     }
 
