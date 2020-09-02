@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.BackStackManager;
 import com.miyuan.adas.BasePage;
@@ -43,8 +44,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
 import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener;
@@ -57,6 +63,9 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Sink;
 
 public class MainActivity extends AppCompatActivity implements BleCallBackListener {
 
@@ -280,9 +289,133 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             case OBDEvent.HUD_PARAMS_INFO:
                 updateStateParams(((HUDParams) data).getOrigin());
                 break;
+            case OBDEvent.NORMAL:
+                obdStatusInfo = (OBDStatusInfo) data;
+                checkFirmwareVersion(obdStatusInfo);
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 检查固件升级
+     */
+    private void checkFirmwareVersion(OBDStatusInfo obdStatusInfo) {
+        if (null == obdStatusInfo) {
+            return;
+        }
+        Log.d("checkFirmwareVersion");
+        String sn = obdStatusInfo.getSn();
+        String bVersion = obdStatusInfo.getbVersion();
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", sn);
+            jsonObject.put("version", bVersion);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("checkFirmwareVersion input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_FIRMWARE)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                FirmwareUpdateInfo info = JSON.parseObject(responese, FirmwareUpdateInfo.class);
+                if (info.getUpdateState() == 1) { // 固件需要升级
+                    downloadFirmware(info.getUrl());
+                }
+            }
+        });
+    }
+
+    private void downloadFirmware(final String url) {
+        Request request = new Request.Builder().url(url).build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // 下载失败
+                e.printStackTrace();
+                Log.d("downloadFirmware failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Sink sink = null;
+                BufferedSink bufferedSink = null;
+                try {
+                    String mSDCardPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "update";
+//                    String appPath = getApplicationContext().getFilesDir().getAbsolutePath();//此APP的files路径
+                    File dest = new File(mSDCardPath, url.substring(url.lastIndexOf("/") + 1));
+                    sink = Okio.sink(dest);
+                    bufferedSink = Okio.buffer(sink);
+                    bufferedSink.writeAll(response.body().source());
+                    bufferedSink.close();
+                    decompress(dest.getPath(), mSDCardPath);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (bufferedSink != null) {
+                        bufferedSink.close();
+                    }
+                }
+            }
+        });
+    }
+
+    private void decompress(String zipFile, String dstPath) throws IOException {
+        File pathFile = new File(dstPath);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
+        ZipFile zip = new ZipFile(zipFile);
+        for (Enumeration entries = zip.entries(); entries.hasMoreElements(); ) {
+            ZipEntry entry = (ZipEntry) entries.nextElement();
+            String zipEntryName = entry.getName();
+            InputStream in = null;
+            OutputStream out = null;
+            try {
+                in = zip.getInputStream(entry);
+                String outPath = (dstPath + "/" + zipEntryName).replaceAll("\\*", "/");
+                //判断路径是否存在,不存在则创建文件路径
+                File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));
+                if (!file.exists()) {
+                    file.mkdirs();
+                }
+                //判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
+                if (new File(outPath).isDirectory()) {
+                    continue;
+                }
+                out = new FileOutputStream(outPath);
+                byte[] buf1 = new byte[1024];
+                int len;
+                while ((len = in.read(buf1)) > 0) {
+                    out.write(buf1, 0, len);
+                }
+            } finally {
+                if (null != in) {
+                    in.close();
+                }
+
+                if (null != out) {
+                    out.close();
+                }
+            }
+        }
+        zip.close();
     }
 
     /**

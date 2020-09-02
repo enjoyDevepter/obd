@@ -29,5 +29,6 @@ public class URLUtils {
     public static final String UPDATE_STATUS = HOST + "service/data/check";
     public static final String UPDATE_SEN_STATUS = HOST + "service/box/updateBlmd";
     public static final String UPDATE_STATE_PARAMS = HOST + "service/data/uploadBoxParams";
+    public static final String UPDATE_FIRMWARE = HOST + "service/update/getUpdate";
     public static final String UPDATE_WARM_PARAMS = UPDATE_STATE_PARAMS;
 }

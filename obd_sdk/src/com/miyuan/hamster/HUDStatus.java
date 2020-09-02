@@ -22,6 +22,7 @@ public class HUDStatus implements Serializable {
     private int multifunctionalOneType;
     private int multifunctionalTwoType;
     private int multifunctionalThreeType;
+    private int c2Mode;
 
     public int getHudType() {
         return hudType;
@@ -151,6 +152,14 @@ public class HUDStatus implements Serializable {
         this.multifunctionalThreeType = multifunctionalThreeType;
     }
 
+    public int getC2Mode() {
+        return c2Mode;
+    }
+
+    public void setC2Mode(int c2Mode) {
+        this.c2Mode = c2Mode;
+    }
+
     @Override
     public String toString() {
         return "HUDStatus{" +
@@ -170,6 +179,7 @@ public class HUDStatus implements Serializable {
                 ", multifunctionalOneType=" + multifunctionalOneType +
                 ", multifunctionalTwoType=" + multifunctionalTwoType +
                 ", multifunctionalThreeType=" + multifunctionalThreeType +
+                ", c2Mode=" + c2Mode +
                 '}';
     }
 }

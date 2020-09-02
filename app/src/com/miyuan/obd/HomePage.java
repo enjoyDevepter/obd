@@ -469,7 +469,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                     break;
                                 case 0x62:
                                 case 0x48:
-                                    PageManager.go(new HUDSettingPage());
+                                    PageManager.go(new C2SettingPage());
                                     break;
                                 default:
                                     break;
@@ -763,10 +763,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 if (aMapLaneInfos[i].isRecommended()) {
                                     enter += Math.pow(2, i);
                                 }
-                                laneType[i] = (byte) (aMapLaneInfos[i].getLaneTypeIdArray()[0] & 0xFF);
+                                laneType[i] = (byte) (Integer.valueOf(String.valueOf(aMapLaneInfos[i].getLaneTypeIdArray()[0])) & 0xFF);
                             }
-                            Log.d("aMapLaneInfo  showLaneInfo " + count);
-                            Log.d("aMapLaneInfo  laneType " + Arrays.toString(laneType));
+                            Log.d("aMapLaneInfo  laneType1 " + Arrays.toString(laneType));
                             if (!showLane) {
                                 showLane = true;
                                 if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
@@ -779,6 +778,9 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
+                            Log.d("showLaneInfo  " + Arrays.toString(aMapLaneInfo.backgroundLane));
+                            Log.d("showLaneInfo  " + Arrays.toString(aMapLaneInfo.frontLane));
+                            Log.d("showLaneInfo  " + Integer.valueOf(String.valueOf(aMapLaneInfo.getLaneTypeIdArray())));
                         }
 
                         @Override

@@ -1056,6 +1056,9 @@ public class BlueManager {
                             case 0x23: // 多功能三区
                                 hudStatus.setMultifunctionalThreeType(value);
                                 break;
+                            case 0x31: // C2背景区模式
+                                hudStatus.setC2Mode(value);
+                                break;
                             default:
                                 break;
                         }

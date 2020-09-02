@@ -86,7 +86,7 @@ public class HUDGuidPage extends AppBasePage implements View.OnClickListener {
                             break;
                         case 0x62:
                         case 0x48:
-                            PageManager.go(new HUDSettingPage());
+                            PageManager.go(new C2SettingPage());
                             break;
                         default:
                             break;
