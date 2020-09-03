@@ -114,7 +114,7 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             default:
-                if (choice) {
+                if (!choice) {
                     showSetting(v.getId());
                 }
                 break;
