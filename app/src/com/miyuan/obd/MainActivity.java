@@ -282,6 +282,37 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         checkFirmwareVersion(obdStatusInfo);
     }
 
+    private FirmwareUpdateInfo updateInfo;
+
+    private void updateForOneUnit(int index, boolean isFlash) {
+
+        int num = updates.length % UNIT == 0 ? updates.length / UNIT : updates.length / UNIT + 1;
+
+        if (index > num) {
+            return;
+        }
+
+//        showUpdateProgress(index == 1 ? updates.length : (index - 1) * UNIT);
+
+        byte[] date;
+        if (index == num) {
+            if (updates.length % UNIT == 0) {
+                date = new byte[UNIT];
+            } else {
+                date = new byte[updates.length % UNIT];
+            }
+        } else {
+            date = new byte[UNIT];
+        }
+        System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
+
+        if (isFlash) {
+            BlueManager.getInstance().send(ProtocolUtils.updateFlashForUnit(index, date));
+        } else {
+            BlueManager.getInstance().send(ProtocolUtils.updateFirmwareForUnit(index, date));
+        }
+    }
+
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
@@ -346,7 +377,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         break;
                     case 2: // 升级完成 判断是否还有其他flash文件
                         if (++flashIndex > flashFilePath.size() - 1) {
-                            // flash 升级完成
+                            // flash 升级完成 通知服务器
+                            notifyUpdateSuccess();
                         } else {
                             getUpdateInfo(flashFilePath.get(flashIndex), true);
                         }
@@ -380,35 +412,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 break;
             default:
                 break;
-        }
-    }
-
-    private void updateForOneUnit(int index, boolean isFlash) {
-
-        int num = updates.length % UNIT == 0 ? updates.length / UNIT : updates.length / UNIT + 1;
-
-        if (index > num) {
-            return;
-        }
-
-//        showUpdateProgress(index == 1 ? updates.length : (index - 1) * UNIT);
-
-        byte[] date;
-        if (index == num) {
-            if (updates.length % UNIT == 0) {
-                date = new byte[UNIT];
-            } else {
-                date = new byte[updates.length % UNIT];
-            }
-        } else {
-            date = new byte[UNIT];
-        }
-        System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
-
-        if (isFlash) {
-            BlueManager.getInstance().send(ProtocolUtils.updateFlashForUnit(index, date));
-        } else {
-            BlueManager.getInstance().send(ProtocolUtils.updateFirmwareForUnit(index, date));
         }
     }
 
@@ -452,9 +455,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 Log.d("checkFirmwareVersion onResponse " + responese);
-                FirmwareUpdateInfo info = JSON.parseObject(responese, FirmwareUpdateInfo.class);
-                if (info.getbUpdateState() == 1) { // 固件需要升级
-                    downloadFirmware(info.getUrl());
+                updateInfo = JSON.parseObject(responese, FirmwareUpdateInfo.class);
+                if (updateInfo.getbUpdateState() == 1) { // 固件需要升级
+                    downloadFirmware(updateInfo.getUrl());
                 }
             }
         });
@@ -727,6 +730,46 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             }
         });
     }
+
+    /**
+     * 通知服务器固件升级完成
+     */
+    private void notifyUpdateSuccess() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
+            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
+            jsonObject.put("id", null != updateInfo ? updateInfo.getId() : "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("notifyUpdateSuccess input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.FIRMWARE_UPDATE_SUCCESS)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .post(requestBody)
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("notifyUpdateSuccess failure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("notifyUpdateSuccess success " + responese);
+            }
+        });
+    }
+
 
     private void uploadCarData(String filePath) {
 

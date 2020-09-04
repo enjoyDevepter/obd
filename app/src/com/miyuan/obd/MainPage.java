@@ -705,17 +705,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 //                sn = version.getSn();
 //                checkOBDVersion(version);
                 break;
-            case OBDEvent.OBD_FIRMWARE_UPDATE_SUCCESS:
-//                // 判断是否需要升级固件
-//                if (null != obdVersion) {
-//                    if (obdVersion.getUpdateState() == 1) {
-//                        downloadUpdate(obdVersion);
-//                    } else {
-//                        notifyUpdateSuccess(obdVersion);
-//                        showStudy();
-//                    }
-//                }
-                break;
             case OBDEvent.OBD_UPPATE_TIRE_PRESSURE_STATUS:
                 // 胎压状态改变，
                 parseStatus((PressureInfo) data);
