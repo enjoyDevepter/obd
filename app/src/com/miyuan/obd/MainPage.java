@@ -130,7 +130,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                             GlobalUtil.getHandler().post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    BlueManager.getInstance().send(ProtocolUtils.updateInfo(version, HexUtils.longToByte(updates.length)));
+                                    BlueManager.getInstance().send(ProtocolUtils.updateFirmwareInfo(version, HexUtils.longToByte(updates.length)));
                                 }
                             });
                         } catch (FileNotFoundException e) {
@@ -664,7 +664,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.OBD_BEGIN_UPDATE:
+            case OBDEvent.OBD_FIRMWARE_BEGIN_UPDATE:
                 if ((Integer) data == 0) { // 是否可以升级
                     try {
                         Thread.sleep(2000);
@@ -677,7 +677,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                     updateForOneUnit(1);
                 }
                 break;
-            case OBDEvent.OBD_UPDATE_FINISH_UNIT:
+            case OBDEvent.OBD_FIRMWARE_UPDATE_FINISH_UNIT:
 //                Update update = (Update) data;
 //                if (update.getStatus() == 0) {
 //                    // 重新传递
@@ -705,7 +705,7 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 //                sn = version.getSn();
 //                checkOBDVersion(version);
                 break;
-            case OBDEvent.OBD_UPDATE_PARAMS_SUCCESS:
+            case OBDEvent.OBD_FIRMWARE_UPDATE_SUCCESS:
 //                // 判断是否需要升级固件
 //                if (null != obdVersion) {
 //                    if (obdVersion.getUpdateState() == 1) {
@@ -1187,6 +1187,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         }
         System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
 
-        BlueManager.getInstance().send(ProtocolUtils.updateForUnit(index, date));
+        BlueManager.getInstance().send(ProtocolUtils.updateFirmwareForUnit(index, date));
     }
 }

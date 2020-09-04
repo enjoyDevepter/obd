@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -29,8 +30,11 @@ import com.miyuan.hamster.HUDParams;
 import com.miyuan.hamster.HUDWarmStatus;
 import com.miyuan.hamster.OBDEvent;
 import com.miyuan.hamster.OBDStatusInfo;
+import com.miyuan.hamster.Update;
 import com.miyuan.hamster.core.HexUtils;
+import com.miyuan.hamster.core.ProtocolUtils;
 import com.miyuan.hamster.log.Log;
+import com.miyuan.obd.utils.EncodeUtil;
 import com.miyuan.obd.utils.PermissionUtil;
 import com.miyuan.obd.utils.URLUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -41,12 +45,15 @@ import org.simple.eventbus.EventBus;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -144,40 +151,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PermissionUtil.requestPermissionForInit(new PermissionUtil.RequestPermission() {
-            @Override
-            public void onRequestPermissionSuccess() {
-                //request permission success, do something.
-                if (isFirst()) {
-                    addTasks();
-                }
-                setFirst(false);
-                BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
-            }
-
-            @Override
-            public void onRequestPermissionFailure(List<String> permissions) {
-                PageManager.finishActivity(MainActivity.this);
-            }
-
-            @Override
-            public void onRequestPermissionFailureWithAskNeverAgain(List<String> permissions) {
-                PageManager.finishActivity(MainActivity.this);
-            }
-        }, new RxPermissions(MainActivity.getInstance()), RxErrorHandler.builder().with(MainActivity.getInstance()).responseErrorListener(new ResponseErrorListener() {
-            @Override
-            public void handleResponseError(Context context, Throwable t) {
-            }
-        }).build());
-        if (serviceForegroundIntent != null) {
-//            AMapNavi.getInstance(this).setIsUseExtraGPSData(false);
-            stopService(serviceForegroundIntent);
-            serviceForegroundIntent = null;
-        }
-    }
+    private static final int UNIT = 1024;
 
     @Override
     protected void onDestroy() {
@@ -261,12 +235,123 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         return super.onCreateDialog(id, args);
     }
 
+    private int flashIndex = 0;
+    private byte[] checkUpdate;
+    private String appFilePath = null;
+    private byte[] updates;
+    private List<String> flashFilePath = new ArrayList<>();
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PermissionUtil.requestPermissionForInit(new PermissionUtil.RequestPermission() {
+            @Override
+            public void onRequestPermissionSuccess() {
+                //request permission success, do something.
+                if (isFirst()) {
+                    addTasks();
+                }
+                setFirst(false);
+                BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
+            }
+
+            @Override
+            public void onRequestPermissionFailure(List<String> permissions) {
+                PageManager.finishActivity(MainActivity.this);
+            }
+
+            @Override
+            public void onRequestPermissionFailureWithAskNeverAgain(List<String> permissions) {
+                PageManager.finishActivity(MainActivity.this);
+            }
+        }, new RxPermissions(MainActivity.getInstance()), RxErrorHandler.builder().with(MainActivity.getInstance()).responseErrorListener(new ResponseErrorListener() {
+            @Override
+            public void handleResponseError(Context context, Throwable t) {
+            }
+        }).build());
+        if (serviceForegroundIntent != null) {
+//            AMapNavi.getInstance(this).setIsUseExtraGPSData(false);
+            stopService(serviceForegroundIntent);
+            serviceForegroundIntent = null;
+        }
+
+        obdStatusInfo = new OBDStatusInfo();
+        obdStatusInfo.setSn("JNL7-VB93-GCXL-V32W");
+        obdStatusInfo.setbVersion("TPMSA01V1001");
+        obdStatusInfo.setpVersion("TPMSA01V1001");
+        checkFirmwareVersion(obdStatusInfo);
+    }
+
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
             case OBDEvent.OBD_DISCONNECTED:
                 Toast.makeText(GlobalUtil.getContext(), "OBD连接断开！", Toast.LENGTH_SHORT).show();
                 PageManager.go(new ConnectPage());
+                break;
+            case OBDEvent.OBD_FIRMWARE_BEGIN_UPDATE:
+                if ((Integer) data == 0) { // 是否可以升级
+                    try {
+                        Thread.sleep(2000);
+                        BlueManager.getInstance().send(checkUpdate);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // 固件升级开始
+                    updateForOneUnit(0, false);
+                }
+                break;
+            case OBDEvent.OBD_FIRMWARE_UPDATE_FINISH_UNIT:
+                Update update = (Update) data;
+                switch (update.getStatus()) {
+                    case 0:
+                        //  重新传递
+                        updateForOneUnit(update.getIndex(), false);
+                        break;
+                    case 1:
+                        // 继续
+                        updateForOneUnit(update.getIndex() + 1, false);
+                        break;
+                    case 2: // 固件升级完成
+                        // 开始升级flash
+                        String flashPath = flashFilePath.get(flashIndex);
+                        getUpdateInfo(flashPath, true);
+                        break;
+                }
+                break;
+            case OBDEvent.OBD_FLASH_BEGIN_UPDATE:
+                if ((Integer) data == 0) { // flash是否可以升级
+                    try {
+                        Thread.sleep(2000);
+                        BlueManager.getInstance().send(checkUpdate);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // 固件升级开始
+                    updateForOneUnit(0, true);
+                }
+                break;
+            case OBDEvent.OBD_FLASH_UPDATE_FINISH_UNIT:
+                Update flashUpdate = (Update) data;
+                switch (flashUpdate.getStatus()) {
+                    case 0:
+                        //  重新传递
+                        updateForOneUnit(flashUpdate.getIndex(), true);
+                        break;
+                    case 1:
+                        // 继续
+                        updateForOneUnit(flashUpdate.getIndex() + 1, true);
+                        break;
+                    case 2: // 升级完成 判断是否还有其他flash文件
+                        if (++flashIndex > flashFilePath.size() - 1) {
+                            // flash 升级完成
+                        } else {
+                            getUpdateInfo(flashFilePath.get(flashIndex), true);
+                        }
+                        break;
+                }
                 break;
             case OBDEvent.STATUS_UPDATA:
                 obdStatusInfo = (OBDStatusInfo) data;
@@ -298,6 +383,35 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         }
     }
 
+    private void updateForOneUnit(int index, boolean isFlash) {
+
+        int num = updates.length % UNIT == 0 ? updates.length / UNIT : updates.length / UNIT + 1;
+
+        if (index > num) {
+            return;
+        }
+
+//        showUpdateProgress(index == 1 ? updates.length : (index - 1) * UNIT);
+
+        byte[] date;
+        if (index == num) {
+            if (updates.length % UNIT == 0) {
+                date = new byte[UNIT];
+            } else {
+                date = new byte[updates.length % UNIT];
+            }
+        } else {
+            date = new byte[UNIT];
+        }
+        System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
+
+        if (isFlash) {
+            BlueManager.getInstance().send(ProtocolUtils.updateFlashForUnit(index, date));
+        } else {
+            BlueManager.getInstance().send(ProtocolUtils.updateFirmwareForUnit(index, date));
+        }
+    }
+
     /**
      * 检查固件升级
      */
@@ -308,11 +422,13 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         Log.d("checkFirmwareVersion");
         String sn = obdStatusInfo.getSn();
         String bVersion = obdStatusInfo.getbVersion();
+        String pVersion = obdStatusInfo.getpVersion();
 
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("serialNumber", sn);
-            jsonObject.put("version", bVersion);
+            jsonObject.put("pVersion", pVersion);
+            jsonObject.put("bVersion", bVersion);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -329,13 +445,15 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.d("checkFirmwareVersion onFailure " + e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
+                Log.d("checkFirmwareVersion onResponse " + responese);
                 FirmwareUpdateInfo info = JSON.parseObject(responese, FirmwareUpdateInfo.class);
-                if (info.getUpdateState() == 1) { // 固件需要升级
+                if (info.getbUpdateState() == 1) { // 固件需要升级
                     downloadFirmware(info.getUrl());
                 }
             }
@@ -352,19 +470,25 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 Log.d("downloadFirmware failure " + e.getMessage());
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 Sink sink = null;
                 BufferedSink bufferedSink = null;
                 try {
                     String mSDCardPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "update";
-//                    String appPath = getApplicationContext().getFilesDir().getAbsolutePath();//此APP的files路径
+                    File dir = new File(mSDCardPath);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
                     File dest = new File(mSDCardPath, url.substring(url.lastIndexOf("/") + 1));
                     sink = Okio.sink(dest);
                     bufferedSink = Okio.buffer(sink);
                     bufferedSink.writeAll(response.body().source());
                     bufferedSink.close();
                     decompress(dest.getPath(), mSDCardPath);
+                    // 分析固件文件
+                    analysisFirmwareFile(mSDCardPath);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -376,12 +500,71 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         });
     }
 
-    private void decompress(String zipFile, String dstPath) throws IOException {
-        File pathFile = new File(dstPath);
-        if (!pathFile.exists()) {
-            pathFile.mkdirs();
+    private void analysisFirmwareFile(String mSDCardPath) {
+        File dir = new File(mSDCardPath);
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                if (file.getName().startsWith("app")) {
+                    appFilePath = file.getPath();
+                    continue;
+                }
+                if (file.getName().startsWith("flash")) {
+                    flashFilePath.add(file.getPath());
+                    continue;
+                }
+            }
         }
-        ZipFile zip = new ZipFile(zipFile);
+
+        if (appFilePath != null) {
+            getUpdateInfo(appFilePath, false);
+            BlueManager.getInstance().send(checkUpdate);
+        } else {
+            if (flashFilePath.size() > 0) {
+                getUpdateInfo(flashFilePath.get(flashIndex), true);
+            }
+            Log.d("appFilePath not exists");
+        }
+    }
+
+    private void getUpdateInfo(String path, boolean isFlash) {
+        FileInputStream fis = null;
+        try {
+            File file = new File(path);
+            fis = new FileInputStream(file);
+            updates = new byte[fis.available()];
+            fis.read(updates);
+            fis.close();
+            if (isFlash) {
+                String prefix = file.getName().substring(0, file.getName().indexOf("."));
+                String[] version = prefix.split("_");
+                int index = HexUtils.hexStringToBytes(version[1])[0];
+                short start = HexUtils.byteToShort(HexUtils.hexStringToBytes(version[2]));
+                checkUpdate = ProtocolUtils.updateFlashInfo(index, start, updates.length);
+            } else {
+                String prefix = file.getName().substring(0, file.getName().indexOf("."));
+                String version = prefix.split("_")[1];
+                Log.d(" appFilePath updates.length " + updates.length + " prefix =  " + prefix + " version=  " + version);
+                checkUpdate = ProtocolUtils.updateFirmwareInfo(version.getBytes(), HexUtils.intToByte(updates.length));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != fis) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void decompress(String zipFile, String dstPath) throws Exception {
+        String fileEncode = EncodeUtil.getEncode(zipFile, true);
+        ZipFile zip = new ZipFile(zipFile, Charset.forName(fileEncode));
         for (Enumeration entries = zip.entries(); entries.hasMoreElements(); ) {
             ZipEntry entry = (ZipEntry) entries.nextElement();
             String zipEntryName = entry.getName();

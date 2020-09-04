@@ -283,8 +283,8 @@ public class ProtocolUtils {
         return result;
     }
 
-    public static byte[] updateInfo(byte[] version, byte[] packageSize) {
-        Log.d("Protocol updateInfo ===");
+    public static byte[] updateFirmwareInfo(byte[] version, byte[] packageSize) {
+        Log.d("Protocol updateFirmwareInfo ===");
         byte[] result = new byte[version.length + packageSize.length + 5];
         byte[] temp = new byte[version.length + packageSize.length];
         System.arraycopy(version, 0, temp, 0, version.length);
@@ -303,16 +303,54 @@ public class ProtocolUtils {
     }
 
 
-    public static byte[] updateForUnit(int index, byte[] date) {
-        Log.d("Protocol updateForUnit ===");
-        byte[] result = new byte[date.length + 6];
+    public static byte[] updateFirmwareForUnit(int index, byte[] date) {
+        Log.d("Protocol updateFirmwareForUnit ===");
+        byte[] result = new byte[date.length + 7];
         result[0] = PROTOCOL_HEAD_TAIL;
         result[1] = (byte) PROTOCAL_COMMON_06;
         result[2] = 02;
-        result[3] = (byte) index;
-        int cr = result[1] ^ result[2] ^ result[3];
+        result[3] = (byte) ((index >> 8) & 0xFF);
+        result[4] = (byte) (index & 0xFF);
+        int cr = result[1] ^ result[2] ^ result[3] ^ result[4];
         for (int i = 0; i < date.length; i++) {
-            result[4 + i] = date[i];
+            result[5 + i] = date[i];
+            cr = cr ^ date[i];
+        }
+        result[result.length - 2] = (byte) cr;
+        result[result.length - 1] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+
+    public static byte[] updateFlashInfo(int index, short start, int length) {
+        Log.d("Protocol updateFlashInfo ===");
+        byte[] result = new byte[12];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_06;
+        result[2] = 03;
+        result[3] = (byte) (index & 0xFF);
+        result[4] = (byte) ((start >> 8) & 0xFF);
+        result[5] = (byte) (start & 0xFF);
+        result[6] = (byte) ((length >> 24) & 0xFF);
+        result[7] = (byte) ((length >> 16) & 0xFF);
+        result[8] = (byte) ((length >> 8) & 0xFF);
+        result[9] = (byte) (length & 0xFF);
+        result[10] = (byte) (result[1] ^ result[2] ^ result[3] ^ result[4] ^ result[5] ^ result[6] ^ result[7] ^ result[8] ^ result[9]);
+        result[11] = PROTOCOL_HEAD_TAIL;
+        return result;
+    }
+
+    public static byte[] updateFlashForUnit(int index, byte[] date) {
+        Log.d("Protocol updateFlashForUnit ===");
+        byte[] result = new byte[date.length + 7];
+        result[0] = PROTOCOL_HEAD_TAIL;
+        result[1] = (byte) PROTOCAL_COMMON_06;
+        result[2] = 04;
+        result[3] = (byte) ((index >> 8) & 0xFF);
+        result[4] = (byte) (index & 0xFF);
+        int cr = result[1] ^ result[2] ^ result[3] ^ result[4];
+        for (int i = 0; i < date.length; i++) {
+            result[5 + i] = date[i];
             cr = cr ^ date[i];
         }
         result[result.length - 2] = (byte) cr;

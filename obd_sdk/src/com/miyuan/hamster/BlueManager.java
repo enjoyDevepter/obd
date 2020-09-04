@@ -48,7 +48,16 @@ public class BlueManager {
     public static final String KEY_WRITE_BUNDLE_VALUE = "write_value";
     private static final int STOP_SCAN_AND_CONNECT = 0;
     private static final int MSG_SPLIT_WRITE = 1;
-
+    private static final int MSG_VERIFY = 2;
+    private static final int MSG_AUTH_RESULT = 3;
+    private static final int MSG_OBD_VERSION = 4;
+    private static final int MSG_TIRE_PRESSURE_STATUS = 5;
+    private static final int MSG_FIRMWARE_BEGIN_TO_UPDATE = 6;
+    private static final int MSG_FIRMWARE_UPDATE_FOR_ONE_UNIT = 7;
+    private static final int MSG_STUDY = 8;
+    private static final int MSG_STUDY_PROGRESS = 9;
+    private static final int MSG_FLASH_BEGIN_TO_UPDATE = 10;
+    private static final int MSG_FLASH_UPDATE_FOR_ONE_UNIT = 11;
     private static final int MSG_OBD_DISCONNECTED = 12;
 
 
@@ -82,15 +91,7 @@ public class BlueManager {
     private static final int MSG_FM_STATUS_INFO = 183; // FM参数属性
 
 
-    private static final int MSG_VERIFY = 2;
-    private static final int MSG_AUTH_RESULT = 3;
-    private static final int MSG_OBD_VERSION = 4;
-    private static final int MSG_TIRE_PRESSURE_STATUS = 5;
-    private static final int MSG_BEGIN_TO_UPDATE = 6;
-    private static final int MSG_UPDATE_FOR_ONE_UNIT = 7;
-    private static final int MSG_PARAMS_UPDATE_SUCESS = 8;
-    private static final int MSG_STUDY = 10;
-    private static final int MSG_STUDY_PROGRESS = 11;
+
 
 
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
@@ -931,6 +932,27 @@ public class BlueManager {
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 }
+            } else if (content[0] == 6) {
+                if (content[1] == 1) {
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_FIRMWARE_BEGIN_TO_UPDATE;
+                    bundle.putInt("status", content[2]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                } else if (content[1] == 02) {
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_FIRMWARE_UPDATE_FOR_ONE_UNIT;
+                    bundle.putInt("index", HexUtils.byteToShort(new byte[]{content[2], content[3]}));
+                    bundle.putInt("status", content[4]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
+                } else if (content[1] == 03) {
+
+                } else if (content[1] == 04) {
+
+                }
             } else if (content[0] == 8) {
                 if (content[1] == 1) {
                     Message message = mHandler.obtainMessage();
@@ -1258,31 +1280,22 @@ public class BlueManager {
                         }
                     });
                     break;
-                case MSG_BEGIN_TO_UPDATE:
+                case MSG_FIRMWARE_BEGIN_TO_UPDATE:
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_BEGIN_UPDATE, bundle.getInt("status"));
+                            notifyBleCallBackListener(OBDEvent.OBD_FIRMWARE_BEGIN_UPDATE, bundle.getInt("status"));
                         }
                     });
                     break;
-                case MSG_UPDATE_FOR_ONE_UNIT:
+                case MSG_FIRMWARE_UPDATE_FOR_ONE_UNIT:
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             Update update = new Update();
                             update.setIndex(bundle.getInt("index"));
                             update.setStatus(bundle.getInt("status"));
-                            notifyBleCallBackListener(OBDEvent.OBD_UPDATE_FINISH_UNIT, update);
-                        }
-                    });
-                    break;
-                case MSG_PARAMS_UPDATE_SUCESS:
-                    // 车型参数更新成功
-                    mMainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            notifyBleCallBackListener(OBDEvent.OBD_UPDATE_PARAMS_SUCCESS, null);
+                            notifyBleCallBackListener(OBDEvent.OBD_FIRMWARE_UPDATE_FINISH_UNIT, update);
                         }
                     });
                     break;
@@ -1311,6 +1324,25 @@ public class BlueManager {
                         @Override
                         public void run() {
                             notifyBleCallBackListener(OBDEvent.OBD_STUDY_PROGRESS, bundle.getInt("status"));
+                        }
+                    });
+                    break;
+                case MSG_FLASH_BEGIN_TO_UPDATE:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyBleCallBackListener(OBDEvent.OBD_FLASH_BEGIN_UPDATE, bundle.getInt("status"));
+                        }
+                    });
+                    break;
+                case MSG_FLASH_UPDATE_FOR_ONE_UNIT:
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Update update = new Update();
+                            update.setIndex(bundle.getInt("index"));
+                            update.setStatus(bundle.getInt("status"));
+                            notifyBleCallBackListener(OBDEvent.OBD_FLASH_UPDATE_FINISH_UNIT, update);
                         }
                     });
                     break;

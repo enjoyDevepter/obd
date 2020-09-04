@@ -161,6 +161,18 @@ public class HexUtils {
         return b;
     }
 
+    public static byte[] intToByte(int number) {
+        int temp = number;
+        byte[] result = new byte[4];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = new Integer(temp & 0xff).byteValue();
+            // 将最低位保存在最低位
+            temp = temp >> 8;
+            // 向右移8位
+        }
+        return result;
+    }
+
     public static short byteToShort(byte[] b) {
         short s = 0;
         short s0 = (short) (b[0] & 0xff);// 最高位

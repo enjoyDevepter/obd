@@ -34,13 +34,13 @@ public class OBDEvent {
      */
     public static final int OBD_DISCONNECTED = 6;
     /**
-     * 开始升级
+     * 开始固件升级
      */
-    public static final int OBD_BEGIN_UPDATE = 10;
+    public static final int OBD_FIRMWARE_BEGIN_UPDATE = 10;
     /**
-     * 完成1k数据传递
+     * 固件完成1k数据传递
      */
-    public static final int OBD_UPDATE_FINISH_UNIT = 11;
+    public static final int OBD_FIRMWARE_UPDATE_FINISH_UNIT = 11;
     /**
      * OBD盒子版本
      */
@@ -52,29 +52,32 @@ public class OBDEvent {
     public static final int OBD_AUTH_RESULT = 13;
 
     /**
-     * OBD 参数更新成功
-     */
-    public static final int OBD_UPDATE_PARAMS_SUCCESS = 14;
-
-    /**
      * 胎压状态更新
      */
-    public static final int OBD_UPPATE_TIRE_PRESSURE_STATUS = 15;
+    public static final int OBD_UPPATE_TIRE_PRESSURE_STATUS = 14;
     /**
      * OBD 异常
      */
-    public static final int OBD_ERROR = 16;
+    public static final int OBD_ERROR = 15;
 
     /**
      * OBD 胎压开始学习
      */
-    public static final int OBD_STUDY = 17;
+    public static final int OBD_STUDY = 16;
 
     /**
      * OBD 胎压学习进度
      */
-    public static final int OBD_STUDY_PROGRESS = 18;
+    public static final int OBD_STUDY_PROGRESS = 17;
 
+    /**
+     * 开始flash升级
+     */
+    public static final int OBD_FLASH_BEGIN_UPDATE = 18;
+    /**
+     * flash完成1k数据传递
+     */
+    public static final int OBD_FLASH_UPDATE_FINISH_UNIT = 19;
 
     /**
      * 未注册

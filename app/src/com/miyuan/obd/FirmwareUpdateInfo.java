@@ -5,20 +5,73 @@ package com.miyuan.obd;
  */
 
 public class FirmwareUpdateInfo {
-    private int updateState;
+    private String status;
+    private String message;
+    private int bUpdateState;
+    private int pUpdateState;
+    private int id;
+    private String bVersion;
+    private String pVersion;
     private String version;
     private String url;
     private int size;
     private String desc;
     private String create_time;
-    private String message;
 
-    public int getUpdateState() {
-        return updateState;
+    public String getStatus() {
+        return status;
     }
 
-    public void setUpdateState(int updateState) {
-        this.updateState = updateState;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public int getbUpdateState() {
+        return bUpdateState;
+    }
+
+    public void setbUpdateState(int bUpdateState) {
+        this.bUpdateState = bUpdateState;
+    }
+
+    public int getpUpdateState() {
+        return pUpdateState;
+    }
+
+    public void setpUpdateState(int pUpdateState) {
+        this.pUpdateState = pUpdateState;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getbVersion() {
+        return bVersion;
+    }
+
+    public void setbVersion(String bVersion) {
+        this.bVersion = bVersion;
+    }
+
+    public String getpVersion() {
+        return pVersion;
+    }
+
+    public void setpVersion(String pVersion) {
+        this.pVersion = pVersion;
     }
 
     public String getVersion() {
@@ -61,24 +114,21 @@ public class FirmwareUpdateInfo {
         this.create_time = create_time;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     @Override
     public String toString() {
         return "FirmwareUpdateInfo{" +
-                "updateState=" + updateState +
+                "status='" + status + '\'' +
+                ", message='" + message + '\'' +
+                ", bUpdateState=" + bUpdateState +
+                ", pUpdateState=" + pUpdateState +
+                ", id=" + id +
+                ", bVersion='" + bVersion + '\'' +
+                ", pVersion='" + pVersion + '\'' +
                 ", version='" + version + '\'' +
                 ", url='" + url + '\'' +
                 ", size=" + size +
                 ", desc='" + desc + '\'' +
                 ", create_time='" + create_time + '\'' +
-                ", message='" + message + '\'' +
                 '}';
     }
 }
