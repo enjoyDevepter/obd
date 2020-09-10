@@ -54,6 +54,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -74,9 +75,12 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
 
+import static com.miyuan.hamster.OBDEvent.AUTHORIZATION_SUCCESS;
+
 public class MainActivity extends AppCompatActivity implements BleCallBackListener {
 
     private static MainActivity INSTANCE = null;
+    public static boolean hasCheck = false;
     public boolean first = true;
     private ViewGroup rootViewGroup;
     private View splashView;
@@ -148,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .statusBarDarkFont(true)
                 .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
+
+        BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
     }
 
 
@@ -252,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                     addTasks();
                 }
                 setFirst(false);
-                BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
             }
 
             @Override
@@ -274,12 +279,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             stopService(serviceForegroundIntent);
             serviceForegroundIntent = null;
         }
-
-        obdStatusInfo = new OBDStatusInfo();
-        obdStatusInfo.setSn("JNL7-VB93-GCXL-V32W");
-        obdStatusInfo.setbVersion("TPMSA01V1001");
-        obdStatusInfo.setpVersion("TPMSA01V1001");
-        checkFirmwareVersion(obdStatusInfo);
     }
 
     private FirmwareUpdateInfo updateInfo;
@@ -288,14 +287,14 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
         int num = updates.length % UNIT == 0 ? updates.length / UNIT : updates.length / UNIT + 1;
 
-        if (index > num) {
+        if (index > num - 1) {
             return;
         }
 
 //        showUpdateProgress(index == 1 ? updates.length : (index - 1) * UNIT);
 
         byte[] date;
-        if (index == num) {
+        if (index == num - 1) {
             if (updates.length % UNIT == 0) {
                 date = new byte[UNIT];
             } else {
@@ -304,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         } else {
             date = new byte[UNIT];
         }
-        System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
+        System.arraycopy(updates, 0 + index * UNIT, date, 0, date.length);
 
         if (isFlash) {
             BlueManager.getInstance().send(ProtocolUtils.updateFlashForUnit(index, date));
@@ -348,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                         // 开始升级flash
                         String flashPath = flashFilePath.get(flashIndex);
                         getUpdateInfo(flashPath, true);
+                        BlueManager.getInstance().send(checkUpdate);
                         break;
                 }
                 break;
@@ -366,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 break;
             case OBDEvent.OBD_FLASH_UPDATE_FINISH_UNIT:
                 Update flashUpdate = (Update) data;
+                Log.d("OBD_FLASH_UPDATE_FINISH_UNIT  " + flashUpdate);
                 switch (flashUpdate.getStatus()) {
                     case 0:
                         //  重新传递
@@ -392,8 +393,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             case OBDEvent.AUTHORIZATION:
                 obdStatusInfo = (OBDStatusInfo) data;
                 break;
-            case OBDEvent.AUTHORIZATION_SUCCESS:
+            case AUTHORIZATION_SUCCESS:
                 obdStatusInfo = (OBDStatusInfo) data;
+                if (!hasCheck) {
+                    hasCheck = true;
+                    checkFirmwareVersion(obdStatusInfo);
+                }
                 break;
             case OBDEvent.ADJUST_SUCCESS:
                 break;
@@ -405,10 +410,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 break;
             case OBDEvent.HUD_PARAMS_INFO:
                 updateStateParams(((HUDParams) data).getOrigin());
-                break;
-            case OBDEvent.NORMAL:
-                obdStatusInfo = (OBDStatusInfo) data;
-                checkFirmwareVersion(obdStatusInfo);
                 break;
             default:
                 break;
@@ -539,9 +540,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             fis.close();
             if (isFlash) {
                 String prefix = file.getName().substring(0, file.getName().indexOf("."));
+                Log.d("prefix " + prefix);
                 String[] version = prefix.split("_");
+                Log.d("version " + Arrays.toString(version));
                 int index = HexUtils.hexStringToBytes(version[1])[0];
                 short start = HexUtils.byteToShort(HexUtils.hexStringToBytes(version[2]));
+                Log.d(" flashFilePath updates.length " + updates.length + " index =  " + index + " start=  " + start);
                 checkUpdate = ProtocolUtils.updateFlashInfo(index, start, updates.length);
             } else {
                 String prefix = file.getName().substring(0, file.getName().indexOf("."));

@@ -101,11 +101,11 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                     settingV.setText("完成");
                 }
                 settingV.setSelected(!choice);
-                warm_layoutV.setBackgroundResource(!choice ? R.drawable.c2_error_bg : R.drawable.transparent);
-                regular_layoutV.setBackgroundResource(!choice ? R.drawable.c2_bg : R.drawable.transparent);
-                overall_layoutV.setBackgroundResource(!choice ? R.drawable.c2_bg : R.drawable.transparent);
-                standard_layoutV.setBackgroundResource(!choice ? R.drawable.c2_bg : R.drawable.transparent);
-                concise_layoutV.setBackgroundResource(!choice ? R.drawable.c2_bg : R.drawable.transparent);
+                warm_layoutV.setBackgroundResource(choice ? R.drawable.c2_error_bg : R.drawable.transparent);
+                regular_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
+                overall_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
+                standard_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
+                concise_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
                 break;
             case R.id.params:
                 PageManager.go(new HUDSettingPage());
@@ -114,7 +114,7 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             default:
-                if (!choice) {
+                if (choice) {
                     showSetting(v.getId());
                 }
                 break;

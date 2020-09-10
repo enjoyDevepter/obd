@@ -1,13 +1,9 @@
 package com.miyuan.obd;
 
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Environment;
 import android.text.Html;
@@ -43,8 +39,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -92,10 +86,8 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     private AnimationDrawable highAnimationDrawable;
     private AnimationDrawable lowAnimationDrawable;
 
-    private byte[] updates;
     private OBDVersion obdVersion;
     private ProgressBar progressBar;
-    private DownloadManager downloadManager;
     private long mTaskId;
     private int time = 10;
     private Timer timer;
@@ -105,46 +97,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
 
     private volatile boolean needNotifyParamsSuccess;
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            DownloadManager.Query query = new DownloadManager.Query();
-            query.setFilterById(mTaskId);//筛选下载任务，传入任务ID，可变参数
-            Cursor c = downloadManager.query(query);
-            if (c.moveToFirst()) {
-                int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                switch (status) {
-                    case DownloadManager.STATUS_PAUSED:
-                    case DownloadManager.STATUS_PENDING:
-                    case DownloadManager.STATUS_RUNNING:
-                        break;
-                    case DownloadManager.STATUS_SUCCESSFUL:
-                        try {
-                            File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
-                            FileInputStream fis = new FileInputStream(file);
-                            updates = new byte[fis.available()];
-                            fis.read(updates);
-                            fis.close();
-                            Log.d(" updates.length " + updates.length);
-                            final byte[] version = new byte[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-                            GlobalUtil.getHandler().post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    BlueManager.getInstance().send(ProtocolUtils.updateFirmwareInfo(version, HexUtils.longToByte(updates.length)));
-                                }
-                            });
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case DownloadManager.STATUS_FAILED:
-                        break;
-                }
-            }
-        }
-    };
 
     private Timer heartTimer;
     private NumberSeekBar sensitiveView;
@@ -664,42 +616,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.OBD_FIRMWARE_BEGIN_UPDATE:
-                if ((Integer) data == 0) { // 是否可以升级
-                    try {
-                        Thread.sleep(2000);
-                        downloadUpdate(obdVersion);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    // 固件升级开始
-                    updateForOneUnit(1);
-                }
-                break;
-            case OBDEvent.OBD_FIRMWARE_UPDATE_FINISH_UNIT:
-//                Update update = (Update) data;
-//                if (update.getStatus() == 0) {
-//                    // 重新传递
-//                    updateForOneUnit(update.getIndex());
-//                } else if (update.getStatus() == 1) {
-//                    // 继续
-//                    updateForOneUnit(update.getIndex() + 1);
-//                } else if (update.getStatus() == 2) {
-//                    File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
-//                    if (file.exists()) {
-//                        file.delete();
-//                    }
-//                    // 升级完成，通知服务器
-//                    notifyUpdateSuccess(obdVersion);
-//                    if (null != progressBar && null != updateDialog) {
-//                        updateDialog.dismiss();
-//                        updateDialog = null;
-//                        progressBar = null;
-//                    }
-//                    showStudy();
-//                }
-                break;
             case OBDEvent.OBD_GET_VERSION:
 //                OBDVersionInfo version = (OBDVersionInfo) data;
 //                sn = version.getSn();
@@ -1041,28 +957,6 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         });
     }
 
-    private void showUpdateProgress(final int percent) {
-        if (null == updateDialog) {
-            updateDialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                    .setViewListener(new CustomDialog.ViewListener() {
-                        @Override
-                        public void bindView(View view) {
-                            progressBar = (ProgressBar) view.findViewById(R.id.progress);
-                            progressBar.setMax(percent);
-                        }
-                    })
-                    .setLayoutRes(R.layout.dailog_update)
-                    .setDimAmount(0.5f)
-                    .isCenter(true)
-                    .setCancelOutside(false)
-                    .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                    .show();
-        } else {
-            progressBar.setProgress(percent);
-        }
-    }
-
-
     /**
      * 通知服务器固件升级完成
      */
@@ -1120,62 +1014,5 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
         });
     }
 
-    private void downloadUpdate(OBDVersion obdVersion) {
-//        //创建下载任务
-//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(obdVersion.getUrl()));
-//        request.setAllowedOverRoaming(false);//漫游网络是否可以下载
-//
-//        //设置文件类型，可以在下载结束后自动打开该文件
-//        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-//        String mimeString = mimeTypeMap.getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(obdVersion.getUrl()));
-//        request.setMimeType(mimeString);
-//
-//        //在通知栏中显示，默认就是显示的
-//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-//        request.setVisibleInDownloadsUi(true);
-//
-//        //sdcard的目录下的download文件夹，必须设置
-//        File file = new File(Environment.getExternalStoragePublicDirectory("/download/"), "update.bin");
-//        if (file.exists()) {
-//            file.delete();
-//        }
-//        request.setDestinationInExternalPublicDir("/download/", "update.bin");
-//
-//        //将下载请求加入下载队列
-//        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-//        //加入下载队列后会给该任务返回一个long型的id，
-//        //通过该id可以取消任务，重启任务等等，看上面源码中框起来的方法
-//        mTaskId = downloadManager.enqueue(request);
-//
-//        //注册广播接收者，监听下载状态
-//        getContext().registerReceiver(receiver,
-//                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    }
 
-    private void updateForOneUnit(int index) {
-
-        int num = updates.length % UNIT == 0 ? updates.length / UNIT : updates.length / UNIT + 1;
-
-
-        if (index > num) {
-            return;
-        }
-
-        showUpdateProgress(index == 1 ? updates.length : (index - 1) * UNIT);
-
-        byte[] date;
-        if (index == num) {
-            if (updates.length % UNIT == 0) {
-                date = new byte[UNIT];
-            } else {
-                date = new byte[updates.length % UNIT];
-            }
-
-        } else {
-            date = new byte[UNIT];
-        }
-        System.arraycopy(updates, 0 + (index - 1) * UNIT, date, 0, date.length);
-
-        BlueManager.getInstance().send(ProtocolUtils.updateFirmwareForUnit(index, date));
-    }
 }

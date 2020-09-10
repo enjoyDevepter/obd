@@ -91,9 +91,6 @@ public class BlueManager {
     private static final int MSG_FM_STATUS_INFO = 183; // FM参数属性
 
 
-
-
-
     private static final String SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
     private static final String WRITE_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
     private static final String NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
@@ -588,6 +585,9 @@ public class BlueManager {
             } else if ((data[1] == (byte) 0x90 && data[2] == 01) || (data[1] == (byte) 0x90 && data[2] == 02) || (data[1] == (byte) 0x90 && data[2] == 03)) {
                 COMMAND_TIMEOUT = 1500;
                 timeOutThread.startCommand(false);
+            } else if ((data[1] == (byte) 0x86 && (data[2] == 02 || data[2] == 03 || data[2] == 04 || data[2] == 05))) {
+                COMMAND_TIMEOUT = 10000;
+                timeOutThread.startCommand(true);
             } else {
                 COMMAND_TIMEOUT = 5000;
                 timeOutThread.startCommand(true);
@@ -937,21 +937,32 @@ public class BlueManager {
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_FIRMWARE_BEGIN_TO_UPDATE;
-                    bundle.putInt("status", content[2]);
+                    bundle.putInt("status", content[4]);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 } else if (content[1] == 02) {
                     Message message = mHandler.obtainMessage();
                     Bundle bundle = new Bundle();
                     message.what = MSG_FIRMWARE_UPDATE_FOR_ONE_UNIT;
-                    bundle.putInt("index", HexUtils.byteToShort(new byte[]{content[2], content[3]}));
-                    bundle.putInt("status", content[4]);
+                    bundle.putInt("index", HexUtils.byteToShort(new byte[]{content[4], content[5]}));
+                    bundle.putInt("status", content[6]);
                     message.setData(bundle);
                     mHandler.sendMessage(message);
                 } else if (content[1] == 03) {
-
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_FLASH_BEGIN_TO_UPDATE;
+                    bundle.putInt("status", content[4]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 } else if (content[1] == 04) {
-
+                    Message message = mHandler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    message.what = MSG_FLASH_UPDATE_FOR_ONE_UNIT;
+                    bundle.putInt("index", HexUtils.byteToShort(new byte[]{content[4], content[5]}));
+                    bundle.putInt("status", content[6]);
+                    message.setData(bundle);
+                    mHandler.sendMessage(message);
                 }
             } else if (content[0] == 8) {
                 if (content[1] == 1) {

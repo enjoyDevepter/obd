@@ -517,7 +517,7 @@ public class ProtocolUtils {
         return result;
     }
 
-    /**
+    /**updateFlashInfo
      * 获取HUD预警属性
      *
      * @return
@@ -535,7 +535,7 @@ public class ProtocolUtils {
     }
 
     /**
-     * 设置HUD预警属性
+     * 设置HUD预警属性HUD_WARM_STATUS_INFO
      *
      * @return
      */
