@@ -28,23 +28,6 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
     @ViewInject(R.id.params)
     TextView paramsV;
 
-    @ViewInject(R.id.regular_layout)
-    View regular_layoutV;
-    @ViewInject(R.id.regular)
-    View regularV;
-    @ViewInject(R.id.overall_layout)
-    View overall_layoutV;
-    @ViewInject(R.id.overall)
-    View overallV;
-    @ViewInject(R.id.standard_layout)
-    View standard_layoutV;
-    @ViewInject(R.id.standard)
-    View standardV;
-    @ViewInject(R.id.concise_layout)
-    View concise_layoutV;
-    @ViewInject(R.id.concise)
-    View conciseV;
-
     @ViewInject(R.id.tire)
     View tireV;
     @ViewInject(R.id.warm_layout)
@@ -76,10 +59,10 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
         backV.setOnClickListener(this);
         settingV.setOnClickListener(this);
         paramsV.setOnClickListener(this);
-        regularV.setOnClickListener(this);
-        overallV.setOnClickListener(this);
-        standardV.setOnClickListener(this);
-        conciseV.setOnClickListener(this);
+//        regularV.setOnClickListener(this);
+//        overallV.setOnClickListener(this);
+//        standardV.setOnClickListener(this);
+//        conciseV.setOnClickListener(this);
         warm_layoutV.setOnClickListener(this);
     }
 
@@ -102,10 +85,6 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                 }
                 settingV.setSelected(!choice);
                 warm_layoutV.setBackgroundResource(choice ? R.drawable.c2_error_bg : R.drawable.transparent);
-                regular_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
-                overall_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
-                standard_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
-                concise_layoutV.setBackgroundResource(choice ? R.drawable.c2_bg : R.drawable.transparent);
                 break;
             case R.id.params:
                 PageManager.go(new HUDSettingPage());
@@ -114,7 +93,7 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             default:
-                if (choice) {
+                if (!choice) {
                     showSetting(v.getId());
                 }
                 break;
@@ -126,34 +105,6 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
             return;
         }
         switch (viewId) {
-            case R.id.regular:
-                regularV.setBackgroundResource(R.drawable.regular_sel);
-                standardV.setBackgroundResource(R.drawable.standard_normal);
-                overallV.setBackgroundResource(R.drawable.overall_normal);
-                conciseV.setBackgroundResource(R.drawable.concise_normal);
-                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x31, 0x81));
-                break;
-            case R.id.standard:
-                regularV.setBackgroundResource(R.drawable.regular_normal);
-                standardV.setBackgroundResource(R.drawable.standard_sel);
-                overallV.setBackgroundResource(R.drawable.overall_normal);
-                conciseV.setBackgroundResource(R.drawable.concise_normal);
-                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x31, 0x83));
-                break;
-            case R.id.overall:
-                regularV.setBackgroundResource(R.drawable.regular_normal);
-                standardV.setBackgroundResource(R.drawable.standard_normal);
-                overallV.setBackgroundResource(R.drawable.overall_sel);
-                conciseV.setBackgroundResource(R.drawable.concise_normal);
-                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x31, 0x82));
-                break;
-            case R.id.concise:
-                regularV.setBackgroundResource(R.drawable.regular_normal);
-                standardV.setBackgroundResource(R.drawable.standard_normal);
-                overallV.setBackgroundResource(R.drawable.overall_normal);
-                conciseV.setBackgroundResource(R.drawable.concise_sel);
-                BlueManager.getInstance().send(ProtocolUtils.setHUDStatus(0x31, 0x84));
-                break;
             case R.id.warm_layout:
                 showWarm();
                 break;
@@ -349,34 +300,6 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
     }
 
     private void updateUI() {
-        if (null != hudStatus) {
-            switch (hudStatus.getC2Mode()) {
-                case 0x81:
-                    regularV.setBackgroundResource(R.drawable.regular_sel);
-                    standardV.setBackgroundResource(R.drawable.standard_normal);
-                    overallV.setBackgroundResource(R.drawable.overall_normal);
-                    conciseV.setBackgroundResource(R.drawable.concise_normal);
-                    break;
-                case 0x82:
-                    regularV.setBackgroundResource(R.drawable.regular_normal);
-                    standardV.setBackgroundResource(R.drawable.standard_normal);
-                    overallV.setBackgroundResource(R.drawable.overall_sel);
-                    conciseV.setBackgroundResource(R.drawable.concise_normal);
-                    break;
-                case 0x83:
-                    regularV.setBackgroundResource(R.drawable.regular_normal);
-                    standardV.setBackgroundResource(R.drawable.standard_sel);
-                    overallV.setBackgroundResource(R.drawable.overall_normal);
-                    conciseV.setBackgroundResource(R.drawable.concise_normal);
-                    break;
-                case 0x84:
-                    regularV.setBackgroundResource(R.drawable.regular_normal);
-                    standardV.setBackgroundResource(R.drawable.standard_normal);
-                    overallV.setBackgroundResource(R.drawable.overall_normal);
-                    conciseV.setBackgroundResource(R.drawable.concise_sel);
-                    break;
-            }
-        }
         if (null != hudWarmStatus) {
             faultV.setBackgroundResource(hudWarmStatus.isFaultWarmShow() ? R.drawable.c2_fault_show : R.drawable.c2_fault_dismiss);
             voltageV.setBackgroundResource(hudWarmStatus.isVoltageWarmShow() ? R.drawable.c2_voltage_show : R.drawable.c2_voltage_dismiss);

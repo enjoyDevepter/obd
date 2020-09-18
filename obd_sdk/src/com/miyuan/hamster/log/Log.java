@@ -15,7 +15,7 @@ import timber.log.Timber;
 public class Log {
 
     public final static String TAG = "OBD_CORE";
-    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
 
     static {
         Timber.plant(new Timber.DebugTree());

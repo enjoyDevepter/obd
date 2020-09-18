@@ -266,11 +266,11 @@ public class BlueManager {
     private BleWriteCallback bleWriteCallback = new BleWriteCallback() {
         @Override
         public void onWriteSuccess(byte[] justWrite) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             write();
         }
 
