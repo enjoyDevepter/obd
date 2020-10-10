@@ -32,6 +32,7 @@
 /app/autoBuild
 co_branch.sh
 /debug.bat
+/app/release
 
 # 去除对 build 出错时生成文件的跟踪
 ajcore*.txt

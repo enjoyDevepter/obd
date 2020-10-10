@@ -20,6 +20,17 @@
         android:textColor="@color/text_color"
         android:textSize="@dimen/text_size" />
 
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:text="本次升级共需约XX分，当前升级进度："
+        android:textColor="@color/text_color"
+        android:textSize="20sp" />
+
     <ProgressBar
         android:id="@+id/progress"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"

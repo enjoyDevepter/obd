@@ -24,6 +24,13 @@
             android:layout_height="match_parent">
 
             <View
+                android:id="@+id/warm_bg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/c2_error_bg"
+                android:visibility="invisible" />
+
+            <View
                 android:id="@+id/tire"
                 android:layout_width="53dp"
                 android:layout_height="47dp"

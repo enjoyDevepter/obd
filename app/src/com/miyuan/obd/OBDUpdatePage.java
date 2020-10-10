@@ -73,6 +73,8 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
     private View reportV;
     @ViewInject(R.id.message)
     private TextView messageTV;
+    @ViewInject(R.id.info)
+    private TextView infoTV;
     @ViewInject(R.id.progress)
     private ProgressBar progressBar;
     private CustomDialog dialog;
@@ -82,6 +84,7 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
     private String updatePath = null;
     private long count;
     private long current;
+    private boolean update;
     private byte[] updates;
     private List<String> flashFilePath = new ArrayList<>();
 
@@ -92,7 +95,12 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
         reportV.setOnClickListener(this);
         back.setVisibility(View.GONE);
         messageTV.setText(getDate().getString("message"));
-        downloadFirmware(getDate().getString("url"));
+        infoTV.setText("本次升级共需约" + (int) ((getDate().getInt("size") / 1024 * 0.6) / 60) + "分，当前升级进度：");
+        if (!update) {
+            downloadFirmware(getDate().getString("url"));
+            update = true;
+        }
+
     }
 
     @Override
@@ -209,6 +217,10 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
 
 
     private void downloadFirmware(final String url) {
+        updatePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "update";
+        // 先删除原来升级文件
+        delFile(new File(updatePath));
+
         Request request = new Request.Builder().url(url).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -265,8 +277,7 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
 
         if (appFilePath != null) {
             getUpdateInfo(appFilePath, false);
-            byte[] test = new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 31};
-            BlueManager.getInstance().send(test);
+            BlueManager.getInstance().send(checkUpdate);
         } else {
             if (flashFilePath.size() > 0) {
                 getUpdateInfo(flashFilePath.get(flashIndex), true);

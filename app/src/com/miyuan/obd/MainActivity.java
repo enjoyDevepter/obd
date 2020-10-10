@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -362,6 +363,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override
                     public void bindView(View view) {
+                        TextView textView = view.findViewById(R.id.info);
+                        String info = "当前有新版本升级，共需约" + (int) ((updateInfo.getSize() / 1024 * 0.6) / 60) + "分钟。升级过程中不能关闭手机，不能关闭硬件设备，不能做其他任何操作。否则升级失败可能导致设备使用不正常，需要重新升级。";
+                        textView.setText(info);
                         view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -371,7 +375,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                                 bundle.putString("serialNumber", obdStatusInfo.getSn());
                                 bundle.putString("bVersion", obdStatusInfo.getbVersion());
                                 bundle.putString("pVersion", obdStatusInfo.getpVersion());
-                                bundle.putString("message", updateInfo.getMessage());
+                                bundle.putString("message", updateInfo.getDesc());
+                                bundle.putInt("size", updateInfo.getSize());
                                 bundle.putInt("id", updateInfo.getId());
                                 page.setDate(bundle);
                                 PageManager.clearHistoryAndGo(page);

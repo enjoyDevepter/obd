@@ -32,6 +32,8 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
     View tireV;
     @ViewInject(R.id.warm_layout)
     View warm_layoutV;
+    @ViewInject(R.id.warm_bg)
+    View warmBgV;
     @ViewInject(R.id.fault)
     View faultV;
     @ViewInject(R.id.temperature)
@@ -59,10 +61,6 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
         backV.setOnClickListener(this);
         settingV.setOnClickListener(this);
         paramsV.setOnClickListener(this);
-//        regularV.setOnClickListener(this);
-//        overallV.setOnClickListener(this);
-//        standardV.setOnClickListener(this);
-//        conciseV.setOnClickListener(this);
         warm_layoutV.setOnClickListener(this);
     }
 
@@ -84,7 +82,7 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                     settingV.setText("完成");
                 }
                 settingV.setSelected(!choice);
-                warm_layoutV.setBackgroundResource(choice ? R.drawable.c2_error_bg : R.drawable.transparent);
+                warmBgV.setVisibility(choice ? View.INVISIBLE : View.VISIBLE);
                 break;
             case R.id.params:
                 PageManager.go(new HUDSettingPage());
@@ -93,7 +91,7 @@ public class C2SettingPage extends AppBasePage implements View.OnClickListener, 
                 PageManager.back();
                 break;
             default:
-                if (!choice) {
+                if (choice) {
                     showSetting(v.getId());
                 }
                 break;
