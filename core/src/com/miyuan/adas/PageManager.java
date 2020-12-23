@@ -16,7 +16,6 @@ public class PageManager {
     }
 
     public static void go(@NonNull BasePage page) {
-
         switch (page.getFlag()) {
             case BasePage.FLAG_SINGLE_TASK:// singleTask机制
                 // 的Page,打开页面时是将该页面之上所有Page都清除
@@ -60,6 +59,10 @@ public class PageManager {
         backStackManager.setCurrent(page);
         page.init();
         page.show();
+    }
+
+    public static boolean contains(BasePage page) {
+        return backStackManager.contains(page);
     }
 
     /**

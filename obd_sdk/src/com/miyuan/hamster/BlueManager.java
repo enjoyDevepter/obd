@@ -263,6 +263,7 @@ public class BlueManager {
     private int mCount = 20;
     private Queue<byte[]> mDataQueue;
     private TimeOutThread timeOutThread;
+    private boolean obdUpdate;
     private BleWriteCallback bleWriteCallback = new BleWriteCallback() {
         @Override
         public void onWriteSuccess(byte[] justWrite) {
@@ -468,6 +469,14 @@ public class BlueManager {
         return connectStatus == 1;
     }
 
+    public boolean isObdUpdate() {
+        return obdUpdate;
+    }
+
+    public void setObdUpdate(boolean obdUpdate) {
+        this.obdUpdate = obdUpdate;
+    }
+
     /**
      * 发送指令
      *
@@ -478,13 +487,20 @@ public class BlueManager {
 
 //        Log.d("send1  instructList size " + (instructList != null ? instructList.size() : "NULL "));
 
+//        Log.d("APP->OBD   " + obdUpdate + "  " + HexUtils.byte2HexStr(data));
+
+        if (isObdUpdate() && (data[1] & 0xFF) != 0x86) {
+            return;
+        }
+
+
         if (instructList == null) {
             instructList = new LinkedList<>();
             queue.add(data);
             return;
         }
 
-//        Log.d("send1  queue size " + queue.size() + " canGo " + canGo);
+        Log.d("send1  queue size " + queue.size() + " canGo " + canGo);
 
         if (queue.size() == 0 && canGo) {
             queue.add(data);
@@ -505,10 +521,10 @@ public class BlueManager {
                 instructList.pollLast();
                 instructList.addLast(data);
             }
-//            Log.d("instructList has one ");
+            Log.d("instructList has one ");
             return;
         }
-//        Log.d("add to instructList");
+        Log.d("add to instructList");
         instructList.addLast(data);
     }
 

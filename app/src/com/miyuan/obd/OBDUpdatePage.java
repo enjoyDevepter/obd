@@ -88,25 +88,11 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
     private byte[] updates;
     private List<String> flashFilePath = new ArrayList<>();
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        title.setText("固件升级");
-        reportV.setOnClickListener(this);
-        back.setVisibility(View.GONE);
-        messageTV.setText(getDate().getString("message"));
-        infoTV.setText("本次升级共需约" + (int) ((getDate().getInt("size") / 1024 * 0.6) / 60) + "分，当前升级进度：");
-        if (!update) {
-            downloadFirmware(getDate().getString("url"));
-            update = true;
-        }
-
-    }
+    private int firmwareCurrentIndex = -1;
 
     @Override
     public void onStart() {
         super.onStart();
-        BlueManager.getInstance().addBleCallBackListener(this);
     }
 
     @Override
@@ -120,6 +106,24 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
         return true;
     }
 
+    private int flashCurrentIndex = -1;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        title.setText("固件升级");
+        reportV.setOnClickListener(this);
+        back.setVisibility(View.GONE);
+        messageTV.setText(getDate().getString("message"));
+        infoTV.setText("本次升级共需约" + (int) ((getDate().getInt("size") / 1024 * 0.6) / 60) + "分，当前升级进度：");
+        if (!update) {
+            BlueManager.getInstance().addBleCallBackListener(this);
+            update = true;
+            Log.d("update  " + update);
+            downloadFirmware(getDate().getString("url"));
+        }
+
+    }
 
     @Override
     public void onEvent(int event, Object data) {
@@ -134,6 +138,7 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
                     }
                 } else {
                     // 固件升级开始
+                    firmwareCurrentIndex = 0;
                     updateForOneUnit(0, false);
                 }
                 break;
@@ -142,12 +147,17 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
                 switch (update.getStatus()) {
                     case 0:
                         //  重新传递
+                        firmwareCurrentIndex = update.getIndex();
                         updateForOneUnit(update.getIndex(), false);
                         break;
                     case 1:
                         // 继续
                         current += UNIT;
                         progressBar.setProgress((int) current);
+                        if (firmwareCurrentIndex == update.getIndex() + 1) {
+                            return;
+                        }
+                        firmwareCurrentIndex = update.getIndex() + 1;
                         updateForOneUnit(update.getIndex() + 1, false);
                         break;
                     case 2: // 固件升级完成
@@ -158,6 +168,8 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
                             BlueManager.getInstance().send(checkUpdate);
                         } else {
                             // 升级完成
+                            firmwareCurrentIndex = -1;
+                            notifyUpdateSuccess();
                             showUpdateFinisheDialog();
                         }
                         break;
@@ -173,6 +185,7 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
                     }
                 } else {
                     // 固件升级开始
+                    flashCurrentIndex = 0;
                     updateForOneUnit(0, true);
                 }
                 break;
@@ -182,17 +195,23 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
                 switch (flashUpdate.getStatus()) {
                     case 0:
                         //  重新传递
+                        flashCurrentIndex = flashUpdate.getIndex();
                         updateForOneUnit(flashUpdate.getIndex(), true);
                         break;
                     case 1:
                         // 继续
                         current += UNIT;
                         progressBar.setProgress((int) current);
+                        if (flashCurrentIndex == flashUpdate.getIndex() + 1) {
+                            return;
+                        }
+                        flashCurrentIndex = flashUpdate.getIndex() + 1;
                         updateForOneUnit(flashUpdate.getIndex() + 1, true);
                         break;
                     case 2: // 升级完成 判断是否还有其他flash文件
                         if (++flashIndex > flashFilePath.size() - 1) {
                             // flash 升级完成 通知服务器
+                            flashCurrentIndex = -1;
                             notifyUpdateSuccess();
                             showUpdateFinisheDialog();
                         } else {
@@ -219,7 +238,7 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
     private void downloadFirmware(final String url) {
         updatePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "update";
         // 先删除原来升级文件
-        delFile(new File(updatePath));
+        delFile(new File(updatePath), true);
 
         Request request = new Request.Builder().url(url).build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
@@ -275,6 +294,7 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
             }
         }
 
+        BlueManager.getInstance().setObdUpdate(true);
         if (appFilePath != null) {
             getUpdateInfo(appFilePath, false);
             BlueManager.getInstance().send(checkUpdate);
@@ -475,24 +495,28 @@ public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, V
                 if (null != updatePath) {
                     File updateDir = new File(updatePath);
                     if (updateDir.exists()) {
-                        delFile(updateDir);
+                        delFile(updateDir, false);
                     }
                 }
             }
         });
     }
 
-    private void delFile(@NonNull File file) {
+    private void delFile(@NonNull File file, boolean isDown) {
         if (file.isFile()) {
-            file.delete();
+            boolean del = file.delete();
+            Log.d("isDown  " + isDown + " del  " + del + " delFile path  " + file.getPath());
             return;
         }
-        for (File f : file.listFiles()) {
-            delFile(f);
+        if (null != file.listFiles() && file.listFiles().length > 0) {
+            for (File f : file.listFiles()) {
+                delFile(f, isDown);
+            }
         }
     }
 
     private void showUpdateFinisheDialog() {
+        BlueManager.getInstance().setObdUpdate(false);
         dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
                 .setViewListener(new CustomDialog.ViewListener() {
                     @Override

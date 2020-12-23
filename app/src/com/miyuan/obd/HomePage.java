@@ -307,7 +307,11 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
             public void onResponse(Call call, Response response) throws IOException {
                 String responese = response.body().string();
                 Log.d("checkOBDRight success " + responese);
-                obdRightInfo = JSON.parseObject(responese, OBDRightInfo.class);
+                try {
+                    obdRightInfo = JSON.parseObject(responese, OBDRightInfo.class);
+                } catch (Exception e) {
+                    Log.d("checkOBDRight onResponse  Exception " + e.getMessage());
+                }
             }
         });
     }

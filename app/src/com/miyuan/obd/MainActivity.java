@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                                 bundle.putInt("size", updateInfo.getSize());
                                 bundle.putInt("id", updateInfo.getId());
                                 page.setDate(bundle);
-                                PageManager.clearHistoryAndGo(page);
+                                PageManager.go(page);
                                 dialog.dismiss();
                             }
                         });

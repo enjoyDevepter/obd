@@ -199,6 +199,12 @@ public class BackStackManager {
         return targetPage;
     }
 
+    public boolean contains(BasePage page) {
+        if (!historyList.isEmpty()) {
+            return historyList.contains(page);
+        }
+        return false;
+    }
 
     /**
      * 单例持有器
