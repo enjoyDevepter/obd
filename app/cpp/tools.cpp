@@ -65,8 +65,8 @@ unsigned short convert_picture(unsigned char *pu8PictureBitmapIn, unsigned char 
  * Signature: ([B[B)[B
  */
 JNIEXPORT jbyteArray JNICALL
-Java_com_miyuan_obd_HomePage_convertPicture(JNIEnv *env, jclass jcl, jbyteArray src,
-                                            jbyteArray des) {
+Java_com_miyuan_obd_OBDAuthPage_convertPicture(JNIEnv *env, jclass jcl, jbyteArray src,
+                                               jbyteArray des) {
     jbyte *srcBuffer = env->GetByteArrayElements(src, 0);
     jbyte *desBuffer = env->GetByteArrayElements(des, 0);
     unsigned short length = convert_picture((unsigned char *) srcBuffer,

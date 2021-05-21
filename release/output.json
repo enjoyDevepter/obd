@@ -1,0 +1,19 @@
+[
+  {
+    "outputType": {
+      "type": "APK"
+    },
+    "apkData": {
+      "type": "MAIN",
+      "splits": [],
+      "versionCode": 1400,
+      "versionName": "3.1",
+      "enabled": true,
+      "outputFile": "formal_OBD.apk",
+      "fullName": "formalRelease",
+      "baseName": "formal-release"
+    },
+    "path": "formal_OBD.apk",
+    "properties": {}
+  }
+]
