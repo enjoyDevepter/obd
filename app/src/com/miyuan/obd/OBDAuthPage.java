@@ -924,50 +924,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 authFail("授权失败!请联系客服!");
                 uploadLog();
                 break;
-            case OBDEvent.NO_CAR_ID:
-                obdStatusInfo = (OBDStatusInfo) data;
-                ChoiceCarPage choiceCarPage = new ChoiceCarPage();
-                Bundle carBundle = new Bundle();
-                carBundle.putString("boxId", obdStatusInfo.getbVersion());
-                carBundle.putString("sn", obdStatusInfo.getSn());
-                choiceCarPage.setDate(carBundle);
-                PageManager.go(choiceCarPage);
-                break;
-            case OBDEvent.NO_PARAM: // 无参数
-                obdStatusInfo = (OBDStatusInfo) data;
-                checkTireSupport();
-                break;
-            case OBDEvent.PARAM_UPDATE_SUCCESS:
-                obdStatusInfo = (OBDStatusInfo) data;
-                notifyUpdateSuccess(false);
-                break;
-            case OBDEvent.PARAM_UPDATE_FAIL:
-                break;
-            case OBDEvent.CURRENT_MISMATCHING:
-                ProtocolCheckFailPage checkFailPage = new ProtocolCheckFailPage();
-                Bundle checkFailPageBundle = new Bundle();
-                checkFailPageBundle.putBoolean("before_matching", false);
-                checkFailPage.setDate(checkFailPageBundle);
-                PageManager.go(checkFailPage);
-                break;
-            case OBDEvent.BEFORE_MATCHING:
-                ProtocolCheckFailPage protocolCheckFailPage = new ProtocolCheckFailPage();
-                Bundle protocolCheckFailPageBundle = new Bundle();
-                protocolCheckFailPageBundle.putBoolean("before_matching", true);
-                protocolCheckFailPage.setDate(protocolCheckFailPageBundle);
-                PageManager.go(protocolCheckFailPage);
-                break;
-            case OBDEvent.UN_ADJUST:
-                // FIXME: 2018/9/29
-                obdStatusInfo = (OBDStatusInfo) data;
-                checkColectStauts();
-                break;
-            case OBDEvent.ADJUSTING:
-                checkOBDVersionForNew();
-                break;
-            case OBDEvent.ADJUST_SUCCESS:
-                PageManager.go(new HomePage());
-                break;
             default:
                 break;
         }
