@@ -781,6 +781,15 @@ public class BlueManager {
                         mHandler.sendMessage(message);
                         return;
                     }
+
+                    // 三期新需求，优先判断是否选择车型
+                    if (content[1] == 02) {
+                        obdStatusInfo.setNews(true);
+                        obdStatusInfo.setHudType(content[68]);
+                        obdStatusInfo.setSupportNavi(content[69] == 1);
+                        obdStatusInfo.setSupportFM(content[70] == 1);
+                    }
+
                     // 判断是否授权
                     if ((content[5] & 15) == 0) { // 未授权或者授权过期或者授权失败
 //                        if ((content[5] >> 4) != 0) { // 授权失败
@@ -827,10 +836,6 @@ public class BlueManager {
                             mHandler.sendMessage(message);
                             return;
                         }
-                        obdStatusInfo.setNews(true);
-                        obdStatusInfo.setHudType(content[68]);
-                        obdStatusInfo.setSupportNavi(content[69] == 1);
-                        obdStatusInfo.setSupportFM(content[70] == 1);
                     }
 
                     // 判断是否存在车型参数

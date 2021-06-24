@@ -13,11 +13,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.AmapNaviPage;
 import com.amap.api.navi.AmapNaviParams;
+import com.amap.api.navi.INaviInfoCallback;
+import com.amap.api.navi.enums.PageType;
 import com.amap.api.navi.model.AMapCalcRouteResult;
 import com.amap.api.navi.model.AMapLaneInfo;
 import com.amap.api.navi.model.AMapModelCross;
@@ -84,9 +85,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     private View statusV;
     private volatile boolean verified;
     private CustomDialog dialog;
-    private volatile boolean needNotifyParamsSuccess;
-    private volatile boolean needNotifyVerifiedSuccess;
-
+    private boolean backToNavi = false;
     private AnimationDrawable animationDrawable;
 
     static {
@@ -107,8 +106,10 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     @Override
     public void onStart() {
         super.onStart();
-        verify();
-        BlueManager.getInstance().addBleCallBackListener(this);
+        if (!backToNavi) {
+            verify();
+            BlueManager.getInstance().addBleCallBackListener(this);
+        }
     }
 
     /**
@@ -187,98 +188,10 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
     private Timer heartTimer = new Timer();
     private boolean showLane;
-    private boolean endNavi;
     private byte[] lastBitmap;
 
     public native static byte[] convertPicture(byte[] src, byte[] des);
 
-
-    /**
-     * 获取采集上传状态
-     */
-    private void checkColectStauts() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", obdStatusInfo.getSn());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("checkColectStauts input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_STATUS)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                                .setViewListener(new CustomDialog.ViewListener() {
-                                    @Override
-                                    public void bindView(View view) {
-                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
-                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
-                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
-                                        final View confirm = view.findViewById(R.id.confirm);
-                                        confirm.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                checkColectStauts();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setLayoutRes(R.layout.dailog_common_warm)
-                                .setCancelOutside(false)
-                                .setDimAmount(0.5f)
-                                .isCenter(true)
-                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                                .show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("checkColectStauts success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        String state = result.optString("state");
-                        if ("1".equals(state)) {
-                            CollectPage collectPage = new CollectPage();
-                            Bundle bundle = new Bundle();
-                            bundle.putString("sn", obdStatusInfo.getSn());
-                            collectPage.setDate(bundle);
-                            PageManager.go(collectPage);
-                        } else {
-                            CollectGuide collectGuide = new CollectGuide();
-                            Bundle collectBundle = new Bundle();
-                            collectBundle.putBoolean("matching", true);
-                            collectBundle.putString("sn", obdStatusInfo.getSn());
-                            collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
-                            collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
-                            collectGuide.setDate(collectBundle);
-                            PageManager.go(collectGuide);
-                        }
-                    }
-                } catch (JSONException e) {
-                    Log.d("checkColectStauts failure " + e.getMessage());
-                }
-            }
-        });
-    }
 
     public static int shortToByteArray1(short i, byte[] data, int offset) {
         data[offset + 1] = (byte) (i >> 8 & 255);
@@ -349,7 +262,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 try {
                     final JSONObject result = new JSONObject(responese);
                     if ("000".equals(result.optString("status"))) {
-                        needNotifyVerifiedSuccess = true;
                         String code = result.optString("rightStr");
                         BlueManager.getInstance().send(ProtocolUtils.auth(obdStatusInfo.getSn(), code));
                     } else {
@@ -407,142 +319,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
         });
     }
 
-    /**
-     * 激活成功
-     */
-    private void authSuccess() {
-
-        if (!needNotifyVerifiedSuccess) {
-            return;
-        }
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", obdStatusInfo.getSn());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("activate success input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.ACTIVATE_SUCCESS)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("activate failure " + e.getMessage());
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                                .setViewListener(new CustomDialog.ViewListener() {
-                                    @Override
-                                    public void bindView(View view) {
-                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
-                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
-                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
-                                        final View confirm = view.findViewById(R.id.confirm);
-                                        confirm.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                confirm.setEnabled(false);
-                                                authSuccess();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setLayoutRes(R.layout.dailog_common_warm)
-                                .setCancelOutside(false)
-                                .setDimAmount(0.5f)
-                                .isCenter(true)
-                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                                .show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("activate success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        // 协议匹配检查（通过获取胎压信息）
-                        needNotifyVerifiedSuccess = false;
-                    } else {
-                        Log.d("activate failure" + result.optString("message"));
-                    }
-                } catch (JSONException e) {
-                    Log.d("activate failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
-    /**
-     * 通知服务器固件升级完成
-     */
-    private void notifyUpdateSuccess(boolean force) {
-        if (!needNotifyParamsSuccess && !force) {
-            return;
-        }
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", obdStatusInfo.getSn());
-            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
-            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("notifyUpdateSuccess  " + force + " input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.FIRMWARE_UPDATE_SUCCESS)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .post(requestBody)
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("notifyUpdateSuccess failure " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("notifyUpdateSuccess success " + responese);
-                try {
-                    final JSONObject result = new JSONObject(responese);
-                    if ("000".equals(result.optString("status"))) {
-                        needNotifyParamsSuccess = false;
-                    } else {
-                        GlobalUtil.getHandler().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), result.optString("message"), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    Log.d("notifyUpdateSuccess failure " + e.getMessage());
-                }
-            }
-        });
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -552,256 +328,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
         }
     }
 
-
-//    private void checkSupportTire() {
-//
-//        switch (SettingPreferencesConfig.TIRE_STATUS.get()) {
-//            case 0:
-//                checkTireSupport();
-//                break;
-//            case 1:
-//                checkOBDVersion();
-//                break;
-//            case 2:
-//                PageManager.go(new HomePage());
-//                break;
-//        }
-//    }
-
-    private void checkTireSupport() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", obdStatusInfo.getSn());
-            jsonObject.put("boxId", obdStatusInfo.getBoxId());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("checkSupportTire input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.TIRE_CHECK)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("checkSupportTire failure " + e.getMessage());
-                GlobalUtil.getHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                                .setViewListener(new CustomDialog.ViewListener() {
-                                    @Override
-                                    public void bindView(View view) {
-                                        ((TextView) (view.findViewById(R.id.confirm))).setText("已打开网络，重试");
-                                        ((TextView) (view.findViewById(R.id.info))).setText("请打开网络，否则无法完成当前操作!");
-                                        ((TextView) (view.findViewById(R.id.title))).setText("网络异常");
-                                        final View confirm = view.findViewById(R.id.confirm);
-                                        confirm.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                                checkTireSupport();
-                                            }
-                                        });
-                                    }
-                                })
-                                .setLayoutRes(R.layout.dailog_common_warm)
-                                .setCancelOutside(false)
-                                .setDimAmount(0.5f)
-                                .isCenter(true)
-                                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
-                                .show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("checkSupportTire success " + responese);
-                final TPMSStatus tpmsStatus = JSON.parseObject(responese, TPMSStatus.class);
-                if ("000".equals(tpmsStatus.getStatus())) {
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            SettingPreferencesConfig.TIRE_STATUS.set(tpmsStatus.getState());
-                            switch (tpmsStatus.getState()) {
-                                case 1:
-                                    checkOBDVersion();
-                                    break;
-                                case 2:
-                                    notifyUpdateSuccess(true);
-                                    PageManager.go(new HomePage());
-                                    break;
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    private void checkOBDVersion() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", obdStatusInfo.getSn());
-            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
-            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("checkOBDVersion input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.FIRMWARE_UPDATE)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("checkOBDVersion failure " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("checkOBDVersion success " + responese);
-                final OBDVersion obdVersion = JSON.parseObject(responese, OBDVersion.class);
-                if ("000".equals(obdVersion.getStatus())) {
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (obdVersion.getpUpdateState()) {
-                                case 0:  // 无参数更新
-                                    break;
-                                case 1: // 有更新
-                                    needNotifyParamsSuccess = true;
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
-                                    break;
-                                case 2: // 临时车型，需要采集
-                                    CollectGuide collectGuide = new CollectGuide();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putBoolean("matching", false);
-                                    bundle.putString("sn", obdStatusInfo.getSn());
-                                    bundle.putString("pVersion", obdStatusInfo.getpVersion());
-                                    bundle.putString("bVersion", obdStatusInfo.getbVersion());
-                                    collectGuide.setDate(bundle);
-                                    PageManager.go(collectGuide);
-                                    break;
-                                case 3: // 临时车型，参数已采集
-                                    CollectFinish collectFinish = new CollectFinish();
-                                    Bundle collectBundle = new Bundle();
-                                    collectBundle.putString("sn", obdStatusInfo.getSn());
-                                    collectBundle.putString("pVersion", obdStatusInfo.getpVersion());
-                                    collectBundle.putString("bVersion", obdStatusInfo.getbVersion());
-                                    collectBundle.putBoolean("success", false);
-                                    collectFinish.setDate(collectBundle);
-                                    PageManager.go(collectFinish);
-                                    break;
-                                case 6: // 车型不支持
-                                    CollectFinish finish = new CollectFinish();
-                                    Bundle finishBundle = new Bundle();
-                                    finishBundle.putString("sn", obdStatusInfo.getSn());
-                                    finishBundle.putString("pVersion", obdStatusInfo.getpVersion());
-                                    finishBundle.putString("bVersion", obdStatusInfo.getbVersion());
-                                    finishBundle.putBoolean("success", false);
-                                    finishBundle.putBoolean("unPlay", true);
-                                    finish.setDate(finishBundle);
-                                    PageManager.go(finish);
-                                    break;
-                            }
-                        }
-                    });
-                } else {
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-
-    private void checkOBDVersionForNew() {
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("serialNumber", obdStatusInfo.getSn());
-            jsonObject.put("bVersion", obdStatusInfo.getbVersion());
-            jsonObject.put("pVersion", obdStatusInfo.getpVersion());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Log.d("checkOBDVersion input " + jsonObject.toString());
-
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
-
-        Request request = new Request.Builder()
-                .url(URLUtils.FIRMWARE_UPDATE)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
-        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("checkOBDVersion failure " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responese = response.body().string();
-                Log.d("checkOBDVersion success " + responese);
-                final OBDVersion obdVersion = JSON.parseObject(responese, OBDVersion.class);
-                if ("000".equals(obdVersion.getStatus())) {
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (obdVersion.getpUpdateState()) {
-                                case 0:  // 无参数更新
-                                case 2:
-                                case 3:
-                                case 6:
-                                    CollectPage collectPage = new CollectPage();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("sn", obdStatusInfo.getSn());
-                                    collectPage.setDate(bundle);
-                                    PageManager.go(collectPage);
-                                    break;
-                                case 1: // 有更新
-                                    needNotifyParamsSuccess = true;
-                                    BlueManager.getInstance().send(ProtocolUtils.updateParams(obdStatusInfo.getSn(), obdVersion.getParams()));
-                                    break;
-                            }
-                        }
-                    });
-                } else {
-                    GlobalUtil.getHandler().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(), obdVersion.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
-        });
-    }
 
     private void showLogDailog() {
         GlobalUtil.getHandler().post(new Runnable() {
@@ -918,6 +444,8 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                 break;
             case OBDEvent.AUTHORIZATION_SUCCESS:
                 // 直接跳导航
+                obdStatusInfo = (OBDStatusInfo) data;
+                Log.d("obdStatusInfo  " + obdStatusInfo);
                 goNavi();
                 break;
             case OBDEvent.AUTHORIZATION_FAIL:
@@ -942,22 +470,19 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     private void goNavi() {
         BlueManager.getInstance().setNavi(true);
         initTimer();
+        backToNavi = true;
         final AMapNavi aMapNavi = AMapNavi.getInstance(getContext());
         aMapNavi.addAMapNaviListener(new AMapNaviListener() {
             @Override
             public void onInitNaviFailure() {
-//                            Log.d("onInitNaviFailure");
             }
 
             @Override
             public void onInitNaviSuccess() {
-//                            Log.d("onInitNaviSuccess");
             }
 
             @Override
             public void onStartNavi(int i) {
-                endNavi = false;
-//                            Log.d("onStartNavi " + i);
             }
 
             @Override
@@ -982,8 +507,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void onEndEmulatorNavi() {
-//                            Log.d("onEndEmulatorNavi");
-                endNavi = true;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -994,8 +517,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void onArriveDestination() {
-//                            Log.d("onArriveDestination");
-                endNavi = true;
                 if (heartTimer != null) {
                     heartTimer.cancel();
                 }
@@ -1034,10 +555,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void onNaviInfoUpdate(NaviInfo naviInfo) {
-                if (endNavi) {
-                    return;
-                }
-//                            Log.d("onNaviInfoUpdate  naviInfo " + naviInfo.getCurStepRetainDistance());
                 int type = 0;
                 switch (naviInfo.getIconType()) {
                     case 0:
@@ -1112,9 +629,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
-                if (endNavi) {
-                    return;
-                }
                 int index = showCamera(aMapNaviCameraInfos);
                 if (index != -1) {
                     AMapNaviCameraInfo cameraInfo = aMapNaviCameraInfos[index];
@@ -1202,9 +716,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void showLaneInfo(AMapLaneInfo[] aMapLaneInfos, byte[] bytes, byte[] bytes1) {
-                if (endNavi) {
-                    return;
-                }
                 int enter = 0;
                 int count = aMapLaneInfos.length;
                 byte[] laneType = new byte[count];
@@ -1234,10 +745,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void hideLaneInfo() {
-                if (endNavi) {
-                    return;
-                }
-//                            Log.d("aMapLaneInfo  hideLaneInfo ");
                 if (showLane) {
                     showLane = false;
                     BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0, null));
@@ -1299,8 +806,110 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             }
         });
-        AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), null);
+        AmapNaviPage.getInstance().showRouteActivity(getContext(), new AmapNaviParams(null), new INaviInfoCallback() {
+            @Override
+            public void onInitNaviFailure() {
 
+            }
+
+            @Override
+            public void onGetNavigationText(String s) {
+
+            }
+
+            @Override
+            public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
+
+            }
+
+            @Override
+            public void onArriveDestination(boolean b) {
+
+            }
+
+            @Override
+            public void onStartNavi(int i) {
+
+            }
+
+            @Override
+            public void onCalculateRouteSuccess(int[] ints) {
+
+            }
+
+            @Override
+            public void onCalculateRouteFailure(int i) {
+
+            }
+
+            @Override
+            public void onStopSpeaking() {
+
+            }
+
+            @Override
+            public void onReCalculateRoute(int i) {
+
+            }
+
+            @Override
+            public void onExitPage(int i) {
+                Log.d("onExitPage  i = " + i);
+                if (PageType.COMPONENT == i) {
+                    PageManager.back();
+                }
+            }
+
+            @Override
+            public void onStrategyChanged(int i) {
+
+            }
+
+            @Override
+            public View getCustomNaviBottomView() {
+                return null;
+            }
+
+            @Override
+            public View getCustomNaviView() {
+                return null;
+            }
+
+            @Override
+            public void onArrivedWayPoint(int i) {
+
+            }
+
+            @Override
+            public void onMapTypeChanged(int i) {
+
+            }
+
+            @Override
+            public View getCustomMiddleView() {
+                return null;
+            }
+
+            @Override
+            public void onNaviDirectionChanged(int i) {
+
+            }
+
+            @Override
+            public void onDayAndNightModeChanged(int i) {
+
+            }
+
+            @Override
+            public void onBroadcastModeChanged(int i) {
+
+            }
+
+            @Override
+            public void onScaleAutoChanged(boolean b) {
+
+            }
+        });
     }
 
     public void saveMyBitmap(Bitmap mBitmap) {
