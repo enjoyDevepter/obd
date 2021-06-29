@@ -9,10 +9,13 @@ import android.graphics.Matrix;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.AmapNaviPage;
@@ -86,7 +89,17 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     private volatile boolean verified;
     private CustomDialog dialog;
     private boolean backToNavi = false;
+    public static boolean hasCheck = false;
     private AnimationDrawable animationDrawable;
+
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            goNavi();
+            return true;
+        }
+    }
+    );
 
     static {
         System.loadLibrary("tools");
@@ -427,34 +440,161 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     @Override
     public void onEvent(int event, Object data) {
         switch (event) {
-            case OBDEvent.UNREGISTERED://未注册
-                // 激活
-                obdStatusInfo = (OBDStatusInfo) data;
-                Log.d("obdStatusInfo  " + obdStatusInfo);
-                InstallationGuidePage obdInitPage = new InstallationGuidePage();
-                Bundle bundle = new Bundle();
-                bundle.putString("boxId", obdStatusInfo.getBoxId());
-                obdInitPage.setDate(bundle);
-                PageManager.go(obdInitPage);
-                break;
             case OBDEvent.AUTHORIZATION: //未授权或者授权过期
                 obdStatusInfo = (OBDStatusInfo) data;
                 // 获取授权码
                 getLisense();
                 break;
-            case OBDEvent.AUTHORIZATION_SUCCESS:
+            case OBDEvent.NORMAL:
                 // 直接跳导航
                 obdStatusInfo = (OBDStatusInfo) data;
                 Log.d("obdStatusInfo  " + obdStatusInfo);
-                goNavi();
-                break;
-            case OBDEvent.AUTHORIZATION_FAIL:
-                authFail("授权失败!请联系客服!");
-                uploadLog();
+                updateCarID();
                 break;
             default:
                 break;
         }
+    }
+
+
+    /**
+     * 检查固件升级
+     */
+    private void checkFirmwareVersion(OBDStatusInfo obdStatusInfo) {
+        if (null == obdStatusInfo) {
+            return;
+        }
+        String sn = obdStatusInfo.getSn();
+        String bVersion = obdStatusInfo.getbVersion();
+        String pVersion = obdStatusInfo.getpVersion();
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("serialNumber", sn);
+            jsonObject.put("pVersion", pVersion);
+            jsonObject.put("bVersion", bVersion);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("checkFirmwareVersion input " + jsonObject.toString());
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+
+        Request request = new Request.Builder()
+                .url(URLUtils.UPDATE_FIRMWARE)
+                .post(requestBody)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("checkFirmwareVersion onFailure " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responese = response.body().string();
+                Log.d("checkFirmwareVersion onResponse " + responese);
+                final FirmwareUpdateInfo updateInfo = JSON.parseObject(responese, FirmwareUpdateInfo.class);
+                if (updateInfo.getbUpdateState() == 1) { // 固件需要升级
+                    // 弹出对话框
+                    GlobalUtil.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            showUpdateConfirmDailog(updateInfo);
+                        }
+                    });
+                } else {
+                    handler.sendEmptyMessage(1);
+                }
+            }
+        });
+    }
+
+    private void showUpdateConfirmDailog(final FirmwareUpdateInfo updateInfo) {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
+                .setViewListener(new CustomDialog.ViewListener() {
+                    @Override
+                    public void bindView(View view) {
+                        Log.d("showUpdateConfirmDailog  " + updateInfo);
+                        TextView textView = view.findViewById(R.id.info);
+                        String info = "当前有新版本升级，共需约" + (int) ((updateInfo.getSize() / 1024 * 0.6) / 60) + "分钟。升级过程中不能关闭手机，不能关闭硬件设备，不能做其他任何操作。否则升级失败可能导致设备使用不正常，需要重新升级。";
+                        textView.setText(info);
+                        view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                OBDUpdatePage page = new OBDUpdatePage();
+                                Bundle bundle = new Bundle();
+                                bundle.putString("url", updateInfo.getUrl());
+                                bundle.putString("serialNumber", obdStatusInfo.getSn());
+                                bundle.putString("bVersion", obdStatusInfo.getbVersion());
+                                bundle.putString("pVersion", obdStatusInfo.getpVersion());
+                                bundle.putString("message", updateInfo.getDesc());
+                                bundle.putInt("size", updateInfo.getSize());
+                                bundle.putInt("id", updateInfo.getId());
+                                page.setDate(bundle);
+                                PageManager.go(page);
+                                dialog.dismiss();
+                            }
+                        });
+
+                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                goNavi();
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                })
+                .setLayoutRes(R.layout.dailog_update)
+                .setDimAmount(0.5f)
+                .isCenter(true)
+                .setWidth(OBDUtils.getDimens(getContext(), R.dimen.dailog_width))
+                .show();
+    }
+
+    private void updateCarID() {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("carId", "10479");
+            jsonObject.put("serialNumber", obdStatusInfo.getSn());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("updateCarID input " + jsonObject.toString());
+        RequestBody requestBody = new FormBody.Builder()
+                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        Request request = new Request.Builder()
+                .url(URLUtils.MODIFY_CAR_BRAND)
+                .addHeader("content-type", "application/json;charset:utf-8")
+                .post(requestBody)
+                .build();
+        GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String responese = response.body().string();
+
+                Log.d("updateCarID success " + responese);
+                try {
+                    final JSONObject result = new JSONObject(responese);
+                    if ("000".equals(result.optString("status"))) {
+                        if (!hasCheck) {
+                            hasCheck = true;
+                            checkFirmwareVersion(obdStatusInfo);
+                        }
+                    }
+                } catch (JSONException e) {
+                    Log.d("updateCarID failure " + e.getMessage());
+                }
+            }
+        });
     }
 
     private void initTimer() {

@@ -759,28 +759,28 @@ public class BlueManager {
                     obdStatusInfo.setBerforeMatching(content[8] == 01);
                     obdStatusInfo.setOrginal(content);
 
-                    if (content[content.length - 1] == 1) {
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_STATUS_UPDATA;
-                        mHandler.sendMessage(message);
-                    }
-//                    Message message = mHandler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putSerializable("obd_status_info", obdStatusInfo);
-//                    message.setData(bundle);
-                    // 判断是否注册
-                    if (content[4] == 00) { // 未注册
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_UNREGISTERED;
-                        mHandler.sendMessage(message);
-                        return;
-                    }
+//                    if (content[content.length - 1] == 1) {
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_STATUS_UPDATA;
+//                        mHandler.sendMessage(message);
+//                    }
+////                    Message message = mHandler.obtainMessage();
+////                    Bundle bundle = new Bundle();
+////                    bundle.putSerializable("obd_status_info", obdStatusInfo);
+////                    message.setData(bundle);
+//                    // 判断是否注册
+//                    if (content[4] == 00) { // 未注册
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_UNREGISTERED;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
 
                     // 三期新需求，优先判断是否选择车型
                     if (content[1] == 02) {
@@ -789,8 +789,8 @@ public class BlueManager {
                         obdStatusInfo.setSupportNavi(content[69] == 1);
                         obdStatusInfo.setSupportFM(content[70] == 1);
                     }
-
-                    // 判断是否授权
+//
+//                    // 判断是否授权
                     if ((content[5] & 15) == 0) { // 未授权或者授权过期或者授权失败
 //                        if ((content[5] >> 4) != 0) { // 授权失败
 //                            Message message = mHandler.obtainMessage();
@@ -808,112 +808,113 @@ public class BlueManager {
                         message.what = MSG_AUTHORIZATION;
                         mHandler.sendMessage(message);
                         return;
-                    } else if ((content[5] & 15) == 1) {
-                        // 授权成功
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_AUTHORIZATION_SUCCESS;
-                        mHandler.sendMessage(message);
-                    } else {
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_AUTHORIZATION_FAIL;
-                        mHandler.sendMessage(message);
-                        return;
                     }
-                    // 三期新需求，优先判断是否选择车型
-                    if (content[1] == 02) {
-                        if (content[67] == 00) { // 未选择车型
-                            Message message = mHandler.obtainMessage();
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("obd_status_info", obdStatusInfo);
-                            message.setData(bundle);
-                            message.what = MSG_NO_CAR_ID;
-                            mHandler.sendMessage(message);
-                            return;
-                        }
-                    }
+//                    else if ((content[5] & 15) == 1) {
+//                        // 授权成功
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_AUTHORIZATION_SUCCESS;
+//                        mHandler.sendMessage(message);
+//                    } else {
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_AUTHORIZATION_FAIL;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
+//                    // 三期新需求，优先判断是否选择车型
+//                    if (content[1] == 02) {
+//                        if (content[67] == 00) { // 未选择车型
+//                            Message message = mHandler.obtainMessage();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                            message.setData(bundle);
+//                            message.what = MSG_NO_CAR_ID;
+//                            mHandler.sendMessage(message);
+//                            return;
+//                        }
+//                    }
 
-                    // 判断是否存在车型参数
-                    if ((content[6] & 15) == 00) { // 未车型参数或者车型参数更新失败
-                        if ((content[6] >> 4) != 00) { // 车型参数失败
-                            Message message = mHandler.obtainMessage();
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("obd_status_info", obdStatusInfo);
-                            message.setData(bundle);
-                            message.what = MSG_PARAM_UPDATE_FAIL;
-                            mHandler.sendMessage(message);
-                            return;
-                        }
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_NO_PARAM;
-                        mHandler.sendMessage(message);
-                        return;
-                    } else {
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_PARAM_UPDATE_SUCCESS;
-                        mHandler.sendMessage(message);
-                    }
-
-                    // 判断当前胎压是否匹配
-                    if (content[7] == 00) { // 当前胎压不匹配
-                        // 优先判断之前胎压是否匹配
-                        if (content[8] == 01) { // 之前胎压匹配
-                            Message message = mHandler.obtainMessage();
-                            Bundle bundle = new Bundle();
-                            bundle.putSerializable("obd_status_info", obdStatusInfo);
-                            message.setData(bundle);
-                            message.what = MSG_BEFORE_MATCHING;
-                            mHandler.sendMessage(message);
-                            return;
-                        }
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_CURRENT_MISMATCHING;
-                        mHandler.sendMessage(message);
-                        return;
-                    }
-
-                    // 判断是否完成校准
-                    if (content[9] == 00) { // 校准状态
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_UN_ADJUST;
-                        mHandler.sendMessage(message);
-                        return;
-                    }
-                    if (content[9] == 01) { // 校准中状态
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_ADJUSTING;
-                        mHandler.sendMessage(message);
-                        return;
-                    }
-
-                    if (content[9] == 02) { // 校准完成
-                        Message message = mHandler.obtainMessage();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("obd_status_info", obdStatusInfo);
-                        message.setData(bundle);
-                        message.what = MSG_ADJUST_SUCCESS;
-                        mHandler.sendMessage(message);
-                    }
+//                    // 判断是否存在车型参数
+//                    if ((content[6] & 15) == 00) { // 未车型参数或者车型参数更新失败
+//                        if ((content[6] >> 4) != 00) { // 车型参数失败
+//                            Message message = mHandler.obtainMessage();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                            message.setData(bundle);
+//                            message.what = MSG_PARAM_UPDATE_FAIL;
+//                            mHandler.sendMessage(message);
+//                            return;
+//                        }
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_NO_PARAM;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    } else {
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_PARAM_UPDATE_SUCCESS;
+//                        mHandler.sendMessage(message);
+//                    }
+//
+//                    // 判断当前胎压是否匹配
+//                    if (content[7] == 00) { // 当前胎压不匹配
+//                        // 优先判断之前胎压是否匹配
+//                        if (content[8] == 01) { // 之前胎压匹配
+//                            Message message = mHandler.obtainMessage();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                            message.setData(bundle);
+//                            message.what = MSG_BEFORE_MATCHING;
+//                            mHandler.sendMessage(message);
+//                            return;
+//                        }
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_CURRENT_MISMATCHING;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
+//
+//                    // 判断是否完成校准
+//                    if (content[9] == 00) { // 校准状态
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_UN_ADJUST;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
+//                    if (content[9] == 01) { // 校准中状态
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_ADJUSTING;
+//                        mHandler.sendMessage(message);
+//                        return;
+//                    }
+//
+//                    if (content[9] == 02) { // 校准完成
+//                        Message message = mHandler.obtainMessage();
+//                        Bundle bundle = new Bundle();
+//                        bundle.putSerializable("obd_status_info", obdStatusInfo);
+//                        message.setData(bundle);
+//                        message.what = MSG_ADJUST_SUCCESS;
+//                        mHandler.sendMessage(message);
+//                    }
 
 //                    // 判断BoxId是否合法
 //                    if (content[10] == 00) { // boxId是否合法
