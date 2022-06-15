@@ -1,5 +1,7 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -55,6 +57,7 @@ import com.miyuan.obd.utils.URLUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -71,8 +74,6 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.obd_auth_layout, toHistory = false)
 public class OBDAuthPage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
@@ -108,7 +109,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     @Override
     public void onResume() {
         super.onResume();
-        title.setText("获取盒子状态");
+        title.setText("设备授权");
         reportV.setOnClickListener(this);
         back.setVisibility(View.GONE);
         statusV.setBackgroundResource(R.drawable.check_status_bg);
@@ -602,6 +603,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
         heartTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                Log.d(" send Heard ");
                 BlueManager.getInstance().send(ProtocolUtils.getTurnInfo());
             }
         }, 1000 * 3, 1000 * 8);
@@ -657,9 +659,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void onArriveDestination() {
-                if (heartTimer != null) {
-                    heartTimer.cancel();
-                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -1079,6 +1078,21 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
             BlueManager.getInstance().send(ProtocolUtils.getImage(code));
         }
 
+    }
+
+    public byte[] saveJPG_After(Bitmap bitmap) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(bitmap.getByteCount());
+            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)) {
+                baos.flush();
+                baos.close();
+                return baos.toByteArray();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new byte[0];
     }
 
     public byte[] bitmap2RGB(Bitmap bitmap) {

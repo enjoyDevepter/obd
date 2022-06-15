@@ -1,5 +1,7 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -38,8 +40,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
-
 @PageSetting(contentViewId = R.layout.connect_layout, toHistory = false)
 public class ConnectPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
 
@@ -59,7 +59,7 @@ public class ConnectPage extends AppBasePage implements View.OnClickListener, Bl
     public void onResume() {
         super.onResume();
         back.setVisibility(View.GONE);
-        title.setText("连接盒子");
+        title.setText("正在连接抬头显示");
         retry.setOnClickListener(this);
         reportV.setOnClickListener(this);
         BlueManager.getInstance().startScan();
