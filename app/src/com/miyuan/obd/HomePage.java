@@ -1,5 +1,7 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.app.NotificationManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.maps.AMapException;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.AmapNaviPage;
@@ -27,7 +30,6 @@ import com.amap.api.navi.model.AMapLaneInfo;
 import com.amap.api.navi.model.AMapModelCross;
 import com.amap.api.navi.model.AMapNaviCameraInfo;
 import com.amap.api.navi.model.AMapNaviCross;
-import com.amap.api.navi.model.AMapNaviInfo;
 import com.amap.api.navi.model.AMapNaviLocation;
 import com.amap.api.navi.model.AMapNaviRouteNotifyData;
 import com.amap.api.navi.model.AMapNaviTrafficFacilityInfo;
@@ -35,7 +37,6 @@ import com.amap.api.navi.model.AMapServiceAreaInfo;
 import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
-import com.autonavi.tbt.TrafficFacilityInfo;
 import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.BasePage;
 import com.miyuan.adas.GlobalUtil;
@@ -74,8 +75,6 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.home_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class HomePage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
@@ -497,7 +496,12 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                     BlueManager.getInstance().setNavi(true);
                     initTimer();
-                    final AMapNavi aMapNavi = AMapNavi.getInstance(getContext());
+                    final AMapNavi aMapNavi;
+                    try {
+                        aMapNavi = AMapNavi.getInstance(getContext());
+                    } catch (AMapException e) {
+                        throw new RuntimeException(e);
+                    }
                     aMapNavi.addAMapNaviListener(new AMapNaviListener() {
                         @Override
                         public void onInitNaviFailure() {
@@ -662,10 +666,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         }
 
                         @Override
-                        public void onNaviInfoUpdated(AMapNaviInfo aMapNaviInfo) {
-                        }
-
-                        @Override
                         public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
                             if (endNavi) {
                                 return;
@@ -820,11 +820,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                         }
 
                         @Override
-                        public void OnUpdateTrafficFacility(TrafficFacilityInfo trafficFacilityInfo) {
-
-                        }
-
-                        @Override
                         public void updateAimlessModeStatistics(AimLessModeStat aimLessModeStat) {
 
                         }
@@ -851,6 +846,11 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
 
                         @Override
                         public void onNaviRouteNotify(AMapNaviRouteNotifyData aMapNaviRouteNotifyData) {
+
+                        }
+
+                        @Override
+                        public void onGpsSignalWeak(boolean b) {
 
                         }
                     });

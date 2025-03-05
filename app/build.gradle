@@ -78,16 +78,16 @@ android {
             }
         }
 
-        applicationVariants.all { variant ->
-            if (variant.buildType.name != "debug") {
-                variant.getPackageApplicationProvider().get().outputDirectory = new File(project.rootDir.absolutePath + "/release")
-            }
-            variant.getPackageApplicationProvider().get().outputScope.apkDatas.forEach { apkData ->
-                apkData.outputFileName =
-                        variant.flavorName + "_" + "OBD" +
-                                ".apk"
-            }
-        }
+//        applicationVariants.all { variant ->
+//            if (variant.buildType.name != "debug") {
+//                variant.getPackageApplicationProvider().get().outputDirectory = new File(project.rootDir.absolutePath + "/release")
+//            }
+//            variant.getPackageApplicationProvider().get().outputScope.apkDatas.forEach { apkData ->
+//                apkData.outputFileName =
+//                        variant.flavorName + "_" + "OBD" +
+//                                ".apk"
+//            }
+//        }
     }
 
     externalNativeBuild {
