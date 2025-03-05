@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.amap.api.maps.AMapException;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
 import com.amap.api.navi.AmapNaviPage;
@@ -29,7 +30,6 @@ import com.amap.api.navi.model.AMapLaneInfo;
 import com.amap.api.navi.model.AMapModelCross;
 import com.amap.api.navi.model.AMapNaviCameraInfo;
 import com.amap.api.navi.model.AMapNaviCross;
-import com.amap.api.navi.model.AMapNaviInfo;
 import com.amap.api.navi.model.AMapNaviLocation;
 import com.amap.api.navi.model.AMapNaviRouteNotifyData;
 import com.amap.api.navi.model.AMapNaviTrafficFacilityInfo;
@@ -37,7 +37,6 @@ import com.amap.api.navi.model.AMapServiceAreaInfo;
 import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
-import com.autonavi.tbt.TrafficFacilityInfo;
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
 import com.miyuan.adas.anno.PageSetting;
@@ -96,7 +95,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            goNavi();
+            try {
+                goNavi();
+            } catch (AMapException e) {
+                throw new RuntimeException(e);
+            }
             return true;
         }
     }
@@ -543,7 +546,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
                         view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                goNavi();
+                                try {
+                                    goNavi();
+                                } catch (AMapException e) {
+                                    throw new RuntimeException(e);
+                                }
                                 dialog.dismiss();
                             }
                         });
@@ -609,7 +616,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
         }, 1000 * 3, 1000 * 8);
     }
 
-    private void goNavi() {
+    private void goNavi() throws AMapException {
         BlueManager.getInstance().setNavi(true);
         initTimer();
         backToNavi = true;
@@ -763,10 +770,6 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
             }
 
             @Override
-            public void onNaviInfoUpdated(AMapNaviInfo aMapNaviInfo) {
-            }
-
-            @Override
             public void updateCameraInfo(AMapNaviCameraInfo[] aMapNaviCameraInfos) {
                 int index = showCamera(aMapNaviCameraInfos);
                 if (index != -1) {
@@ -910,10 +913,7 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             }
 
-            @Override
-            public void OnUpdateTrafficFacility(TrafficFacilityInfo trafficFacilityInfo) {
 
-            }
 
             @Override
             public void updateAimlessModeStatistics(AimLessModeStat aimLessModeStat) {
@@ -942,6 +942,11 @@ public class OBDAuthPage extends AppBasePage implements BleCallBackListener, Vie
 
             @Override
             public void onNaviRouteNotify(AMapNaviRouteNotifyData aMapNaviRouteNotifyData) {
+
+            }
+
+            @Override
+            public void onGpsSignalWeak(boolean b) {
 
             }
         });

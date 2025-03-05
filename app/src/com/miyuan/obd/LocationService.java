@@ -11,6 +11,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps.AMapException;
 import com.amap.api.navi.AMapNavi;
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.hamster.log.Log;
@@ -47,7 +48,11 @@ public class LocationService extends Service {
             location.setAccuracy(amapLocation.getAccuracy());
             location.setBearing(amapLocation.getBearing());
             location.setTime(amapLocation.getTime());
-            AMapNavi.getInstance(getBaseContext()).setExtraGPSData(1, location);
+            try {
+                AMapNavi.getInstance(getBaseContext()).setExtraGPSData(1, location);
+            } catch (AMapException e) {
+                throw new RuntimeException(e);
+            }
         }
     };
     //声明AMapLocationClient类对象
@@ -91,10 +96,14 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        getPosition();
+        try {
+            getPosition();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void getPosition() {
+    public void getPosition() throws Exception {
         // 初始化定位
         mLocationClient = new AMapLocationClient(getApplicationContext());
         // 设置定位回调监听
