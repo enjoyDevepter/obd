@@ -9,11 +9,10 @@ android {
             storePassword 'mapbar2009'
         }
     }
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdk appTargetSdk
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 27
+        minSdk appMinSdk
+        targetSdk appTargetSdk
     }
     buildTypes {
         release {
@@ -40,6 +39,6 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     api project(path: ':obd_sdk')
-    api 'com.squareup.okhttp3:okhttp:3.8.0'
-    api 'com.android.support:appcompat-v7:27.1.1'
+    api 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation "androidx.appcompat:appcompat:1.6.0"
 }

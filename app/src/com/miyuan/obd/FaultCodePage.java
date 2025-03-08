@@ -1,13 +1,16 @@
 package com.miyuan.obd;
 
+import static com.miyuan.hamster.OBDEvent.FAULT_CODE;
+
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.GlobalUtil;
@@ -23,8 +26,6 @@ import com.miyuan.obd.utils.DBManager;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.miyuan.hamster.OBDEvent.FAULT_CODE;
 
 @PageSetting(contentViewId = R.layout.fault_code_layout)
 public class FaultCodePage extends AppBasePage implements View.OnClickListener, BleCallBackListener {

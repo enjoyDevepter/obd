@@ -4,6 +4,8 @@ package com.miyuan.obd.view;
  * Created by guomin on 2018/9/29.
  */
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -14,17 +16,17 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
+import androidx.appcompat.widget.AppCompatEditText;
+
 import com.miyuan.obd.R;
 import com.miyuan.obd.utils.OBDUtils;
-
-import static android.graphics.Paint.ANTI_ALIAS_FLAG;
 
 /**
  * Created by Allen on 2017/5/7.
  * 自定义支付密码输入框
  */
 
-public class CustomInputView extends android.support.v7.widget.AppCompatEditText {
+public class CustomInputView extends AppCompatEditText {
 
     private final static int psdType_weChat = 0;
     private final static int psdType_bottomLine = 1;

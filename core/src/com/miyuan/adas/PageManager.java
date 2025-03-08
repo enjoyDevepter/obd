@@ -2,7 +2,8 @@ package com.miyuan.adas;
 
 import android.app.Activity;
 import android.os.Process;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 
 /**

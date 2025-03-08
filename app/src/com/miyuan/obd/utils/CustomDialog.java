@@ -1,9 +1,10 @@
 package com.miyuan.obd.utils;
 
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
+
+import androidx.annotation.LayoutRes;
+import androidx.fragment.app.FragmentManager;
 
 /**
  * Created by guomin on 2018/3/12.
@@ -54,17 +55,6 @@ public class CustomDialog extends BaseDialog {
             mWidth = savedInstanceState.getInt(KEY_WIDTH);
             mCenter = savedInstanceState.getBoolean(KEY_CENTER);
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(KEY_LAYOUT_RES, mLayoutRes);
-        outState.putInt(KEY_HEIGHT, mHeight);
-        outState.putInt(KEY_WIDTH, mWidth);
-        outState.putFloat(KEY_DIM, mDimAmount);
-        outState.putBoolean(KEY_CANCEL_OUTSIDE, mIsCancelOutside);
-        outState.putBoolean(KEY_CENTER, mCenter);
-        super.onSaveInstanceState(outState);
     }
 
     @Override

@@ -1,14 +1,14 @@
 package com.miyuan.obd;
 
+import static com.miyuan.hamster.OBDEvent.AUTHORIZATION_SUCCESS;
+
+import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +17,11 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.alibaba.fastjson.JSON;
 import com.gyf.barlibrary.ImmersionBar;
@@ -34,9 +39,7 @@ import com.miyuan.hamster.core.HexUtils;
 import com.miyuan.hamster.log.Log;
 import com.miyuan.obd.utils.CustomDialog;
 import com.miyuan.obd.utils.OBDUtils;
-import com.miyuan.obd.utils.PermissionUtil;
 import com.miyuan.obd.utils.URLUtils;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,10 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
-import me.jessyan.rxerrorhandler.core.RxErrorHandler;
-import me.jessyan.rxerrorhandler.handler.listener.ResponseErrorListener;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -61,8 +61,6 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.miyuan.hamster.OBDEvent.AUTHORIZATION_SUCCESS;
 
 public class MainActivity extends AppCompatActivity implements BleCallBackListener {
 
@@ -130,7 +128,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         rootViewGroup.addView(splashView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        BlueManager.getInstance().init(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.BLUETOOTH_CONNECT}, 10001);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA}, 10001);
+        }
 
         EventBus.getDefault().register(this);
 
@@ -140,7 +143,29 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
                 .init(); //初始化，默认透明状态栏和黑色导航栏
 
-        BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // 有权限没有通过
+        boolean hasPermissionDismiss = false;
+        if (10001 == requestCode) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == -1) {
+                    hasPermissionDismiss = true;
+                    break;
+                }
+            }
+        }
+        if (hasPermissionDismiss) {
+            // 有权限未通过的处理
+            System.exit(0);
+        } else {
+            addTasks();
+            BlueManager.getInstance().init(this);
+            BlueManager.getInstance().addBleCallBackListener(MainActivity.this);
+        }
     }
 
 
@@ -230,30 +255,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onResume() {
         super.onResume();
-        PermissionUtil.requestPermissionForInit(new PermissionUtil.RequestPermission() {
-            @Override
-            public void onRequestPermissionSuccess() {
-                //request permission success, do something.
-                if (isFirst()) {
-                    addTasks();
-                }
-                setFirst(false);
-            }
 
-            @Override
-            public void onRequestPermissionFailure(List<String> permissions) {
-                PageManager.finishActivity(MainActivity.this);
-            }
-
-            @Override
-            public void onRequestPermissionFailureWithAskNeverAgain(List<String> permissions) {
-                PageManager.finishActivity(MainActivity.this);
-            }
-        }, new RxPermissions(MainActivity.getInstance()), RxErrorHandler.builder().with(MainActivity.getInstance()).responseErrorListener(new ResponseErrorListener() {
-            @Override
-            public void handleResponseError(Context context, Throwable t) {
-            }
-        }).build());
         if (serviceForegroundIntent != null) {
 //            AMapNavi.getInstance(this).setIsUseExtraGPSData(false);
             stopService(serviceForegroundIntent);
@@ -541,8 +543,8 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
                 .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
                 .addPart(MultipartBody.Part.createFormData("type", "4"))
                 .addPart(Headers.of(
-                        "Content-Disposition",
-                        "form-data; name=\"file\"; filename=\"car\"")
+                                "Content-Disposition",
+                                "form-data; name=\"file\"; filename=\"car\"")
                         , fileBody).build();
 
 

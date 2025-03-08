@@ -2,7 +2,8 @@ package com.miyuan.obd;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by guomin on 2018/6/3.

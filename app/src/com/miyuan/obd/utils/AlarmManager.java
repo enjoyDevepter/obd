@@ -2,7 +2,8 @@ package com.miyuan.obd.utils;
 
 
 import android.media.MediaPlayer;
-import android.support.annotation.RawRes;
+
+import androidx.annotation.RawRes;
 
 import com.miyuan.adas.GlobalUtil;
 

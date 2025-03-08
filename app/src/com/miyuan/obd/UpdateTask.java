@@ -1,5 +1,7 @@
 package com.miyuan.obd;
 
+import static com.miyuan.adas.GlobalUtil.getContext;
+
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +13,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.support.v4.content.FileProvider;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
 
@@ -35,8 +37,6 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.miyuan.adas.GlobalUtil.getContext;
 
 /**
  * 更新功能初始化
@@ -268,19 +268,17 @@ public class UpdateTask extends BaseTask {
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath(), "app.apk");
         Log.d("file.exists() " + file.exists());
         Log.d("file.getPath() " + file.getPath());
-        Intent install = new Intent(Intent.ACTION_VIEW);
-        if (Build.VERSION.SDK_INT >= 24) {//判读版本是否在7.0以上
-            Uri apkUri = FileProvider.getUriForFile(GlobalUtil.getContext(), "com.miyuan.obd.fileprovider", file);//在AndroidManifest中的android:authorities值
-            Log.d("apkUri " + apkUri);
-            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            install.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//添加这一句表示对目标应用临时授权该Uri所代表的文件
-            install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            boolean hasInstallPermission = GlobalUtil.getContext().getPackageManager().canRequestPackageInstalls();
+            if (!hasInstallPermission) {
+                GlobalUtil.getContext().startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
         } else {
-            install.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         }
-        GlobalUtil.getContext().startActivity(install);
 
     }
 

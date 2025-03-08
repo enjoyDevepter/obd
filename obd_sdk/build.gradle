@@ -11,13 +11,10 @@ android {
         }
     }
 
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdk appTargetSdk
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 27
-        versionCode 1
-        versionName '1.0'
+        minSdk appMinSdk
+        targetSdk appTargetSdk
     }
     lintOptions {
         abortOnError false
@@ -48,9 +45,8 @@ android {
 }
 
 dependencies {
-    api fileTree(include: ['*.jar'], dir: 'libs')
-    api 'com.jakewharton.timber:timber:4.7.0'
-    api 'com.android.support:support-annotations:27.1.1'
-//    compile 'com.android.support:appcompat-v7:25.2.1'
-//    compile 'com.android.support:design:22.2.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.jakewharton.timber:timber:4.7.0'
+    implementation "androidx.appcompat:appcompat:1.6.0"
+
 }

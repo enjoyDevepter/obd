@@ -2,12 +2,12 @@ package com.miyuan.adas;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -123,30 +123,6 @@ public class GlobalUtil {
      */
     public static boolean isNotUIThread() {
         return Looper.myLooper() != Looper.getMainLooper();
-    }
-
-
-    public static boolean isM() {
-        return Build.VERSION.SDK_INT >= 23 || "MNC".equals(Build.VERSION.CODENAME);
-    }
-
-    public static boolean isKitKat() {
-        return Build.VERSION.SDK_INT >= 19;
-    }
-
-    public static boolean isNougat() {
-        return Build.VERSION.SDK_INT >= 24 || "N".equals(Build.VERSION.CODENAME);
-    }
-
-    public static int getUnixUID() {
-        if (sUID == 0) {
-            try {
-                sUID = mainActivity.getPackageManager().getPackageInfo(resPackageName, 0).applicationInfo.uid;
-            } catch (Throwable e) {
-//
-            }
-        }
-        return sUID;
     }
 
     public static boolean isPhone(String phone) {

@@ -7,7 +7,7 @@
 
     <include layout="@layout/tittle_layout" />
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -58,6 +58,6 @@
                 android:textColor="#ff000000"
                 android:textSize="18sp" />
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

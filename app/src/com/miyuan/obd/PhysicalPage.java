@@ -1,15 +1,25 @@
 package com.miyuan.obd;
 
+import static com.miyuan.hamster.OBDEvent.COMMON_INFO;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_FIVE;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_FOUR;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_ONE;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_SEVEN;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_SEX;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_THREE;
+import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_TWO;
+
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.GlobalUtil;
@@ -26,15 +36,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.miyuan.hamster.OBDEvent.COMMON_INFO;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_FIVE;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_FOUR;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_ONE;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_SEVEN;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_SEX;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_THREE;
-import static com.miyuan.hamster.OBDEvent.PHYSICAL_STEP_TWO;
 
 @PageSetting(contentViewId = R.layout.physical_layout, toHistory = false)
 public class PhysicalPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {

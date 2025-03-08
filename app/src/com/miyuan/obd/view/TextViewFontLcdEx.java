@@ -3,19 +3,20 @@ package com.miyuan.obd.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
-import android.support.v4.util.LruCache;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import android.util.LruCache;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 import com.miyuan.obd.R;
 import com.miyuan.obd.utils.DecFormatUtil;
 
 
-public class TextViewFontLcdEx extends TextView {
+public class TextViewFontLcdEx extends AppCompatTextView {
     // 创建一个字体缓存，使用LRU缓存策略
     private static final LruCache<String, Typeface> typefaceCache = new LruCache<String, Typeface>(
             6);

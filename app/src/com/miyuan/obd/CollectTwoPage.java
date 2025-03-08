@@ -1,5 +1,7 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -11,10 +13,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
@@ -57,8 +60,6 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.collect_two_layout, toHistory = false)
 public class CollectTwoPage extends AppBasePage implements LocationListener, BleCallBackListener, View.OnClickListener {

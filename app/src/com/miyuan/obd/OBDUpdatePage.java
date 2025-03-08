@@ -1,16 +1,19 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
@@ -58,8 +61,6 @@ import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
-
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.obd_update_layout, toHistory = false)
 public class OBDUpdatePage extends AppBasePage implements BleCallBackListener, View.OnClickListener {
