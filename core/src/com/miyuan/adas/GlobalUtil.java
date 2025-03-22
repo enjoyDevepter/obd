@@ -2,15 +2,16 @@ package com.miyuan.adas;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
 
+import androidx.annotation.ColorRes;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.gyf.immersionbar.ImmersionBar;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -21,7 +22,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 
 public class GlobalUtil {
@@ -54,19 +54,6 @@ public class GlobalUtil {
 
     public static void setOkHttpClient(OkHttpClient okHttpClient) {
         GlobalUtil.okHttpClient = okHttpClient;
-    }
-
-    public static void uploadError(String sn) {
-        if (null != getOkHttpClient()) {
-            File errorDir = new File(Environment.getExternalStorageDirectory().getPath() + "/obd");
-            if (null != errorDir.listFiles()) {
-                MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
-                multipartBodyBuilder.setType(MultipartBody.FORM);
-                for (File file : errorDir.listFiles()) {
-//                    multipartBodyBuilder.addFormDataPart(RequestBody.create(MEDIA_TYPE_PNG, file)))
-                }
-            }
-        }
     }
 
     public static Resources getResources() {
@@ -123,6 +110,16 @@ public class GlobalUtil {
      */
     public static boolean isNotUIThread() {
         return Looper.myLooper() != Looper.getMainLooper();
+    }
+
+
+    public static void changeBarColor(@ColorRes int colorId) {
+        ImmersionBar.with(GlobalUtil.getMainActivity())
+                .fitsSystemWindows(true)
+                .transparentStatusBar()       // 透明状态栏
+                .statusBarDarkFont(true)      // 状态栏图标深色模式
+                .navigationBarColor(colorId) // 导航栏颜色
+                .init();
     }
 
     public static boolean isPhone(String phone) {

@@ -13,7 +13,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.alibaba.fastjson.JSON;
-import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.BackStackManager;
 import com.miyuan.adas.BasePage;
 import com.miyuan.adas.GlobalUtil;
@@ -96,24 +94,23 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        ImmersionBar.with(this)
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
+        if (GlobalUtil.getMainActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            GlobalUtil.changeBarColor(android.R.color.black);
+        } else {
+            GlobalUtil.changeBarColor(android.R.color.white);
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().setBackgroundDrawableResource(android.R.color.white);
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         GlobalUtil.setMainActivity(this);
 
         rootViewGroup = new FrameLayout(this);
 
         // 页面容器
         final FrameLayout pageContainer = new FrameLayout(this);
+        rootViewGroup.setFitsSystemWindows(true);
         pageContainer.setId(R.id.main_activity_page_layer);
         rootViewGroup.addView(pageContainer, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         // 启动画面
@@ -128,21 +125,13 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         rootViewGroup.addView(splashView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(rootViewGroup, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.BLUETOOTH_CONNECT}, 10001);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH_CONNECT}, 10001);
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA}, 10001);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA}, 10001);
         }
 
         EventBus.getDefault().register(this);
-
-        ImmersionBar.with(this)
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : android.R.color.white)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
-
     }
 
     @Override
@@ -159,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
             }
         }
         if (hasPermissionDismiss) {
+            Log.d("System.exit");
             // 有权限未通过的处理
             System.exit(0);
         } else {
@@ -171,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
     @Override
     protected void onDestroy() {
-        ImmersionBar.with(this).destroy(); //不调用该方法，如果界面bar发生改变，在不关闭app的情况下，退出此界面再进入将记忆最后一次bar改变的状态
         super.onDestroy();
         if (serviceForegroundIntent != null) {
             stopService(serviceForegroundIntent);
@@ -328,14 +317,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         }
         Log.d("checkFirmwareVersion input " + jsonObject.toString());
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_FIRMWARE)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
+        Request request = new Request.Builder().url(URLUtils.UPDATE_FIRMWARE).post(requestBody).addHeader("content-type", "application/json;charset:utf-8").build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -361,44 +345,38 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     }
 
     private void showUpdateConfirmDailog() {
-        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager())
-                .setViewListener(new CustomDialog.ViewListener() {
+        dialog = CustomDialog.create(GlobalUtil.getMainActivity().getSupportFragmentManager()).setViewListener(new CustomDialog.ViewListener() {
+            @Override
+            public void bindView(View view) {
+                TextView textView = view.findViewById(R.id.info);
+                String info = "当前有新版本升级，共需约" + (int) ((updateInfo.getSize() / 1024 * 0.6) / 60) + "分钟。升级过程中不能关闭手机，不能关闭硬件设备，不能做其他任何操作。否则升级失败可能导致设备使用不正常，需要重新升级。";
+                textView.setText(info);
+                view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void bindView(View view) {
-                        TextView textView = view.findViewById(R.id.info);
-                        String info = "当前有新版本升级，共需约" + (int) ((updateInfo.getSize() / 1024 * 0.6) / 60) + "分钟。升级过程中不能关闭手机，不能关闭硬件设备，不能做其他任何操作。否则升级失败可能导致设备使用不正常，需要重新升级。";
-                        textView.setText(info);
-                        view.findViewById(R.id.update).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                OBDUpdatePage page = new OBDUpdatePage();
-                                Bundle bundle = new Bundle();
-                                bundle.putString("url", updateInfo.getUrl());
-                                bundle.putString("serialNumber", obdStatusInfo.getSn());
-                                bundle.putString("bVersion", obdStatusInfo.getbVersion());
-                                bundle.putString("pVersion", obdStatusInfo.getpVersion());
-                                bundle.putString("message", updateInfo.getDesc());
-                                bundle.putInt("size", updateInfo.getSize());
-                                bundle.putInt("id", updateInfo.getId());
-                                page.setDate(bundle);
-                                PageManager.go(page);
-                                dialog.dismiss();
-                            }
-                        });
-
-                        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                dialog.dismiss();
-                            }
-                        });
+                    public void onClick(View v) {
+                        OBDUpdatePage page = new OBDUpdatePage();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("url", updateInfo.getUrl());
+                        bundle.putString("serialNumber", obdStatusInfo.getSn());
+                        bundle.putString("bVersion", obdStatusInfo.getbVersion());
+                        bundle.putString("pVersion", obdStatusInfo.getpVersion());
+                        bundle.putString("message", updateInfo.getDesc());
+                        bundle.putInt("size", updateInfo.getSize());
+                        bundle.putInt("id", updateInfo.getId());
+                        page.setDate(bundle);
+                        PageManager.go(page);
+                        dialog.dismiss();
                     }
-                })
-                .setLayoutRes(R.layout.dailog_update)
-                .setDimAmount(0.5f)
-                .isCenter(true)
-                .setWidth(OBDUtils.getDimens(this, R.dimen.dailog_width))
-                .show();
+                });
+
+                view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        }).setLayoutRes(R.layout.dailog_update).setDimAmount(0.5f).isCenter(true).setWidth(OBDUtils.getDimens(this, R.dimen.dailog_width)).show();
     }
 
     /**
@@ -418,14 +396,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
         Log.d("updateWarmParams input " + jsonObject.toString());
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_WARM_PARAMS)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
+        Request request = new Request.Builder().url(URLUtils.UPDATE_WARM_PARAMS).post(requestBody).addHeader("content-type", "application/json;charset:utf-8").build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -460,14 +433,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
         Log.d("updateStateParams input " + jsonObject.toString());
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_STATE_PARAMS)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
+        Request request = new Request.Builder().url(URLUtils.UPDATE_STATE_PARAMS).post(requestBody).addHeader("content-type", "application/json;charset:utf-8").build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -505,14 +473,9 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
 
         Log.d("updateStatusInfo input " + jsonObject.toString());
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
+        RequestBody requestBody = new FormBody.Builder().add("params", GlobalUtil.encrypt(jsonObject.toString())).build();
 
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_TIRE)
-                .post(requestBody)
-                .addHeader("content-type", "application/json;charset:utf-8")
-                .build();
+        Request request = new Request.Builder().url(URLUtils.UPDATE_TIRE).post(requestBody).addHeader("content-type", "application/json;charset:utf-8").build();
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -537,21 +500,12 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
         MediaType type = MediaType.parse("application/octet-stream");//"text/xml;charset=utf-8"
         RequestBody fileBody = RequestBody.create(type, file);
 
-        RequestBody multipartBody = new MultipartBody.Builder()
-                .setType(MultipartBody.ALTERNATIVE)
+        RequestBody multipartBody = new MultipartBody.Builder().setType(MultipartBody.ALTERNATIVE)
                 //一样的效果
-                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn()))
-                .addPart(MultipartBody.Part.createFormData("type", "4"))
-                .addPart(Headers.of(
-                                "Content-Disposition",
-                                "form-data; name=\"file\"; filename=\"car\"")
-                        , fileBody).build();
+                .addPart(MultipartBody.Part.createFormData("serialNumber", obdStatusInfo.getSn())).addPart(MultipartBody.Part.createFormData("type", "4")).addPart(Headers.of("Content-Disposition", "form-data; name=\"file\"; filename=\"car\""), fileBody).build();
 
 
-        Request request = new Request.Builder()
-                .url(URLUtils.UPDATE_ERROR_FILE)
-                .post(multipartBody)
-                .build();
+        Request request = new Request.Builder().url(URLUtils.UPDATE_ERROR_FILE).post(multipartBody).build();
 
         GlobalUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

@@ -7,7 +7,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -37,7 +36,7 @@ import com.amap.api.navi.model.AMapServiceAreaInfo;
 import com.amap.api.navi.model.AimLessModeCongestionInfo;
 import com.amap.api.navi.model.AimLessModeStat;
 import com.amap.api.navi.model.NaviInfo;
-import com.gyf.barlibrary.ImmersionBar;
+import com.gyf.immersionbar.ImmersionBar;
 import com.miyuan.adas.BasePage;
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
@@ -115,6 +114,13 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     @Override
     public void onResume() {
         super.onResume();
+//        GlobalUtil.changeBarColor(R.color.main_title_color);
+        ImmersionBar.with(getFragment())
+                .fitsSystemWindows(true)
+                .transparentStatusBar()       // 透明状态栏
+                .statusBarDarkFont(true)      // 状态栏图标深色模式
+                .navigationBarColor(R.color.main_title_color) // 导航栏颜色
+                .init();
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         BlueManager.getInstance().addBleCallBackListener(this);
         BlueManager.getInstance().send(ProtocolUtils.checkMatchingStatus());
@@ -128,11 +134,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
         naviV.setOnClickListener(this);
         fmView.setOnClickListener(this);
         title.setText("汽车卫士");
-        ImmersionBar.with(MainActivity.getInstance())
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(MainActivity.getInstance().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : R.color.main_title_color)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
         BlueManager.getInstance().setNavi(false);
         if (null != heartTimer) {
             heartTimer.cancel();

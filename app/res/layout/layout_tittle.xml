@@ -3,7 +3,7 @@
     android:id="@+id/tittle_layout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/title_height"
-    android:background="@drawable/title_bg"
+    android:background="@color/main_title_color"
     android:orientation="horizontal">
 
     <LinearLayout

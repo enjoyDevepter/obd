@@ -1,13 +1,18 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
@@ -43,8 +48,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
-
 @PageSetting(contentViewId = R.layout.choice_car_layout)
 public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
 
@@ -72,6 +75,11 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = GlobalUtil.getMainActivity().getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.setStatusBarColor(GlobalUtil.getMainActivity().getResources().getColor(R.color.main_title_color));
+        }
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         title.setText("选择车型");
         next.setOnClickListener(this);
@@ -83,6 +91,17 @@ public class ChoiceCarPage extends AppBasePage implements View.OnClickListener {
     @Override
     public void onStop() {
         super.onStop();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = GlobalUtil.getMainActivity().getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.setStatusBarColor(GlobalUtil.getMainActivity().getResources().getColor(R.color.white));
+        }
     }
 
     /**

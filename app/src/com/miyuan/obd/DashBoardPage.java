@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.view.View;
 import android.widget.TextView;
 
+import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
 import com.miyuan.adas.anno.PageSetting;
 import com.miyuan.adas.anno.ViewInject;
@@ -13,6 +14,7 @@ import com.miyuan.hamster.BlueManager;
 import com.miyuan.hamster.OBDEvent;
 import com.miyuan.hamster.PressureInfo;
 import com.miyuan.hamster.core.ProtocolUtils;
+import com.miyuan.obd.utils.DisplayUtils;
 import com.miyuan.obd.view.TextViewFontLcdEx;
 
 import java.util.Timer;
@@ -52,6 +54,7 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
     @Override
     public void onResume() {
         super.onResume();
+        GlobalUtil.changeBarColor(R.color.transparent);
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         BlueManager.getInstance().addBleCallBackListener(this);
         heartTimer = new Timer();
@@ -117,6 +120,8 @@ public class DashBoardPage extends AppBasePage implements View.OnClickListener, 
             speedRotation = -120;
         }
         ObjectAnimator animationBigPointer = ObjectAnimator.ofFloat(dazhenV, "rotation", preSpeedRotation, speedRotation);
+        dazhenV.setPivotX(dazhenV.getWidth() / 2);
+        dazhenV.setPivotY(dazhenV.getHeight() - DisplayUtils.dp2px(10));
         animationBigPointer.start();
         preSpeedRotation = speedRotation;
 

@@ -1,19 +1,22 @@
 package com.miyuan.obd;
 
+import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Environment;
 import android.text.Html;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.BasePage;
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
@@ -51,8 +54,6 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.miyuan.obd.preferences.SettingPreferencesConfig.SN;
 
 @PageSetting(contentViewId = R.layout.main_layout, flag = BasePage.FLAG_SINGLE_TASK)
 public class MainPage extends AppBasePage implements View.OnClickListener, BleCallBackListener {
@@ -126,11 +127,11 @@ public class MainPage extends AppBasePage implements View.OnClickListener, BleCa
                 BlueManager.getInstance().send(ProtocolUtils.sentHeart());
             }
         }, 1000 * 30, 1000 * 60);
-        ImmersionBar.with(MainActivity.getInstance())
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(MainActivity.getInstance().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? android.R.color.black : R.color.main_title_color)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = GlobalUtil.getMainActivity().getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.setStatusBarColor(GlobalUtil.getMainActivity().getResources().getColor(R.color.colorPrimary));
+        }
     }
 
     @Override

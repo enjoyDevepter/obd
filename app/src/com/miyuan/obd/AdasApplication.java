@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.view.WindowManager;
 
 import com.miyuan.adas.GlobalUtil;
+import com.miyuan.hamster.log.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,9 +79,9 @@ public class AdasApplication extends Application {
     public void onCreate() {
         super.onCreate();
         GlobalUtil.setContext(this);
+        Log.init(this);
         GlobalUtil.setHandler(new Handler());
         registerUncaughtException();
-
         GlobalUtil.setOkHttpClient(new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)

@@ -212,11 +212,11 @@
 
                     <ImageView
                         android:id="@+id/dazhen"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="5dp"
+                        android:layout_height="110dp"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="@dimen/layout_marginTop7"
-                        android:src="@drawable/changzhen_v" />
+                        android:src="@drawable/ic_blue_plate_speed_pointer" />
 
                     <LinearLayout
                         android:id="@+id/line_speed"

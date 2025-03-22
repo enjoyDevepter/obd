@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.gyf.immersionbar.ImmersionBar;
+import com.miyuan.android.core.R;
+
 /**
  * @author guomin Fragment基类
  */
@@ -25,6 +28,14 @@ public abstract class BaseFragment extends Fragment {
 
     public BaseFragment() {
         super();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) {
+            ImmersionBar.destroy(this);
+        }
     }
 
     @Override
@@ -78,6 +89,12 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public void onResume() {
+        ImmersionBar.with(this)
+                .fitsSystemWindows(true)
+                .transparentStatusBar()       // 透明状态栏
+                .statusBarDarkFont(true)      // 状态栏图标深色模式
+                .navigationBarColor(R.color.white_core) // 导航栏颜色
+                .init();
         super.onResume();
         lifeCycleListener.onResume();
     }

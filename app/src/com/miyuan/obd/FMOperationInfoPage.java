@@ -2,7 +2,7 @@ package com.miyuan.obd;
 
 import android.view.View;
 
-import com.gyf.barlibrary.ImmersionBar;
+import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
 import com.miyuan.adas.anno.PageSetting;
 import com.miyuan.adas.anno.ViewInject;
@@ -23,15 +23,11 @@ public class FMOperationInfoPage extends AppBasePage implements View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
+        GlobalUtil.changeBarColor(R.color.white);
         back.setOnClickListener(this);
         homeV.setOnClickListener(this);
         infoV.setOnClickListener(this);
         confirmV.setOnClickListener(this);
-        ImmersionBar.with(MainActivity.getInstance())
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(android.R.color.white)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
     }
 
     @Override

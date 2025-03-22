@@ -7,7 +7,14 @@
     <color name="seekbar_textcolor_light">#FF2EA69C</color>
     <color name="seekbar_textcolor_gray">#809398</color>
     <color name="seekbar_textcolor_red">#FFFF0000</color>
-
+    <color name="colorPrimary">#FF35BDB2</color>
+    <color name="theme_bg">#FFF0F2F6</color>
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="gray">#666</color>
+    <color name="light_gray">#999</color>
+    <color name="transparent">#00000000</color>
+    <color name="colorAccent">#D81B60</color>
 
     <color name="title">#FF4A4A4A</color>
     <color name="text_color">#FF4A4A4A</color>

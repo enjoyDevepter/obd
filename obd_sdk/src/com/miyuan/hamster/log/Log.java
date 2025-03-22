@@ -1,30 +1,50 @@
 package com.miyuan.hamster.log;
 
-import android.os.Environment;
+import android.content.Context;
 
-import java.io.File;
+import com.miyuan.hamster.BuildConfig;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-/**
- * Created by guomin on 2018/4/23.
- */
-
 public class Log {
 
-    public final static String TAG = "OBD_CORE";
-    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
 
-    static {
-        Timber.plant(new Timber.DebugTree());
-        Timber.plant(new FileLoggingTree(Environment.getExternalStorageDirectory().getPath() + File.separator + "obd" + File.separator + "log"));
+    public final static String TAG = "OBD_CORE";
+    private static ThreadPoolExecutor singleThreadExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, queue);
+
+    public static void init(Context context) {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());// 调试模式下输出日志到 Logcat
+        } else {
+            Timber.plant(new FileLoggingTree(context.getExternalFilesDir(null).getAbsolutePath())); // 生产环境自定义日志行为（如不输出）
+        }
     }
 
     public static void d(String message) {
-        Timber.tag(TAG);
-        Timber.d("Thread id  " + Thread.currentThread() + "  " + simpleDateFormat.format(new Date()) + "   " + message + "\n");
+        singleThreadExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                Timber.tag(TAG);
+                Timber.d(simpleDateFormat.format(new Date()) + "   " + message + "\n");
+            }
+        });
+    }
+
+    public static String toString(Throwable ex) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        pw.flush();
+        return ex.toString();
     }
 }
-

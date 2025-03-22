@@ -21,7 +21,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
 import com.miyuan.adas.anno.PageSetting;
@@ -71,6 +70,7 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
     @Override
     public void onResume() {
         super.onResume();
+        GlobalUtil.changeBarColor(R.color.white);
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         BlueManager.getInstance().addBleCallBackListener(this);
         titleTV.setText("正在体检");
@@ -86,12 +86,6 @@ public class PhysicalPage extends AppBasePage implements View.OnClickListener, B
         normalAdapter = new NormalAdapter(physicalList);
         contentLV.setLayoutManager(new LinearLayoutManager(getContext()));
         contentLV.setAdapter(normalAdapter);
-
-        ImmersionBar.with(GlobalUtil.getMainActivity())
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(android.R.color.white)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
     }
 
     private void initPhysical() {

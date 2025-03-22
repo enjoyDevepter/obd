@@ -145,6 +145,10 @@ public abstract class FragmentPage extends BasePage {
         }
     }
 
+    public PageFragment getFragment() {
+        return fragment;
+    }
+
     @Override
     public boolean onBackPressed() {
         return super.onBackPressed();

@@ -5,7 +5,6 @@ import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
-import com.gyf.barlibrary.ImmersionBar;
 import com.miyuan.adas.GlobalUtil;
 import com.miyuan.adas.PageManager;
 import com.miyuan.adas.anno.PageSetting;
@@ -45,11 +44,7 @@ public class PhysicalReadyPage extends AppBasePage implements View.OnClickListen
     @Override
     public void onResume() {
         super.onResume();
-        ImmersionBar.with(GlobalUtil.getMainActivity())
-                .fitsSystemWindows(true)
-                .statusBarDarkFont(true)
-                .statusBarColor(android.R.color.white)
-                .init(); //初始化，默认透明状态栏和黑色导航栏
+        GlobalUtil.changeBarColor(R.color.white);
         MainActivity.getInstance().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         titleTV.setText("准备体检");
         backV.setOnClickListener(this);

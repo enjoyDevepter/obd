@@ -2,7 +2,6 @@ package com.miyuan.hamster;
 
 import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -125,7 +124,6 @@ public class BlueManager {
          * @param rssi
          * @param scanRecord
          */
-        @SuppressLint("MissingPermission")
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, final byte[] scanRecord) {
             if (null == device) {
@@ -148,7 +146,6 @@ public class BlueManager {
 
     MediaPlayer player;
 
-    @SuppressLint("MissingPermission")
     private BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -349,7 +346,6 @@ public class BlueManager {
     }
 
     @MainThread
-    @SuppressLint("MissingPermission")
     public void init(Activity activity) {
         mContext = activity;
         if (isSupportBle()) {
@@ -374,9 +370,8 @@ public class BlueManager {
         startScan();
     }
 
-    @SuppressLint("MissingPermission")
     public synchronized void startScan() {
-//        Log.d("startScan  " + isScaning + " mBluetoothAdapter   " + (null == mBluetoothAdapter));
+        Log.d("startScan  " + isScaning + " mBluetoothAdapter   " + (null == mBluetoothAdapter));
         if (null == mBluetoothAdapter || isScaning) {
             return;
         }
@@ -403,16 +398,15 @@ public class BlueManager {
                 stopScan(false);
             }
         }, 10000);
-//        Log.d("startScan   success");
+        Log.d("startScan   success");
 
     }
 
-    @SuppressLint("MissingPermission")
     public synchronized void stopScan(boolean find) {
         if (null == mBluetoothAdapter || !isScaning) {
             return;
         }
-//        Log.d("stopScan  ");
+        Log.d("stopScan  ");
         isScaning = false;
         if (isNavi && !find) {
             startScan();
@@ -422,7 +416,6 @@ public class BlueManager {
         mBluetoothAdapter.stopLeScan(leScanCallback);
     }
 
-    @SuppressLint("MissingPermission")
     void connect(String address) {
 
         BluetoothDevice bluetoothDevice = mBluetoothAdapter.getRemoteDevice(address);
@@ -441,7 +434,6 @@ public class BlueManager {
     /**
      * 断开链接
      */
-    @SuppressLint("MissingPermission")
     public synchronized void disconnect() {
 
         Log.d(" disconnect ");
@@ -590,7 +582,6 @@ public class BlueManager {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private void realWrite(byte[] data) {
         if (mBluetoothGatt == null || writeCharacteristic == null) {
             return;
