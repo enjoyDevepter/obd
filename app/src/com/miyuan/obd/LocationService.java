@@ -2,6 +2,7 @@ package com.miyuan.obd;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
@@ -70,8 +71,8 @@ public class LocationService extends Service {
                 "后台运行...", content,
                 CHANNEL_ID, CHANNEL_NAME);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(NotificationUtil.NOTIFICATION_ID, notificationUtil.getNotification());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NotificationUtil.NOTIFICATION_ID, notificationUtil.getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
         } else {
             notificationUtil.showNotification();
         }

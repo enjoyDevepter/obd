@@ -70,8 +70,12 @@ public class NotificationUtil {
         Intent notificationIntent = new Intent(ctx, ctx.getClass());
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            flags |= PendingIntent.FLAG_IMMUTABLE; // Works on API 23+
+        }
         pendingIntent = PendingIntent.getActivity(
-                ctx, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                ctx, 0, notificationIntent, flags);
         builder.setContentIntent(pendingIntent);
 
         notification = builder.build();
