@@ -27,7 +27,7 @@ public abstract class FragmentPage extends BasePage {
 
     @Override
     final protected void doInit() {
-        Log.e("page","doInit="+this.getClass().getName());
+        Log.e("page", "doInit=" + this.getClass().getName());
         fragment = new PageFragment();
         fragment.setPage(this);
     }
@@ -65,13 +65,17 @@ public abstract class FragmentPage extends BasePage {
     }
 
     public void replaceAndCommit(int containerViewId, BaseFragment fragment, String tag) {
-        FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-        transaction.replace(containerViewId, fragment);
-        boolean checkBackStack = checkBackStack();
-        if (checkBackStack) {
-            transaction.addToBackStack(tag);
+        FragmentManager supportFragmentManager = activity.getSupportFragmentManager();
+        Fragment fragmentByTag = supportFragmentManager.findFragmentByTag(tag);
+        if (fragmentByTag == null) {
+            FragmentTransaction transaction = supportFragmentManager.beginTransaction();
+            transaction.replace(containerViewId, fragment);
+            boolean checkBackStack = checkBackStack();
+            if (checkBackStack) {
+                transaction.addToBackStack(tag);
+            }
+            setId(transaction.commitAllowingStateLoss());
         }
-        setId(transaction.commitAllowingStateLoss());
     }
 
     /**

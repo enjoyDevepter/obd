@@ -6,8 +6,8 @@ android {
         minSdk appMinSdk
         targetSdk appTargetSdk
         applicationId "com.miyuan.obd"
-        versionCode 1400
-        versionName "3.1"
+        versionCode 1401
+        versionName "3.1.2"
         flavorDimensions "default"
 
         externalNativeBuild {

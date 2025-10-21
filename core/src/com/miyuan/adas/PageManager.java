@@ -17,27 +17,31 @@ public class PageManager {
     }
 
     public static void go(@NonNull BasePage page) {
-        switch (page.getFlag()) {
-            case BasePage.FLAG_SINGLE_TASK:// singleTask机制
-                // 的Page,打开页面时是将该页面之上所有Page都清除
-                BasePage targetPage = backStackManager.findPageAndSkipBetweenPages(page.getClass());
-                if (null != targetPage) {
-                    back();
-                    return;
-                }
-                break;
+        try {
+            switch (page.getFlag()) {
+                case BasePage.FLAG_SINGLE_TASK:// singleTask机制
+                    // 的Page,打开页面时是将该页面之上所有Page都清除
+                    BasePage targetPage = backStackManager.findPageAndSkipBetweenPages(page.getClass());
+                    if (null != targetPage) {
+                        back();
+                        return;
+                    }
+                    break;
+            }
+
+            BasePage prev = backStackManager.getCurrent();
+
+            page.setPrev(prev);
+
+            // 设置新的当前Page
+            backStackManager.setCurrent(page);
+
+            page.init();
+
+            page.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        BasePage prev = backStackManager.getCurrent();
-
-        page.setPrev(prev);
-
-        // 设置新的当前Page
-        backStackManager.setCurrent(page);
-
-        page.init();
-
-        page.show();
     }
 
     public static void back() {

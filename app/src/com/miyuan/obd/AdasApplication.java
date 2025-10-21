@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.view.WindowManager;
 
 import com.miyuan.adas.GlobalUtil;
+import com.miyuan.hamster.log.Log;
 import com.tencent.bugly.Bugly;
 
 import java.io.File;
@@ -79,7 +80,7 @@ public class AdasApplication extends Application {
     public void onCreate() {
         super.onCreate();
         GlobalUtil.setContext(this);
-//        Log.init(this);
+        Log.init(this);
         Bugly.init(this, "eee5092297", true);
         GlobalUtil.setHandler(new Handler());
         registerUncaughtException();

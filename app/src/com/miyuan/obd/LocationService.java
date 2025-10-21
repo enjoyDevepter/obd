@@ -71,12 +71,11 @@ public class LocationService extends Service {
                 "后台运行...", content,
                 CHANNEL_ID, CHANNEL_NAME);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(NotificationUtil.NOTIFICATION_ID, notificationUtil.getNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
         } else {
             notificationUtil.showNotification();
         }
-
         return START_STICKY;
     }
 
