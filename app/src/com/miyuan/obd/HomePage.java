@@ -98,8 +98,6 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     @ViewInject(R.id.fm)
     private View fmView;
     private OBDStatusInfo obdStatusInfo;
-    private boolean showLane;
-
     private CustomDialog dialog;
 
     private Timer heartTimer = new Timer();
@@ -770,15 +768,12 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                                 }
                                 laneType[i] = (byte) (Integer.valueOf(String.valueOf(aMapLaneInfos[i].getLaneTypeIdArray()[0])) & 0xFF);
                             }
-                            Log.d("aMapLaneInfo showLane  laneType1 " + showLane + "   " + Arrays.toString(laneType));
-//                            if (!showLane) {
-//                                showLane = true;
+                            Log.d("aMapLaneInfo showLane  laneType1 " + Arrays.toString(laneType));
                             if (obdStatusInfo.getHudType() == 0x62 || obdStatusInfo.getHudType() == 0x48) {
                                 BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter, laneType));
                             } else {
                                 BlueManager.getInstance().send(ProtocolUtils.getLineInfo(count > 0 ? true : false, count, enter));
                             }
-//                            }
                         }
 
                         @Override
@@ -793,11 +788,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                             if (endNavi) {
                                 return;
                             }
-                            Log.d("aMapLaneInfo  hideLaneInfo  showLane " + showLane);
-//                            if (showLane) {
-//                                showLane = false;
+                            Log.d("aMapLaneInfo  hideLaneInfo  ");
                             BlueManager.getInstance().send(ProtocolUtils.getLineInfo(false, 0, 0, null));
-//                            }
                         }
 
                         @Override
