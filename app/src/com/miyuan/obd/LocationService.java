@@ -100,7 +100,7 @@ public class LocationService extends Service {
         try {
             AMapLocationClient.updatePrivacyAgree(this, true);
             AMapLocationClient.updatePrivacyShow(this, true, true);
-            getPosition();
+//            getPosition();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
