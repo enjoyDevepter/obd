@@ -99,6 +99,7 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     private View fmView;
     private OBDStatusInfo obdStatusInfo;
     private CustomDialog dialog;
+    private AMapNavi aMapNavi;
 
     private Timer heartTimer = new Timer();
 
@@ -239,6 +240,14 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
     public boolean onBackPressed() {
         PageManager.finishActivity(MainActivity.getInstance());
         return true;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (aMapNavi != null) {
+            aMapNavi = null;
+        }
     }
 
     private void showFMDialog() {
@@ -495,9 +504,8 @@ public class HomePage extends AppBasePage implements View.OnClickListener, BleCa
                     }
                     BlueManager.getInstance().setNavi(true);
                     initTimer();
-                    final AMapNavi aMapNavi;
                     try {
-                        aMapNavi = AMapNavi.getInstance(getContext());
+                        aMapNavi = AMapNavi.getInstance(GlobalUtil.getContext());
                         aMapNavi.addAMapNaviListener(new AMapNaviListener() {
                             @Override
                             public void onInitNaviFailure() {

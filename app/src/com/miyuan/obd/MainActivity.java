@@ -250,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements BleCallBackListen
     @Override
     protected void onResume() {
         super.onResume();
-
         if (serviceForegroundIntent != null) {
 //            AMapNavi.getInstance(this).setIsUseExtraGPSData(false);
             stopService(serviceForegroundIntent);

@@ -79,6 +79,7 @@ public class AdasApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        System.out.println(" ADAS onCreate ");
         GlobalUtil.setContext(this);
         Log.init(this);
         Bugly.init(this, "eee5092297", true);
