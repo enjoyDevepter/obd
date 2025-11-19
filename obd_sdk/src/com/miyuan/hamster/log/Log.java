@@ -2,8 +2,6 @@ package com.miyuan.hamster.log;
 
 import android.content.Context;
 
-import com.miyuan.hamster.BuildConfig;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -23,11 +21,8 @@ public class Log {
     private static ThreadPoolExecutor singleThreadExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, queue);
 
     public static void init(Context context) {
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());// 调试模式下输出日志到 Logcat
-        } else {
-            Timber.plant(new FileLoggingTree(context.getExternalFilesDir(null).getAbsolutePath())); // 生产环境自定义日志行为（如不输出）
-        }
+        Timber.plant(new Timber.DebugTree());// 调试模式下输出日志到 Logcat
+        Timber.plant(new FileLoggingTree(context.getExternalFilesDir(null).getAbsolutePath())); // 生产环境自定义日志行为（如不输出）
     }
 
     public static void d(String message) {
